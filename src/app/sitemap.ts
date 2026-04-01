@@ -3,14 +3,14 @@ import { companies } from '@/data/companies';
 import { sectors } from '@/data/sectors';
 import { blogPosts } from '@/data/blog-posts';
 
-const BASE_URL = 'https://chainflow.vercel.app';
+const BASE_URL = 'https://chainflow-mu.vercel.app';
 const locales = ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'de', 'fr', 'pt', 'hi', 'ar', 'vi', 'th', 'id', 'ru', 'tr'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = [];
 
   // Static pages
-  const staticPages = ['', '/explore', '/cascade', '/signals', '/news-gap', '/about', '/blog'];
+  const staticPages = ['', '/explore', '/cascade', '/signals', '/news-gap', '/about', '/blog', '/how-to-use', '/privacy', '/terms'];
 
   for (const locale of locales) {
     for (const page of staticPages) {
