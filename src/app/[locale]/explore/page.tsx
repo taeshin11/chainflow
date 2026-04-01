@@ -1,5 +1,6 @@
 import ExplorePage from '@/components/pages/ExplorePage';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'Supply Chain Explorer - Interactive Map',
-    description:
-      'Interactive supply chain visualization. Click any company to see suppliers, partners, and institutional flow signals across 5 major sectors.',
+    title: t('exploreTitle'),
+    description: t('exploreDescription'),
     path: '/explore',
     locale: params.locale,
     keywords: [

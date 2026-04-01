@@ -1,6 +1,7 @@
 import CompanyPage from '@/components/pages/CompanyPage';
 import { generateSeoMetadata } from '@/lib/seo';
 import { companies } from '@/data/companies';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -8,17 +9,15 @@ export async function generateMetadata({
 }: {
   params: { locale: string; ticker: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   const company = companies.find(
     (c) => c.ticker.toLowerCase() === params.ticker.toLowerCase()
   );
   const companyName = company ? `${company.name} (${company.ticker})` : params.ticker.toUpperCase();
-  const companyDesc = company
-    ? `${companyName} supply chain relationships, revenue breakdown, institutional signals, and cascade position.`
-    : `${companyName} supply chain analysis, institutional signals, and cascade position.`;
 
   return generateSeoMetadata({
-    title: `${companyName} Supply Chain Analysis`,
-    description: companyDesc,
+    title: `${companyName} - ${t('exploreTitle')}`,
+    description: `${companyName} - ${t('exploreDescription')}`,
     path: `/company/${params.ticker}`,
     locale: params.locale,
     keywords: [

@@ -1,5 +1,6 @@
 import NewsGapPage from '@/components/pages/NewsGapPage';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'News Gap Analyzer - The Silence IS the Signal',
-    description:
-      'Compare institutional buying activity against media coverage. Find stocks where smart money is accumulating but headlines show zero coverage.',
+    title: t('newsGapTitle'),
+    description: t('newsGapDescription'),
     path: '/news-gap',
     locale: params.locale,
     keywords: [

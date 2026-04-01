@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FeedbackWidget from '@/components/FeedbackWidget';
@@ -11,10 +11,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'Supply Chain Institutional Flow Tracker',
-    description:
-      'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.',
+    title: t('homeTitle'),
+    description: t('homeDescription'),
     locale: params.locale,
     keywords: [
       'supply chain',

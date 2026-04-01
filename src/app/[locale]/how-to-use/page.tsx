@@ -1,4 +1,21 @@
 import { Search, GitBranch, Bell, ChevronDown, ChevronRight, HelpCircle, BarChart3, Globe, Shield, Zap, TrendingUp, Network, Newspaper, BookOpen } from 'lucide-react';
+import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
+  return generateSeoMetadata({
+    title: `How to Use - ${t('homeTitle')}`,
+    description: t('homeDescription'),
+    path: '/how-to-use',
+    locale: params.locale,
+  });
+}
 
 export default function HowToUsePage() {
   return (

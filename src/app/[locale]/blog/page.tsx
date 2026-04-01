@@ -1,5 +1,6 @@
 import BlogClient from './BlogClient';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'Supply Chain Investment Insights',
-    description:
-      'Expert analysis on supply chain investing, institutional flow patterns, and cascade trading strategies.',
+    title: t('homeTitle') + ' - Blog',
+    description: t('homeDescription'),
     path: '/blog',
     locale: params.locale,
     keywords: [

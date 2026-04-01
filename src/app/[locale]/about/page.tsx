@@ -1,5 +1,6 @@
 import { Mail, ExternalLink, Shield, Eye, Users, Heart, BarChart3, Globe, Zap, Database, TrendingUp, Network } from 'lucide-react';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'About ChainFlow',
-    description:
-      'Learn about ChainFlow by SPINAI. Free supply chain institutional flow tracker for retail investors.',
+    title: t('aboutTitle'),
+    description: t('aboutDescription'),
     path: '/about',
     locale: params.locale,
     keywords: [

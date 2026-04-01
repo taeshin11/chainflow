@@ -1,4 +1,21 @@
 import { FileText } from 'lucide-react';
+import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
+  return generateSeoMetadata({
+    title: `Terms of Service - ${t('homeTitle')}`,
+    description: t('homeDescription'),
+    path: '/terms',
+    locale: params.locale,
+  });
+}
 
 export default function TermsOfServicePage() {
   return (

@@ -1,5 +1,6 @@
 import HomePage from '@/components/pages/HomePage';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'Track Institutional Supply Chain Flows',
-    description:
-      'Free tool to track how institutional buying flows through supply chain relationships. Map companies, detect signals, and spot cascades before headlines.',
+    title: t('homeTitle'),
+    description: t('homeDescription'),
     path: '',
     locale: params.locale,
     keywords: [

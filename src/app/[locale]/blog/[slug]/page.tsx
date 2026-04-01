@@ -2,6 +2,7 @@ import { blogPosts, getBlogPostBySlug } from '@/data/blog-posts';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import BlogArticleClient from './BlogArticleClient';
 
 export function generateStaticParams() {
@@ -13,10 +14,11 @@ export async function generateMetadata({
 }: {
   params: { locale: string; slug: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   const post = getBlogPostBySlug(params.slug);
   if (!post) return { title: 'Not Found' };
   return generateSeoMetadata({
-    title: post.title,
+    title: `${post.title} - ${t('homeTitle')}`,
     description: post.metaDescription,
     path: `/blog/${params.slug}`,
     locale: params.locale,

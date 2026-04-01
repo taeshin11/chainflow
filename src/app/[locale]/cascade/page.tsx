@@ -1,5 +1,6 @@
 import CascadePage from '@/components/pages/CascadePage';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const t = await getTranslations({ locale: params.locale, namespace: 'seo' });
   return generateSeoMetadata({
-    title: 'Leader-to-Midcap Cascade Tracker',
-    description:
-      'Track how institutional buying cascades from sector leaders to mid-cap stocks. Historical patterns across semiconductors, AI, EV, defense, pharma.',
+    title: t('cascadeTitle'),
+    description: t('cascadeDescription'),
     path: '/cascade',
     locale: params.locale,
     keywords: [
