@@ -10,6 +10,7 @@ interface ProGateProps {
 
 export default function ProGate({ feature, children }: ProGateProps) {
   const t = useTranslations('pro');
+  const tCommon = useTranslations('common');
 
   return (
     <div className="relative">
@@ -43,7 +44,7 @@ export default function ProGate({ feature, children }: ProGateProps) {
                           bg-cf-accent/10 text-cf-accent text-xs font-semibold">
             {t('upgradeCta')}
             <span className="ml-1 px-2 py-0.5 rounded-full bg-cf-accent/20 text-[10px] uppercase tracking-wider">
-              Coming Soon
+              {tCommon('comingSoon')}
             </span>
           </span>
         </div>

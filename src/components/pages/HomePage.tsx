@@ -138,6 +138,7 @@ function MiniGraph() {
 
 export default function HomePage() {
   const t = useTranslations('hero');
+  const tHome = useTranslations('home');
   const tCommon = useTranslations('common');
 
   const socialProof = useInView();
@@ -173,28 +174,24 @@ export default function HomePage() {
                 {tCommon('beta')}
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-cf-text-primary leading-tight mb-6">
-                Track where{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cf-primary to-cf-secondary">
-                  smart money
-                </span>{' '}
-                flows through the supply chain
+                {tHome.rich('heroHeadline', { accent: (chunks) => <span className="text-transparent bg-clip-text bg-gradient-to-r from-cf-primary to-cf-secondary">{chunks}</span> })}
               </h1>
               <p className="text-lg md:text-xl text-cf-text-secondary mb-8 max-w-lg">
                 {t('description')}
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/explore" className="cf-btn-primary text-base px-8 py-3.5 gap-2 shadow-lg shadow-cf-primary/25 hover:shadow-xl hover:shadow-cf-primary/30 transition-all">
-                  Explore Supply Chains
+                  {tHome('exploreSupplyChains')}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/signals" className="cf-btn-secondary text-base px-8 py-3.5">
-                  View Signals
+                  {tHome('viewSignals')}
                 </Link>
               </div>
             </div>
             <div className="cf-card p-6">
               <p className="text-xs text-cf-text-secondary mb-2 font-medium uppercase tracking-wider">
-                Live Supply Chain Preview
+                {tHome('livePreview')}
               </p>
               <MiniGraph />
             </div>
@@ -212,10 +209,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '10,000+', label: 'Investors Tracking Supply Chains', icon: <Users className="w-5 h-5" /> },
-              { value: '30+', label: 'Companies Mapped', icon: <Network className="w-5 h-5" /> },
-              { value: '5', label: 'Sectors Covered', icon: <Globe className="w-5 h-5" /> },
-              { value: '$12B+', label: 'Institutional Flows Tracked', icon: <BarChart3 className="w-5 h-5" /> },
+              { value: '10,000+', label: tHome('socialProof.investors'), icon: <Users className="w-5 h-5" /> },
+              { value: '30+', label: tHome('socialProof.companies'), icon: <Network className="w-5 h-5" /> },
+              { value: '5', label: tHome('socialProof.sectors'), icon: <Globe className="w-5 h-5" /> },
+              { value: '$12B+', label: tHome('socialProof.flows'), icon: <BarChart3 className="w-5 h-5" /> },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-cf-primary/10 text-cf-primary mb-3">
@@ -240,10 +237,10 @@ export default function HomePage() {
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
-            Featured Sectors
+            {tHome('featuredSectors')}
           </h2>
           <p className="text-cf-text-secondary max-w-2xl mx-auto">
-            Dive into supply chain maps and cascade patterns for each major sector.
+            {tHome('featuredSectorsDesc')}
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
@@ -267,11 +264,11 @@ export default function HomePage() {
                 {sector.description.split('.')[0]}.
               </p>
               <div className="flex items-center justify-center gap-1 text-sm font-medium text-cf-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                Explore
+                {tHome('explore')}
                 <ArrowRight className="w-4 h-4" />
               </div>
               <p className="text-xs text-cf-text-secondary mt-2">
-                {sector.companyCount} companies
+                {tHome('companies', { count: sector.companyCount })}
               </p>
             </Link>
           ))}
@@ -289,14 +286,14 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-2">
-                Latest Institutional Signals
+                {tHome('latestSignals')}
               </h2>
               <p className="text-cf-text-secondary">
-                Recent 13F filings showing significant institutional activity.
+                {tHome('latestSignalsDesc')}
               </p>
             </div>
             <Link href="/signals" className="cf-btn-secondary gap-2 hidden md:inline-flex">
-              View All Signals
+              {tHome('viewAllSignals')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -333,7 +330,7 @@ export default function HomePage() {
           </div>
           <div className="mt-6 text-center md:hidden">
             <Link href="/signals" className="cf-btn-secondary gap-2">
-              View All Signals
+              {tHome('viewAllSignals')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -349,39 +346,38 @@ export default function HomePage() {
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
-            Four Lenses on Supply Chain Alpha
+            {tHome('fourLenses')}
           </h2>
           <p className="text-cf-text-secondary max-w-2xl mx-auto">
-            ChainFlow combines supply chain mapping, institutional signal detection, cascade
-            analysis, and news gap scoring into one platform.
+            {tHome('fourLensesDesc')}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
               icon: <Network className="w-6 h-6" />,
-              title: 'Supply Chain Maps',
+              title: tHome('featureCards.supplyChainMaps'),
               desc: t('features.realtimeDesc'),
               color: 'text-cf-primary bg-cf-primary/10',
               href: '/explore',
             },
             {
               icon: <TrendingUp className="w-6 h-6" />,
-              title: 'Institutional Flow Signals',
+              title: tHome('featureCards.institutionalFlowSignals'),
               desc: t('features.signalsDesc'),
               color: 'text-cf-secondary bg-cf-secondary/10',
               href: '/signals',
             },
             {
               icon: <Layers className="w-6 h-6" />,
-              title: 'Leader-to-Midcap Cascade',
+              title: tHome('featureCards.leaderToMidcapCascade'),
               desc: t('features.cascadeDesc'),
               color: 'text-cf-accent bg-cf-accent/10',
               href: '/cascade',
             },
             {
               icon: <Newspaper className="w-6 h-6" />,
-              title: 'News Gap Analyzer',
+              title: tHome('featureCards.newsGapAnalyzer'),
               desc: t('features.newsGapDesc'),
               color: 'text-cf-danger bg-cf-danger/10',
               href: '/news-gap',
@@ -416,25 +412,25 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
-              How It Works
+              {tHome('howItWorks')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 step: '1',
-                title: 'Map the Chain',
-                desc: 'Explore interactive supply chain graphs showing how companies are connected through supplier, customer, and partner relationships.',
+                title: tHome('steps.mapTheChain'),
+                desc: tHome('steps.mapTheChainDesc'),
               },
               {
                 step: '2',
-                title: 'Detect the Signal',
-                desc: 'Monitor institutional 13F filings for unusual accumulation patterns. Cross-reference with media coverage to find the news gap.',
+                title: tHome('steps.detectTheSignal'),
+                desc: tHome('steps.detectTheSignalDesc'),
               },
               {
                 step: '3',
-                title: 'Trade the Cascade',
-                desc: 'When a leader stock moves, use our cascade tracker to identify which downstream stocks will follow and when.',
+                title: tHome('steps.tradeTheCascade'),
+                desc: tHome('steps.tradeTheCascadeDesc'),
               },
             ].map((item) => (
               <div key={item.step} className="text-center">
@@ -450,7 +446,7 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-10">
             <Link href="/explore" className="cf-btn-primary text-base px-10 py-3.5 gap-2 shadow-lg shadow-cf-primary/25">
-              Start Exploring Now
+              {tHome('startExploringNow')}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -463,9 +459,7 @@ export default function HomePage() {
       {/* Disclaimer */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
         <div className="text-center text-xs text-cf-text-secondary max-w-2xl mx-auto bg-white/60 rounded-xl p-4 border border-cf-border">
-          ChainFlow provides supply chain data for informational purposes only. It does not
-          constitute financial advice. Past institutional activity does not guarantee future
-          returns. Always conduct your own research before making investment decisions.
+          {tHome('disclaimer')}
         </div>
       </section>
     </div>

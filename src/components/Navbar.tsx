@@ -78,7 +78,7 @@ export default function Navbar() {
                            transition-all duration-200 flex items-center gap-1"
               >
                 <MessageCircle className="w-3 h-3" />
-                Feedback
+                {t('feedback')}
               </a>
             </div>
 

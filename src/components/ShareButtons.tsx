@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Link as LinkIcon, Check } from 'lucide-react';
 
 interface ShareButtonsProps {
@@ -9,6 +10,7 @@ interface ShareButtonsProps {
 }
 
 export default function ShareButtons({ title, url }: ShareButtonsProps) {
+  const t = useTranslations('common');
   const [copied, setCopied] = useState(false);
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://chainflow-mu.vercel.app');
@@ -34,7 +36,7 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-cf-text-secondary mr-1">Share:</span>
+      <span className="text-xs text-cf-text-secondary mr-1">{t('share')}:</span>
       <a
         href={twitterUrl}
         target="_blank"

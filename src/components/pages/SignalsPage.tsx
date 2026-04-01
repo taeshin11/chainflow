@@ -26,11 +26,11 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-const actionColors: Record<string, { text: string; bg: string; label: string }> = {
-  accumulating: { text: 'text-green-600', bg: 'bg-green-50', label: 'Accumulating' },
-  reducing: { text: 'text-red-600', bg: 'bg-red-50', label: 'Reducing' },
-  new_position: { text: 'text-blue-600', bg: 'bg-blue-50', label: 'New Position' },
-  exit: { text: 'text-orange-600', bg: 'bg-orange-50', label: 'Exit' },
+const actionColors: Record<string, { text: string; bg: string; key: string }> = {
+  accumulating: { text: 'text-green-600', bg: 'bg-green-50', key: 'accumulating' },
+  reducing: { text: 'text-red-600', bg: 'bg-red-50', key: 'reducing' },
+  new_position: { text: 'text-blue-600', bg: 'bg-blue-50', key: 'new_position' },
+  exit: { text: 'text-orange-600', bg: 'bg-orange-50', key: 'exit' },
 };
 
 const actionIcons: Record<string, React.ReactNode> = {
@@ -128,7 +128,7 @@ export default function SignalsPage() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-cf-text-secondary" />
-            <span className="text-sm font-medium text-cf-text-secondary">Filters:</span>
+            <span className="text-sm font-medium text-cf-text-secondary">{t('filters')}:</span>
           </div>
 
           <select
@@ -136,7 +136,7 @@ export default function SignalsPage() {
             onChange={(e) => setSectorFilter(e.target.value)}
             className="cf-input w-auto text-sm py-1.5"
           >
-            <option value="all">All Sectors</option>
+            <option value="all">{t('allSectors')}</option>
             {sectors.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -149,11 +149,11 @@ export default function SignalsPage() {
             onChange={(e) => setActionFilter(e.target.value)}
             className="cf-input w-auto text-sm py-1.5"
           >
-            <option value="all">All Actions</option>
-            <option value="accumulating">Accumulating</option>
-            <option value="reducing">Reducing</option>
-            <option value="new_position">New Position</option>
-            <option value="exit">Exit</option>
+            <option value="all">{t('allActions')}</option>
+            <option value="accumulating">{t('actions.accumulating')}</option>
+            <option value="reducing">{t('actions.reducing')}</option>
+            <option value="new_position">{t('actions.new_position')}</option>
+            <option value="exit">{t('actions.exit')}</option>
           </select>
 
           <div className="flex items-center gap-2 ml-auto">
@@ -163,9 +163,9 @@ export default function SignalsPage() {
               onChange={(e) => setSortBy(e.target.value as SortKey)}
               className="cf-input w-auto text-sm py-1.5"
             >
-              <option value="date">Sort by Date</option>
-              <option value="value">Sort by Value</option>
-              <option value="gap">Sort by Gap Score</option>
+              <option value="date">{t('sortByDate')}</option>
+              <option value="value">{t('sortByValue')}</option>
+              <option value="gap">{t('sortByGap')}</option>
             </select>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function SignalsPage() {
         {/* Sector breakdown chart */}
         <div className="cf-card p-6">
           <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
-            Sector Activity
+            {t('sectorActivity')}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -194,7 +194,7 @@ export default function SignalsPage() {
         {/* Top Institutions */}
         <div className="cf-card p-6 lg:col-span-2">
           <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
-            Most Active Institutions
+            {t('mostActiveInstitutions')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {topInstitutions.map(([name, count], i) => (
@@ -211,7 +211,7 @@ export default function SignalsPage() {
                   </span>
                 </div>
                 <span className="text-xs text-cf-text-secondary bg-white px-2 py-1 rounded-full">
-                  {count} signals
+                  {t('signalsCount', { count })}
                 </span>
               </div>
             ))}
@@ -226,25 +226,25 @@ export default function SignalsPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-cf-border">
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  Company
+                  {t('company')}
                 </th>
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  Institution
+                  {t('institution')}
                 </th>
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  Action
+                  {t('action')}
                 </th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  Shares Changed
+                  {t('sharesChanged')}
                 </th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  Value
+                  {t('value')}
                 </th>
                 <th className="text-center py-3 px-4 text-cf-text-secondary font-medium">
-                  Gap Score
+                  {t('gapScore')}
                 </th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  Filing Date
+                  {t('filingDate')}
                 </th>
               </tr>
             </thead>
@@ -273,7 +273,7 @@ export default function SignalsPage() {
                         className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${action.bg} ${action.text}`}
                       >
                         {actionIcons[sig.action]}
-                        {action.label}
+                        {t(`actions.${action.key}`)}
                       </span>
                     </td>
                     <td className="text-right py-3 px-4 font-mono text-xs text-cf-text-secondary">
@@ -311,7 +311,7 @@ export default function SignalsPage() {
         </div>
         {filtered.length === 0 && (
           <div className="py-12 text-center text-cf-text-secondary">
-            No signals match your filters. Try adjusting the criteria.
+            {t('noSignalsMatch')}
           </div>
         )}
       </div>

@@ -31,14 +31,13 @@ export default function CascadePage() {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cf-accent/10 text-cf-accent text-sm font-medium mb-4">
           <Layers className="w-4 h-4" />
-          Cascade Tracker
+          {t('tracker')}
         </div>
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          Leader-to-Midcap Cascade Tracker
+          {t('leaderToMidcap')}
         </h1>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
-          {t('subtitle')}. When a leader stock moves, the signal cascades through
-          suppliers, customers, and mid-cap names over days.
+          {t('subtitle')}. {t('cascadeDescription')}
         </p>
       </div>
 
@@ -68,7 +67,7 @@ export default function CascadePage() {
                         {pattern.leaderName} Cascade
                       </h3>
                       <p className="text-xs text-cf-text-secondary mt-0.5">
-                        Leader: {pattern.leaderTicker}
+                        {t('leader')}: {pattern.leaderTicker}
                       </p>
                     </div>
                     <div
@@ -86,7 +85,7 @@ export default function CascadePage() {
                   <div className="flex items-center gap-4 text-xs text-cf-text-secondary mb-4">
                     <span className="flex items-center gap-1">
                       <Hash className="w-3.5 h-3.5" />
-                      {pattern.sequence.length} steps
+                      {t('steps', { count: pattern.sequence.length })}
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
@@ -94,7 +93,7 @@ export default function CascadePage() {
                     </span>
                     <span className="flex items-center gap-1">
                       <TrendingUp className="w-3.5 h-3.5" />
-                      {pattern.historicalOccurrences.length} events
+                      {t('events', { count: pattern.historicalOccurrences.length })}
                     </span>
                   </div>
 
@@ -122,7 +121,7 @@ export default function CascadePage() {
                     ))}
                     {pattern.sequence.length > 5 && (
                       <span className="text-xs text-cf-text-secondary">
-                        +{pattern.sequence.length - 5} more
+                        {t('more', { count: pattern.sequence.length - 5 })}
                       </span>
                     )}
                   </div>

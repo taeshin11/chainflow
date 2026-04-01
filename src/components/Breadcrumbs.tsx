@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { usePathname } from '@/i18n/routing';
 import { Link } from '@/i18n/routing';
 import { ChevronRight, Home } from 'lucide-react';
@@ -19,6 +20,7 @@ function formatSegment(segment: string): string {
 }
 
 export default function Breadcrumbs({ overrides = {} }: BreadcrumbsProps) {
+  const t = useTranslations('common');
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
 
@@ -36,7 +38,7 @@ export default function Breadcrumbs({ overrides = {} }: BreadcrumbsProps) {
       {
         '@type': 'ListItem',
         position: 1,
-        name: 'Home',
+        name: t('home'),
         item: 'https://chainflow-mu.vercel.app',
       },
       ...crumbs.map((crumb, i) => ({
@@ -58,7 +60,7 @@ export default function Breadcrumbs({ overrides = {} }: BreadcrumbsProps) {
               className="hover:text-cf-primary transition-colors flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
-              <span className="sr-only">Home</span>
+              <span className="sr-only">{t('home')}</span>
             </Link>
           </li>
           {crumbs.map((crumb) => (

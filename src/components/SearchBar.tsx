@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Search, X } from 'lucide-react';
+import { companyNamesI18n, sectorNamesI18n } from '@/data/company-names-i18n';
 
 interface Company {
   name: string;
@@ -28,7 +29,17 @@ export default function SearchBar({ companies, className = '' }: SearchBarProps)
   const filtered = query.trim().length > 0
     ? companies.filter((c) => {
         const q = query.toLowerCase();
-        return c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q);
+        // Match English name and ticker
+        if (c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q)) return true;
+        // Match localized company names
+        const localizedNames = companyNamesI18n[c.ticker];
+        if (localizedNames?.some((name) => name.toLowerCase().includes(q))) return true;
+        // Match localized sector names
+        if (c.sector) {
+          const localizedSectors = sectorNamesI18n[c.sector];
+          if (localizedSectors?.some((name) => name.toLowerCase().includes(q))) return true;
+        }
+        return false;
       }).slice(0, 8)
     : [];
 

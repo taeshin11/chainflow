@@ -1,15 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Lightbulb, X, Send } from 'lucide-react';
 
-const feedbackTypes = [
-  { value: 'bug', label: 'Bug Report' },
-  { value: 'feature', label: 'Feature Request' },
-  { value: 'general', label: 'General Feedback' },
-] as const;
-
 export default function FeedbackWidget() {
+  const t = useTranslations('feedback');
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState('general');
   const [message, setMessage] = useState('');
@@ -38,7 +34,7 @@ export default function FeedbackWidget() {
                       : 'opacity-100 scale-100'
                     }`}
         style={{ backgroundColor: '#6CB4A8', color: '#FFFFFF' }}
-        aria-label="Send Feedback"
+        aria-label={t('sendFeedback')}
       >
         <Lightbulb className="w-6 h-6" />
       </button>
@@ -66,10 +62,10 @@ export default function FeedbackWidget() {
           <div className="flex items-center justify-between px-5 py-4 border-b border-cf-border">
             <div>
               <h3 className="text-base font-heading font-semibold text-cf-text-primary">
-                Send Feedback
+                {t('sendFeedback')}
               </h3>
               <p className="text-xs text-cf-text-secondary mt-0.5">
-                Help us improve ChainFlow
+                {t('helpImprove')}
               </p>
             </div>
             <button
@@ -88,30 +84,28 @@ export default function FeedbackWidget() {
             {/* Type selector */}
             <div>
               <label className="block text-sm font-medium text-cf-text-primary mb-1.5">
-                Feedback Type
+                {t('feedbackType')}
               </label>
               <select
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
                 className="w-full rounded-lg border border-cf-border bg-white px-3 py-2 text-sm text-cf-text-primary focus:outline-none focus:ring-2 focus:ring-cf-primary/30 focus:border-cf-primary transition-colors"
               >
-                {feedbackTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
+                <option value="bug">{t('bugReport')}</option>
+                <option value="feature">{t('featureRequest')}</option>
+                <option value="general">{t('generalFeedback')}</option>
               </select>
             </div>
 
             {/* Message */}
             <div>
               <label className="block text-sm font-medium text-cf-text-primary mb-1.5">
-                Message
+                {t('message')}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tell us what's on your mind..."
+                placeholder={t('tellUs')}
                 rows={4}
                 required
                 className="w-full rounded-lg border border-cf-border bg-white px-3 py-2 text-sm text-cf-text-primary placeholder:text-cf-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-cf-primary/30 focus:border-cf-primary transition-colors resize-none"
@@ -125,7 +119,7 @@ export default function FeedbackWidget() {
                 onClick={() => setIsOpen(false)}
                 className="flex-1 px-4 py-2 rounded-lg border border-cf-border text-sm font-medium text-cf-text-secondary hover:text-cf-text-primary hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="submit"
@@ -133,7 +127,7 @@ export default function FeedbackWidget() {
                 className="flex-1 px-4 py-2 rounded-lg bg-cf-primary text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-cf-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
-                Submit
+                {t('submitBtn')}
               </button>
             </div>
           </form>

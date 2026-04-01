@@ -92,26 +92,23 @@ export default function NewsGapPage() {
           {t('title')}
         </div>
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          The Silence <span className="text-cf-accent">IS</span> the Signal
+          {t.rich('silenceIsSignal', { accent: (chunks) => <span className="text-cf-accent">{chunks}</span> })}
         </h1>
         <div className="flex justify-center mb-4">
           <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | ChainFlow" />
         </div>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
-          When institutional investors are quietly accumulating a stock that the media is
-          ignoring, that divergence often precedes significant price movement. We measure this
-          gap.
+          {t('heroExplanation')}
         </p>
       </div>
 
       {/* Scatter Plot */}
       <div className="cf-card p-6 mb-8">
         <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-2">
-          IB Activity vs Media Coverage
+          {t('ibVsMedia')}
         </h2>
         <p className="text-sm text-cf-text-secondary mb-6">
-          Companies in the <span className="font-bold text-cf-accent">top-left quadrant</span>{' '}
-          (high IB activity, low media) are the strongest signals.
+          {t.rich('ibVsMediaDesc', { accent: (chunks) => <span className="font-bold text-cf-accent">{chunks}</span> })}
         </p>
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
@@ -163,22 +160,22 @@ export default function NewsGapPage() {
         <div className="flex items-center gap-6 mt-4 text-xs text-cf-text-secondary justify-center">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-cf-accent" />
-            High Gap (Signal Zone)
+            {t('highGapSignal')}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-cf-primary" />
-            Normal
+            {t('normal')}
           </span>
         </div>
       </div>
 
       {/* Sort controls */}
       <div className="flex items-center gap-4 mb-6">
-        <span className="text-sm font-medium text-cf-text-secondary">Sort by:</span>
+        <span className="text-sm font-medium text-cf-text-secondary">{t('sortBy')}:</span>
         {[
-          { key: 'gap' as const, label: 'Gap Score' },
-          { key: 'ib' as const, label: 'IB Activity' },
-          { key: 'media' as const, label: 'Media (Low First)' },
+          { key: 'gap' as const, label: t('gapScore') },
+          { key: 'ib' as const, label: t('ibActivity') },
+          { key: 'media' as const, label: t('mediaLowFirst') },
         ].map((opt) => (
           <button
             key={opt.key}
@@ -225,7 +222,7 @@ export default function NewsGapPage() {
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="text-cf-text-secondary flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        IB Activity
+                        {t('ibActivity')}
                       </span>
                       <span className="font-bold text-cf-primary">{entry.ibActivityScore}</span>
                     </div>
@@ -240,7 +237,7 @@ export default function NewsGapPage() {
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="text-cf-text-secondary flex items-center gap-1">
                         <Newspaper className="w-3 h-3" />
-                        Media Coverage
+                        {t('mediaCoverage')}
                       </span>
                       <span className="font-bold text-cf-text-primary">{entry.mediaScore}</span>
                     </div>
@@ -255,7 +252,7 @@ export default function NewsGapPage() {
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="text-cf-text-secondary font-bold flex items-center gap-1">
                         <Eye className="w-3 h-3" />
-                        Gap Score
+                        {t('gapScore')}
                       </span>
                       <span
                         className={`font-bold text-lg ${
@@ -279,7 +276,7 @@ export default function NewsGapPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">
-                      Media Says
+                      {t('mediaSays')}
                     </p>
                     {entry.recentHeadlines.slice(0, 2).map((h, i) => (
                       <p
@@ -290,12 +287,12 @@ export default function NewsGapPage() {
                       </p>
                     ))}
                     {entry.recentHeadlines.length === 0 && (
-                      <p className="text-xs text-cf-text-secondary italic">Minimal coverage</p>
+                      <p className="text-xs text-cf-text-secondary italic">{t('minimalCoverage')}</p>
                     )}
                   </div>
                   <div>
                     <p className="text-xs font-bold text-cf-primary uppercase tracking-wider mb-2">
-                      IBs Are Doing
+                      {t('ibsAreDoing')}
                     </p>
                     {entry.ibActions.slice(0, 2).map((a, i) => (
                       <p key={i} className="text-xs text-cf-text-primary mb-1.5 leading-relaxed">
@@ -313,25 +310,19 @@ export default function NewsGapPage() {
       {/* Explanation */}
       <div className="cf-card p-8 border-l-4 border-cf-accent">
         <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-4">
-          How the News Gap Works
+          {t('howNewsGapWorks')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-cf-text-secondary leading-relaxed">
           <div>
-            <h3 className="font-bold text-cf-text-primary mb-2">The Theory</h3>
+            <h3 className="font-bold text-cf-text-primary mb-2">{t('theTheory')}</h3>
             <p>
-              Institutional investors file 13F reports quarterly, disclosing their holdings.
-              These filings reveal what the most sophisticated investors are buying and selling.
-              Meanwhile, media coverage reflects what the general public and retail investors are
-              paying attention to.
+              {t('theTheoryText')}
             </p>
           </div>
           <div>
-            <h3 className="font-bold text-cf-text-primary mb-2">Why Silence Matters</h3>
+            <h3 className="font-bold text-cf-text-primary mb-2">{t('whySilenceMatters')}</h3>
             <p>
-              When there is a large gap between institutional buying activity and media
-              attention, it often means smart money has identified an opportunity that the
-              broader market has not yet recognized. The silence is not random - it is a signal
-              that the market has mispriced something.
+              {t('whySilenceMattersText')}
             </p>
           </div>
         </div>

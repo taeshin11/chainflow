@@ -13,7 +13,8 @@
     "settings": "設定",
     "language": "言語",
     "menu": "メニュー",
-    "close": "閉じる"
+    "close": "閉じる",
+    "feedback": "フィードバック"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",
@@ -52,7 +53,33 @@
     "noResults": "結果が見つかりません。検索条件やフィルターを調整してください。",
     "mapView": "地図表示",
     "listView": "リスト表示",
-    "graphView": "グラフ表示"
+    "graphView": "グラフ表示",
+    "sectors": {
+      "all": "すべて",
+      "semiconductors": "半導体",
+      "ai-cloud": "AI / クラウド",
+      "ev-battery": "EV / バッテリー",
+      "defense": "防衛",
+      "pharma-biotech": "製薬 / バイオ"
+    },
+    "relationships": {
+      "supplier": "サプライヤー",
+      "customer": "顧客",
+      "partner": "パートナー",
+      "competitor": "競合他社"
+    },
+    "sidePanel": {
+      "products": "製品",
+      "revenueBreakdown": "売上内訳",
+      "relatedCompanies": "関連企業",
+      "cap": "時価総額",
+      "role": "役割",
+      "viewProfile": "詳細プロフィールを見る",
+      "viewCascade": "カスケードを見る"
+    },
+    "loadingGraph": "グラフを読み込み中...",
+    "noCompaniesMatch": "フィルターに一致する企業がありません",
+    "companiesCount": "{count}社"
   },
   "company": {
     "overview": "概要",
@@ -78,7 +105,39 @@
     "geopoliticalRisk": "地政学的リスク",
     "disruptionHistory": "混乱の履歴",
     "supplyChainDepth": "サプライチェーンの深さ",
-    "singleSourceRisk": "単一調達先リスク"
+    "singleSourceRisk": "単一調達先リスク",
+    "notFound": "企業が見つかりません",
+    "notFoundDesc": "ティッカー「{ticker}」の企業が見つかりません。",
+    "backToExplorer": "エクスプローラーに戻る",
+    "productsAndRevenue": "製品と売上",
+    "productRevenueShare": "製品別売上シェア",
+    "revenueBreakdown": "売上内訳",
+    "segment": "セグメント",
+    "share": "シェア",
+    "supplyChainRelationships": "サプライチェーン関係",
+    "partners": "パートナー",
+    "impact": "影響",
+    "institutionalSignals": "機関投資家シグナル",
+    "institution": "機関",
+    "action": "アクション",
+    "shares": "株式数",
+    "value": "価値",
+    "date": "日付",
+    "aiAnalysis": "AI分析",
+    "getAiAnalysis": "AI分析を取得",
+    "analyzing": "分析中...",
+    "aiPrompt": "{company}のAIサプライチェーン分析を受けるには「AI分析を取得」をクリックしてください。",
+    "companyInfo": "企業情報",
+    "newsGapScore": "ニュースギャップスコア",
+    "gapScore": "ギャップスコア",
+    "lowGap": "低ギャップ",
+    "highGap": "高ギャップ",
+    "ibActivity": "機関活動",
+    "mediaScore": "メディアスコア",
+    "cascadePosition": "カスケードポジション",
+    "roleInCascade": "カスケード内の役割",
+    "typicalDelay": "典型的な遅延",
+    "viewFullCascade": "完全なカスケードを見る"
   },
   "cascade": {
     "title": "カスケード・ビジュアライザー",
@@ -105,7 +164,33 @@
       "supplierBankruptcy": "サプライヤーの倒産",
       "portClosure": "港湾 / 航路の閉鎖",
       "rawMaterialShortage": "原材料不足"
-    }
+    },
+    "tracker": "カスケードトラッカー",
+    "leaderToMidcap": "リーダーから中型株へのカスケードトラッカー",
+    "cascadeDescription": "リーダー株が動くと、シグナルがサプライヤー、顧客、中型株へ数日かけて伝播します。",
+    "leader": "リーダー",
+    "steps": "{count}ステップ",
+    "events": "{count}イベント",
+    "more": "+{count}件",
+    "cascadeFlow": "カスケードフロー",
+    "historicalOccurrences": "過去の事例",
+    "earningsCascade": "決算カスケード",
+    "stepsAndEvents": "{steps}ステップ · {events}件の過去イベント",
+    "roleLabels": {
+      "leader": "リーダー",
+      "first_follower": "ファーストフォロワー",
+      "mid_cap": "ミッドチェーン",
+      "late_mover": "レイトムーバー"
+    },
+    "trigger": "トリガー",
+    "leaderMove": "リーダーの動き",
+    "cascadeResult": "カスケード結果",
+    "currentStatus": "現在の状況",
+    "currentStatusDesc": "アクティブなカスケードは検出されていません。次の潜在的トリガーは{ticker}の決算です。",
+    "monitoring": "モニタリング中",
+    "notFound": "カスケードが見つかりません",
+    "notFoundDesc": "セクター「{sector}」のカスケードパターンが見つかりません。",
+    "backToCascades": "カスケード一覧に戻る"
   },
   "signals": {
     "title": "機関投資家シグナル",
@@ -136,7 +221,30 @@
     "today": "今日",
     "thisWeek": "今週",
     "thisMonth": "今月",
-    "thisQuarter": "今四半期"
+    "thisQuarter": "今四半期",
+    "filters": "フィルター",
+    "allSectors": "全セクター",
+    "allActions": "全アクション",
+    "actions": {
+      "accumulating": "買い増し",
+      "reducing": "削減",
+      "new_position": "新規ポジション",
+      "exit": "排出"
+    },
+    "sortByDate": "日付順",
+    "sortByValue": "価値順",
+    "sortByGap": "ギャップスコア順",
+    "sectorActivity": "セクター別活動",
+    "mostActiveInstitutions": "最も活発な機関",
+    "signalsCount": "{count}シグナル",
+    "company": "企業",
+    "institution": "機関",
+    "action": "アクション",
+    "sharesChanged": "株式変動",
+    "value": "価値",
+    "gapScore": "ギャップスコア",
+    "filingDate": "提出日",
+    "noSignalsMatch": "フィルターに一致するシグナルがありません。条件を調整してください。"
   },
   "newsGap": {
     "title": "ニュースギャップ・アナライザー",
@@ -153,7 +261,27 @@
     "potentialImpact": "潜在的影響",
     "readMore": "詳細分析を読む",
     "shareInsight": "インサイトを共有",
-    "saveToWatchlist": "ウォッチリストに保存"
+    "saveToWatchlist": "ウォッチリストに保存",
+    "silenceIsSignal": "沈黙こそが<accent>シグナル</accent>である",
+    "heroExplanation": "機関投資家がメディアが無視している株を静かに買い増しているとき、その乖離は大きな価格変動に先行することが多いです。私たちはこのギャップを測定します。",
+    "ibVsMedia": "機関活動 vs メディア報道",
+    "ibVsMediaDesc": "<accent>左上象限</accent>の企業（高い機関活動、低いメディア）が最も強いシグナルです。",
+    "mediaCoverageScore": "メディア報道スコア",
+    "ibActivityScore": "機関活動スコア",
+    "highGapSignal": "高ギャップ（シグナルゾーン）",
+    "normal": "通常",
+    "sortBy": "並べ替え",
+    "ibActivity": "機関活動",
+    "mediaCoverage": "メディア報道",
+    "mediaLowFirst": "メディア（低い順）",
+    "mediaSays": "メディア報道",
+    "ibsAreDoing": "機関の行動",
+    "minimalCoverage": "報道はほとんどなし",
+    "howNewsGapWorks": "ニュースギャップの仕組み",
+    "theTheory": "理論",
+    "theTheoryText": "機関投資家は四半期ごとに13F報告書を提出し、保有状況を開示します。これらの報告書は最も精通した投資家が何を売買しているかを示します。一方、メディア報道は一般大衆と個人投資家が注目しているものを反映します。",
+    "whySilenceMatters": "なぜ沈黙が重要か",
+    "whySilenceMattersText": "機関の買い活動とメディアの注目の間に大きなギャップがある場合、それはスマートマネーが市場がまだ認識していない機会を発見したことを意味します。"
   },
   "feedback": {
     "title": "フィードバックを送信",
@@ -171,7 +299,17 @@
     "messagePlaceholder": "ご意見をお聞かせください...",
     "submit": "フィードバックを送信",
     "success": "フィードバックをお寄せいただきありがとうございます！",
-    "error": "エラーが発生しました。もう一度お試しください。"
+    "error": "エラーが発生しました。もう一度お試しください。",
+    "sendFeedback": "フィードバックを送信",
+    "helpImprove": "ChainFlowの改善にご協力ください",
+    "feedbackType": "フィードバックの種類",
+    "bugReport": "不具合の報告",
+    "featureRequest": "機能リクエスト",
+    "generalFeedback": "一般的なフィードバック",
+    "message": "メッセージ",
+    "tellUs": "ご意見をお聞かせください...",
+    "cancel": "キャンセル",
+    "submitBtn": "送信"
   },
   "common": {
     "loading": "読み込み中...",
@@ -206,19 +344,36 @@
     "new": "新着",
     "comingSoon": "近日公開",
     "pro": "Pro",
-    "free": "無料"
+    "free": "無料",
+    "share": "共有",
+    "copied": "コピーしました！",
+    "home": "ホーム"
   },
   "footer": {
     "tagline": "世界のサプライチェーンを、一つのつながりから紐解きます。",
     "builtBy": "SPINAIが心を込めて開発",
-    "copyright": "\u00a9 {year} ChainFlow by SPINAI. All rights reserved.",
+    "copyright": "© {year} ChainFlow by SPINAI. All rights reserved.",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "contact": "お問い合わせ",
     "status": "システム状況",
     "documentation": "ドキュメント",
     "api": "APIアクセス",
-    "disclaimer": "ChainFlowは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。投資判断の前に必ずご自身で調査を行ってください。"
+    "disclaimer": "ChainFlowは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。投資判断の前に必ずご自身で調査を行ってください。",
+    "product": "プロダクト",
+    "resources": "リソース",
+    "legal": "法的情報",
+    "company": "会社情報",
+    "explore": "探索",
+    "cascade": "カスケード",
+    "signals": "シグナル",
+    "newsGap": "ニュースギャップ",
+    "blog": "ブログ",
+    "howToUse": "使い方",
+    "faq": "FAQ",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "about": "概要"
   },
   "seo": {
     "homeTitle": "ChainFlow — サプライチェーン・インテリジェンス・プラットフォーム",
@@ -274,5 +429,52 @@
     "valuesAccessibilityText": "強力なツールは、潤沢な資金を持つ機関だけでなく、すべての人が利用できるべきです。",
     "contact": "お問い合わせ",
     "contactText": "ご質問やパートナーシップのご相談がありましたら、お気軽にお問い合わせください。"
+  },
+  "home": {
+    "heroHeadline": "<accent>スマートマネー</accent>がサプライチェーンを通じてどこに流れるかを追跡",
+    "exploreSupplyChains": "サプライチェーンを探索",
+    "viewSignals": "シグナルを見る",
+    "livePreview": "リアルタイムサプライチェーンプレビュー",
+    "socialProof": {
+      "investors": "サプライチェーンを追跡する投資家",
+      "companies": "マッピング済み企業",
+      "sectors": "カバーセクター",
+      "flows": "追跡済み機関資金フロー"
+    },
+    "featuredSectors": "注目セクター",
+    "featuredSectorsDesc": "各主要セクターのサプライチェーンマップとカスケードパターンを探索。",
+    "explore": "探索",
+    "companies": "{count}社",
+    "latestSignals": "最新の機関投資家シグナル",
+    "latestSignalsDesc": "重要な機関活動を示す最新の13F報告書。",
+    "viewAllSignals": "すべてのシグナルを見る",
+    "fourLenses": "サプライチェーンアルファの4つの視点",
+    "fourLensesDesc": "ChainFlowはサプライチェーンマッピング、機関シグナル検出、カスケード分析、ニュースギャップスコアを一つのプラットフォームに統合。",
+    "featureCards": {
+      "supplyChainMaps": "サプライチェーンマップ",
+      "institutionalFlowSignals": "機関資金フローシグナル",
+      "leaderToMidcapCascade": "リーダーから中型株へのカスケード",
+      "newsGapAnalyzer": "ニュースギャップアナライザー"
+    },
+    "howItWorks": "使い方",
+    "steps": {
+      "mapTheChain": "チェーンをマッピング",
+      "mapTheChainDesc": "サプライヤー、顧客、パートナー関係を通じて企業がどのようにつながっているかを示すインタラクティブなサプライチェーングラフを探索。",
+      "detectTheSignal": "シグナルを検出",
+      "detectTheSignalDesc": "機関の13F報告書で異常な買い増しパターンを監視。メディア報道と照合してニュースギャップを発見。",
+      "tradeTheCascade": "カスケード取引",
+      "tradeTheCascadeDesc": "リーダー株が動いたとき、カスケードトラッカーでどの川下株がいつ追随するかを特定。"
+    },
+    "startExploringNow": "今すぐ探索を始める",
+    "disclaimer": "ChainFlowは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。過去の機関活動は将来のリターンを保証するものではありません。"
+  },
+  "emailCta": {
+    "title": "週間サプライチェーンインサイトを受け取る",
+    "description": "機関資金フローシグナル、カスケードアラート、ニュースギャップ分析を毎週月曜日にお届け。",
+    "placeholder": "you@example.com",
+    "subscribe": "購読",
+    "subscribed": "購読完了！",
+    "subscribedDesc": "週間サプライチェーンインサイトをお送りします。",
+    "invalidEmail": "有効なメールアドレスを入力してください。"
   }
 }

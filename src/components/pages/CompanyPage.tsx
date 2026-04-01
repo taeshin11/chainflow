@@ -96,13 +96,13 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20 text-center">
         <h1 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          Company not found
+          {t('notFound')}
         </h1>
         <p className="text-cf-text-secondary mb-6">
-          No company found with ticker &quot;{ticker}&quot;.
+          {t('notFoundDesc', { ticker })}
         </p>
         <Link href="/explore" className="cf-btn-primary">
-          Back to Explorer
+          {t('backToExplorer')}
         </Link>
       </div>
     );
@@ -156,7 +156,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
         className="inline-flex items-center gap-2 text-sm text-cf-text-secondary hover:text-cf-primary transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Explorer
+        {t('backToExplorer')}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -182,13 +182,13 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {/* Products & Revenue */}
           <div className="cf-card p-6">
             <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6">
-              Products & Revenue
+              {t('productsAndRevenue')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Products bar chart */}
               <div>
                 <h3 className="text-sm font-bold text-cf-text-primary mb-3">
-                  Product Revenue Share
+                  {t('productRevenueShare')}
                 </h3>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -210,7 +210,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               {/* Revenue pie */}
               <div>
                 <h3 className="text-sm font-bold text-cf-text-primary mb-3">
-                  Revenue Breakdown ({company.revenue.total})
+                  {t('revenueBreakdown')} ({company.revenue.total})
                 </h3>
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
@@ -254,13 +254,13 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 <thead>
                   <tr className="border-b border-cf-border">
                     <th className="text-left py-2 text-cf-text-secondary font-medium">
-                      Segment
+                      {t('segment')}
                     </th>
                     <th className="text-right py-2 text-cf-text-secondary font-medium">
-                      Revenue
+                      {t('revenue')}
                     </th>
                     <th className="text-right py-2 text-cf-text-secondary font-medium">
-                      Share
+                      {t('share')}
                     </th>
                   </tr>
                 </thead>
@@ -292,7 +292,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {/* Supply Chain Relationships */}
           <div className="cf-card p-6">
             <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6">
-              {t('supplyChain')} Relationships
+              {t('supplyChainRelationships')}
             </h2>
             {Object.entries(groupedRelationships).map(([type, rels]) => (
               <div key={type} className="mb-6 last:mb-0">
@@ -310,7 +310,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                     ? t('customers')
                     : type === 'competitor'
                     ? t('competitors')
-                    : 'Partners'}
+                    : t('partners')}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {rels.map((rel, i) => {
@@ -334,7 +334,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                         </p>
                         {rel.revenueImpact && (
                           <p className="text-xs mt-1 text-cf-primary font-medium">
-                            Impact: {rel.revenueImpact}
+                            {t('impact')}: {rel.revenueImpact}
                           </p>
                         )}
                       </Link>
@@ -349,26 +349,26 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {signals.length > 0 && (
             <div className="cf-card p-6">
               <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6">
-                Institutional Signals
+                {t('institutionalSignals')}
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-cf-border">
                       <th className="text-left py-2 text-cf-text-secondary font-medium">
-                        Institution
+                        {t('institution')}
                       </th>
                       <th className="text-left py-2 text-cf-text-secondary font-medium">
-                        Action
+                        {t('action')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        Shares
+                        {t('share')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        Value
+                        {t('value')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        Date
+                        {t('date')}
                       </th>
                     </tr>
                   </thead>
@@ -408,7 +408,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-heading font-bold text-cf-text-primary flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-cf-accent" />
-                AI Analysis
+                {t('aiAnalysis')}
               </h2>
               <button
                 onClick={getAiAnalysis}
@@ -418,12 +418,12 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 {aiLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Analyzing...
+                    {t('analyzing')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    Get AI Analysis
+                    {t('getAiAnalysis')}
                   </>
                 )}
               </button>
@@ -434,8 +434,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </div>
             ) : (
               <p className="text-sm text-cf-text-secondary">
-                Click &quot;Get AI Analysis&quot; for an AI-powered supply chain analysis of{' '}
-                {company.name}.
+                {t('aiPrompt', { company: company.name })}
               </p>
             )}
           </div>
@@ -446,7 +445,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {/* Company Info */}
           <div className="cf-card p-6">
             <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
-              Company Info
+              {t('companyInfo')}
             </h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -493,12 +492,12 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             <div className="cf-card p-6">
               <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4 flex items-center gap-2">
                 <Gauge className="w-5 h-5" />
-                News Gap Score
+                {t('newsGapScore')}
               </h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-cf-text-secondary">Gap Score</span>
+                    <span className="text-xs text-cf-text-secondary">{t('gapScore')}</span>
                     <span
                       className={`text-lg font-bold ${
                         newsGap.gapScore >= 70
@@ -526,19 +525,19 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                     />
                   </div>
                   <div className="flex justify-between text-xs text-cf-text-secondary mt-1">
-                    <span>Low Gap</span>
-                    <span>High Gap</span>
+                    <span>{t('lowGap')}</span>
+                    <span>{t('highGap')}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-cf-text-secondary">IB Activity</p>
+                    <p className="text-xs text-cf-text-secondary">{t('ibActivity')}</p>
                     <p className="text-lg font-bold text-cf-primary">
                       {newsGap.ibActivityScore}
                     </p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-cf-text-secondary">Media Score</p>
+                    <p className="text-xs text-cf-text-secondary">{t('mediaScore')}</p>
                     <p className="text-lg font-bold text-cf-text-primary">
                       {newsGap.mediaScore}
                     </p>
@@ -552,17 +551,17 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {cascadePosition && (
             <div className="cf-card p-6">
               <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
-                Cascade Position
+                {t('cascadePosition')}
               </h3>
               <div className="space-y-3">
                 <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-cf-text-secondary mb-1">Role in Cascade</p>
+                  <p className="text-xs text-cf-text-secondary mb-1">{t('roleInCascade')}</p>
                   <p className="text-sm font-medium text-cf-text-primary capitalize">
                     {cascadePosition.step.role.replace('_', ' ')}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-cf-text-secondary mb-1">Typical Delay</p>
+                  <p className="text-xs text-cf-text-secondary mb-1">{t('typicalDelay')}</p>
                   <p className="text-sm font-medium text-cf-text-primary">
                     {cascadePosition.step.typicalDelay}
                   </p>
@@ -574,7 +573,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                   href={`/cascade/${cascadePosition.pattern.sector}`}
                   className="cf-btn-secondary w-full justify-center gap-2 text-sm"
                 >
-                  View Full Cascade
+                  {t('viewFullCascade')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

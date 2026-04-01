@@ -13,7 +13,8 @@
     "settings": "설정",
     "language": "언어",
     "menu": "메뉴",
-    "close": "닫기"
+    "close": "닫기",
+    "feedback": "피드백"
   },
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",
@@ -52,7 +53,33 @@
     "noResults": "결과를 찾을 수 없습니다. 검색어나 필터를 조정해 보세요.",
     "mapView": "지도 보기",
     "listView": "목록 보기",
-    "graphView": "그래프 보기"
+    "graphView": "그래프 보기",
+    "sectors": {
+      "all": "전체",
+      "semiconductors": "반도체",
+      "ai-cloud": "AI / 클라우드",
+      "ev-battery": "EV / 배터리",
+      "defense": "방위",
+      "pharma-biotech": "제약 / 바이오"
+    },
+    "relationships": {
+      "supplier": "공급업체",
+      "customer": "고객사",
+      "partner": "파트너",
+      "competitor": "경쟁사"
+    },
+    "sidePanel": {
+      "products": "제품",
+      "revenueBreakdown": "매출 구성",
+      "relatedCompanies": "관련 기업",
+      "cap": "시가총액",
+      "role": "역할",
+      "viewProfile": "전체 프로필 보기",
+      "viewCascade": "연쇄 분석 보기"
+    },
+    "loadingGraph": "그래프 로딩 중...",
+    "noCompaniesMatch": "필터 조건에 맞는 기업이 없습니다",
+    "companiesCount": "{count}개 기업"
   },
   "company": {
     "overview": "개요",
@@ -78,7 +105,39 @@
     "geopoliticalRisk": "지정학적 리스크",
     "disruptionHistory": "차질 이력",
     "supplyChainDepth": "공급망 깊이",
-    "singleSourceRisk": "단일 공급원 리스크"
+    "singleSourceRisk": "단일 공급원 리스크",
+    "notFound": "기업을 찾을 수 없습니다",
+    "notFoundDesc": "티커 \"{ticker}\"에 해당하는 기업을 찾을 수 없습니다.",
+    "backToExplorer": "탐색기로 돌아가기",
+    "productsAndRevenue": "제품 및 매출",
+    "productRevenueShare": "제품별 매출 비중",
+    "revenueBreakdown": "매출 구성",
+    "segment": "부문",
+    "share": "비중",
+    "supplyChainRelationships": "공급망 관계",
+    "partners": "파트너",
+    "impact": "영향",
+    "institutionalSignals": "기관 시그널",
+    "institution": "기관",
+    "action": "행동",
+    "shares": "주식 수",
+    "value": "가치",
+    "date": "날짜",
+    "aiAnalysis": "AI 분석",
+    "getAiAnalysis": "AI 분석 받기",
+    "analyzing": "분석 중...",
+    "aiPrompt": "{company}의 AI 공급망 분석을 받으려면 \"AI 분석 받기\"를 클릭하세요.",
+    "companyInfo": "기업 정보",
+    "newsGapScore": "뉴스 갭 점수",
+    "gapScore": "갭 점수",
+    "lowGap": "낮은 갭",
+    "highGap": "높은 갭",
+    "ibActivity": "기관 활동",
+    "mediaScore": "미디어 점수",
+    "cascadePosition": "연쇄 위치",
+    "roleInCascade": "연쇄 내 역할",
+    "typicalDelay": "일반적 지연",
+    "viewFullCascade": "전체 연쇄 분석 보기"
   },
   "cascade": {
     "title": "연쇄 영향 시각화",
@@ -105,7 +164,33 @@
       "supplierBankruptcy": "공급업체 파산",
       "portClosure": "항만 / 노선 폐쇄",
       "rawMaterialShortage": "원자재 부족"
-    }
+    },
+    "tracker": "연쇄 트래커",
+    "leaderToMidcap": "리더-중형주 연쇄 트래커",
+    "cascadeDescription": "리더 종목이 움직이면 시그널이 공급업체, 고객사, 중형주로 며칠에 걸쳐 전파됩니다.",
+    "leader": "리더",
+    "steps": "{count}단계",
+    "events": "{count}건의 이벤트",
+    "more": "+{count}개 더",
+    "cascadeFlow": "연쇄 흐름",
+    "historicalOccurrences": "과거 사례",
+    "earningsCascade": "실적 연쇄",
+    "stepsAndEvents": "{steps}단계 · {events}건의 과거 이벤트",
+    "roleLabels": {
+      "leader": "리더",
+      "first_follower": "1차 추종자",
+      "mid_cap": "중간 체인",
+      "late_mover": "후발 주자"
+    },
+    "trigger": "트리거",
+    "leaderMove": "리더 움직임",
+    "cascadeResult": "연쇄 결과",
+    "currentStatus": "현재 상태",
+    "currentStatusDesc": "활성 연쇄가 감지되지 않았습니다. 다음 잠재적 트리거는 {ticker} 실적 발표입니다.",
+    "monitoring": "모니터링 중",
+    "notFound": "연쇄 분석을 찾을 수 없습니다",
+    "notFoundDesc": "섹터 \"{sector}\"에 대한 연쇄 패턴을 찾을 수 없습니다.",
+    "backToCascades": "연쇄 분석으로 돌아가기"
   },
   "signals": {
     "title": "기관 투자자 시그널",
@@ -136,7 +221,30 @@
     "today": "오늘",
     "thisWeek": "이번 주",
     "thisMonth": "이번 달",
-    "thisQuarter": "이번 분기"
+    "thisQuarter": "이번 분기",
+    "filters": "필터",
+    "allSectors": "전체 섹터",
+    "allActions": "전체 행동",
+    "actions": {
+      "accumulating": "매집 중",
+      "reducing": "축소 중",
+      "new_position": "신규 포지션",
+      "exit": "청산"
+    },
+    "sortByDate": "날짜순",
+    "sortByValue": "가치순",
+    "sortByGap": "갭 점수순",
+    "sectorActivity": "섹터별 활동",
+    "mostActiveInstitutions": "가장 활발한 기관",
+    "signalsCount": "{count}개 시그널",
+    "company": "기업",
+    "institution": "기관",
+    "action": "행동",
+    "sharesChanged": "주식 변동",
+    "value": "가치",
+    "gapScore": "갭 점수",
+    "filingDate": "신고일",
+    "noSignalsMatch": "필터 조건에 맞는 시그널이 없습니다. 기준을 조정해 보세요."
   },
   "newsGap": {
     "title": "뉴스 갭 분석기",
@@ -153,7 +261,27 @@
     "potentialImpact": "잠재적 영향",
     "readMore": "전체 분석 보기",
     "shareInsight": "인사이트 공유",
-    "saveToWatchlist": "관심 목록에 저장"
+    "saveToWatchlist": "관심 목록에 저장",
+    "silenceIsSignal": "침묵이 바로 <accent>시그널</accent>이다",
+    "heroExplanation": "기관 투자자가 미디어가 무시하는 종목을 조용히 매집할 때, 이 괴리는 종종 큰 가격 변동을 선행합니다. 우리는 이 갭을 측정합니다.",
+    "ibVsMedia": "기관 활동 vs 미디어 보도",
+    "ibVsMediaDesc": "<accent>좌상단 사분면</accent>에 위치한 기업(높은 기관 활동, 낮은 미디어)이 가장 강한 시그널입니다.",
+    "mediaCoverageScore": "미디어 보도 점수",
+    "ibActivityScore": "기관 활동 점수",
+    "highGapSignal": "높은 갭 (시그널 구간)",
+    "normal": "일반",
+    "sortBy": "정렬 기준",
+    "ibActivity": "기관 활동",
+    "mediaCoverage": "미디어 보도",
+    "mediaLowFirst": "미디어 (낮은 순)",
+    "mediaSays": "미디어 보도",
+    "ibsAreDoing": "기관 행동",
+    "minimalCoverage": "보도 거의 없음",
+    "howNewsGapWorks": "뉴스 갭 작동 원리",
+    "theTheory": "이론",
+    "theTheoryText": "기관 투자자는 분기별로 13F 보고서를 제출하여 보유 현황을 공개합니다. 이 보고서는 가장 정교한 투자자들이 무엇을 사고 파는지 보여줍니다. 한편 미디어 보도는 일반 대중과 개인 투자자들이 주목하는 내용을 반영합니다.",
+    "whySilenceMatters": "침묵이 중요한 이유",
+    "whySilenceMattersText": "기관의 매수 활동과 미디어 관심 사이에 큰 격차가 있을 때, 이는 종종 스마트 머니가 시장이 아직 인식하지 못한 기회를 발견했음을 의미합니다."
   },
   "feedback": {
     "title": "피드백 보내기",
@@ -171,7 +299,17 @@
     "messagePlaceholder": "의견을 자유롭게 적어주세요...",
     "submit": "피드백 제출",
     "success": "피드백을 보내주셔서 감사합니다!",
-    "error": "문제가 발생했습니다. 다시 시도해 주세요."
+    "error": "문제가 발생했습니다. 다시 시도해 주세요.",
+    "sendFeedback": "피드백 보내기",
+    "helpImprove": "ChainFlow 개선에 도움을 주세요",
+    "feedbackType": "피드백 유형",
+    "bugReport": "버그 신고",
+    "featureRequest": "기능 요청",
+    "generalFeedback": "일반 피드백",
+    "message": "메시지",
+    "tellUs": "의견을 자유롭게 적어주세요...",
+    "cancel": "취소",
+    "submitBtn": "제출"
   },
   "common": {
     "loading": "로딩 중...",
@@ -206,19 +344,36 @@
     "new": "신규",
     "comingSoon": "출시 예정",
     "pro": "Pro",
-    "free": "무료"
+    "free": "무료",
+    "share": "공유",
+    "copied": "복사됨!",
+    "home": "홈"
   },
   "footer": {
     "tagline": "전 세계 공급망을 하나의 연결 고리씩 매핑합니다.",
     "builtBy": "SPINAI가 정성껏 만들었습니다",
-    "copyright": "\u00a9 {year} ChainFlow by SPINAI. All rights reserved.",
+    "copyright": "© {year} ChainFlow by SPINAI. All rights reserved.",
     "terms": "이용약관",
     "privacy": "개인정보 처리방침",
     "contact": "문의하기",
     "status": "시스템 상태",
     "documentation": "문서",
     "api": "API 접근",
-    "disclaimer": "ChainFlow는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다."
+    "disclaimer": "ChainFlow는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다.",
+    "product": "제품",
+    "resources": "리소스",
+    "legal": "법적 고지",
+    "company": "회사",
+    "explore": "탐색",
+    "cascade": "연쇄 분석",
+    "signals": "시그널",
+    "newsGap": "뉴스 갭",
+    "blog": "블로그",
+    "howToUse": "사용법",
+    "faq": "FAQ",
+    "privacyPolicy": "개인정보 처리방침",
+    "termsOfService": "이용약관",
+    "about": "소개"
   },
   "seo": {
     "homeTitle": "ChainFlow — 공급망 인텔리전스 플랫폼",
@@ -274,5 +429,52 @@
     "valuesAccessibilityText": "강력한 도구는 자본력이 풍부한 기관뿐만 아니라 모든 사람이 이용할 수 있어야 합니다.",
     "contact": "연락하기",
     "contactText": "질문이 있거나 파트너십을 원하시면 언제든 연락주세요."
+  },
+  "home": {
+    "heroHeadline": "<accent>스마트 머니</accent>가 공급망을 통해 어디로 흐르는지 추적하세요",
+    "exploreSupplyChains": "공급망 탐색하기",
+    "viewSignals": "시그널 보기",
+    "livePreview": "실시간 공급망 미리보기",
+    "socialProof": {
+      "investors": "공급망을 추적하는 투자자",
+      "companies": "매핑된 기업",
+      "sectors": "커버 섹터",
+      "flows": "추적된 기관 자금 흐름"
+    },
+    "featuredSectors": "주요 섹터",
+    "featuredSectorsDesc": "각 주요 섹터의 공급망 지도와 연쇄 패턴을 살펴보세요.",
+    "explore": "탐색",
+    "companies": "{count}개 기업",
+    "latestSignals": "최신 기관 시그널",
+    "latestSignalsDesc": "주요 기관 활동을 보여주는 최근 13F 보고서.",
+    "viewAllSignals": "모든 시그널 보기",
+    "fourLenses": "공급망 알파의 네 가지 관점",
+    "fourLensesDesc": "ChainFlow는 공급망 매핑, 기관 시그널 감지, 연쇄 분석, 뉴스 갭 점수를 하나의 플랫폼에 통합합니다.",
+    "featureCards": {
+      "supplyChainMaps": "공급망 지도",
+      "institutionalFlowSignals": "기관 자금 흐름 시그널",
+      "leaderToMidcapCascade": "리더-중형주 연쇄",
+      "newsGapAnalyzer": "뉴스 갭 분석기"
+    },
+    "howItWorks": "이용 방법",
+    "steps": {
+      "mapTheChain": "체인 매핑",
+      "mapTheChainDesc": "공급업체, 고객사, 파트너 관계를 통해 기업이 어떻게 연결되어 있는지 보여주는 인터랙티브 공급망 그래프를 탐색하세요.",
+      "detectTheSignal": "시그널 감지",
+      "detectTheSignalDesc": "기관의 13F 보고서에서 이례적인 매집 패턴을 모니터링하세요. 미디어 보도와 교차 참조하여 뉴스 갭을 찾으세요.",
+      "tradeTheCascade": "연쇄 매매",
+      "tradeTheCascadeDesc": "리더 종목이 움직일 때, 연쇄 트래커를 사용하여 어떤 하류 종목이 언제 따라갈지 식별하세요."
+    },
+    "startExploringNow": "지금 탐색 시작하기",
+    "disclaimer": "ChainFlow는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 과거 기관 활동이 미래 수익을 보장하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다."
+  },
+  "emailCta": {
+    "title": "주간 공급망 인사이트 받기",
+    "description": "기관 자금 흐름 시그널, 연쇄 알림, 뉴스 갭 분석을 매주 월요일 이메일로 받으세요.",
+    "placeholder": "you@example.com",
+    "subscribe": "구독하기",
+    "subscribed": "구독 완료!",
+    "subscribedDesc": "주간 공급망 인사이트를 보내드리겠습니다.",
+    "invalidEmail": "유효한 이메일 주소를 입력해 주세요."
   }
 }

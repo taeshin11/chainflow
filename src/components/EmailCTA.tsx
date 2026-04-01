@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Mail, ArrowRight, Check } from 'lucide-react';
 import { trackEvent } from '@/utils/collect';
 
 export default function EmailCTA() {
+  const t = useTranslations('emailCta');
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -14,7 +16,7 @@ export default function EmailCTA() {
     setError('');
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address.');
+      setError(t('invalidEmail'));
       return;
     }
 
@@ -31,10 +33,10 @@ export default function EmailCTA() {
             <Check className="w-6 h-6 text-cf-success" />
           </div>
           <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-2">
-            You are subscribed!
+            {t('subscribed')}
           </h3>
           <p className="text-sm text-cf-text-secondary">
-            We will send you weekly supply chain insights. Stay tuned.
+            {t('subscribedDesc')}
           </p>
         </div>
       </section>
@@ -49,11 +51,11 @@ export default function EmailCTA() {
             <div className="flex items-center gap-2 mb-2">
               <Mail className="w-5 h-5 text-cf-primary" />
               <h3 className="text-lg font-heading font-bold text-cf-text-primary">
-                Get Weekly Supply Chain Insights
+                {t('title')}
               </h3>
             </div>
             <p className="text-sm text-cf-text-secondary">
-              Institutional flow signals, cascade alerts, and news gap analysis delivered to your inbox every Monday.
+              {t('description')}
             </p>
           </div>
           <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full md:w-auto">
@@ -62,13 +64,13 @@ export default function EmailCTA() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={t('placeholder')}
                 className="cf-input w-full"
               />
               {error && <p className="text-xs text-cf-danger mt-1">{error}</p>}
             </div>
             <button type="submit" className="cf-btn-primary gap-2 flex-shrink-0">
-              Subscribe
+              {t('subscribe')}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

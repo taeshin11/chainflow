@@ -28,14 +28,10 @@ const roleColors: Record<string, { bg: string; text: string; border: string }> =
   late_mover: { bg: 'bg-gray-100', text: 'text-cf-text-secondary', border: 'border-gray-300' },
 };
 
-const roleLabels: Record<string, string> = {
-  leader: 'Leader',
-  first_follower: 'First Follower',
-  mid_cap: 'Mid-Chain',
-  late_mover: 'Late Mover',
-};
+// roleLabels moved to translation keys cascade.roleLabels.*
 
 function CascadeFlowStep({ step, index, total }: { step: CascadeStep; index: number; total: number }) {
+  const t = useTranslations('cascade');
   const colors = roleColors[step.role] || roleColors.late_mover;
 
   return (
@@ -62,7 +58,7 @@ function CascadeFlowStep({ step, index, total }: { step: CascadeStep; index: num
           <span
             className={`text-xs font-medium px-2 py-1 rounded-full ${colors.bg} ${colors.text}`}
           >
-            {roleLabels[step.role]}
+            {t(`roleLabels.${step.role}`)}
           </span>
         </div>
         <div className="flex items-center gap-2 mb-2">
@@ -89,13 +85,13 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20 text-center">
         <h1 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          Cascade not found
+          {t('notFound')}
         </h1>
         <p className="text-cf-text-secondary mb-6">
-          No cascade pattern found for sector &quot;{sector}&quot;.
+          {t('notFoundDesc', { sector })}
         </p>
         <Link href="/cascade" className="cf-btn-primary">
-          Back to Cascades
+          {t('backToCascades')}
         </Link>
       </div>
     );
@@ -112,7 +108,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
         className="inline-flex items-center gap-2 text-sm text-cf-text-secondary hover:text-cf-primary transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Cascades
+        {t('backToCascades')}
       </Link>
 
       {/* Header */}
@@ -134,11 +130,10 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
             </div>
             <div>
               <h2 className="text-xl font-heading font-bold text-cf-text-primary">
-                {pattern.leaderName} ({pattern.leaderTicker}) Earnings Cascade
+                {pattern.leaderName} ({pattern.leaderTicker}) {t('earningsCascade')}
               </h2>
               <p className="text-sm text-cf-text-secondary">
-                {pattern.sequence.length} steps &middot;{' '}
-                {pattern.historicalOccurrences.length} historical events
+                {t('stepsAndEvents', { steps: pattern.sequence.length, events: pattern.historicalOccurrences.length })}
               </p>
             </div>
           </div>
@@ -147,7 +142,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
             {/* Flow Visualization */}
             <div>
               <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-6">
-                Cascade Flow
+                {t('cascadeFlow')}
               </h3>
 
               {/* Horizontal mini-flow at top */}
@@ -193,7 +188,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
             {/* Historical Occurrences */}
             <div>
               <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-6">
-                Historical Occurrences
+                {t('historicalOccurrences')}
               </h3>
               <div className="space-y-4">
                 {pattern.historicalOccurrences.map((event, i) => {
@@ -217,14 +212,14 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
                       <div className="space-y-2">
                         <div>
                           <p className="text-xs font-medium text-cf-text-secondary uppercase tracking-wider mb-1">
-                            Trigger
+                            {t('trigger')}
                           </p>
                           <p className="text-sm text-cf-text-primary">{event.trigger}</p>
                         </div>
 
                         <div className="flex items-center gap-2">
                           <p className="text-xs font-medium text-cf-text-secondary uppercase tracking-wider">
-                            Leader Move:
+                            {t('leaderMove')}:
                           </p>
                           <span
                             className={`text-sm font-bold ${
@@ -237,7 +232,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
 
                         <div>
                           <p className="text-xs font-medium text-cf-text-secondary uppercase tracking-wider mb-1">
-                            Cascade Result
+                            {t('cascadeResult')}
                           </p>
                           <p className="text-sm text-cf-text-secondary leading-relaxed">
                             {event.cascadeResult}
@@ -254,17 +249,15 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle2 className="w-5 h-5 text-cf-success" />
                   <h4 className="font-heading font-bold text-cf-text-primary">
-                    Current Status
+                    {t('currentStatus')}
                   </h4>
                 </div>
                 <p className="text-sm text-cf-text-secondary">
-                  No active cascade detected. The next potential trigger is{' '}
-                  <strong>{pattern.leaderTicker}</strong> earnings. Monitor for guidance
-                  changes or pre-announcement signals.
+                  {t('currentStatusDesc', { ticker: pattern.leaderTicker })}
                 </p>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="w-2 h-2 rounded-full bg-cf-success animate-pulse" />
-                  <span className="text-xs font-medium text-cf-success">Monitoring</span>
+                  <span className="text-xs font-medium text-cf-success">{t('monitoring')}</span>
                 </div>
               </div>
             </div>

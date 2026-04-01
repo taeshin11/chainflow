@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import dynamic from 'next/dynamic';
 import { companies, type Company } from '@/data/companies';
 import { sectors } from '@/data/sectors';
+import { companyNamesI18n } from '@/data/company-names-i18n';
 import {
   X,
   ExternalLink,
@@ -66,6 +67,7 @@ interface SidePanelProps {
 }
 
 function SidePanel({ company, onClose }: SidePanelProps) {
+  const t = useTranslations('explore');
   const pieData = company.revenue.segments.map((s) => ({
     name: s.name,
     value: s.percentage,
@@ -116,12 +118,12 @@ function SidePanel({ company, onClose }: SidePanelProps) {
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2 text-sm">
             <DollarSign className="w-4 h-4 text-cf-text-secondary" />
-            <span className="text-cf-text-secondary">Cap:</span>
+            <span className="text-cf-text-secondary">{t('sidePanel.cap')}:</span>
             <span className="font-medium">{company.marketCap}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="w-4 h-4 text-cf-text-secondary" />
-            <span className="text-cf-text-secondary">Role:</span>
+            <span className="text-cf-text-secondary">{t('sidePanel.role')}:</span>
             <span className="font-medium capitalize">{company.role}</span>
           </div>
         </div>
@@ -133,7 +135,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
         {/* Products */}
         <div>
           <h3 className="text-sm font-bold text-cf-text-primary mb-2 flex items-center gap-2">
-            <Package className="w-4 h-4" /> Products
+            <Package className="w-4 h-4" /> {t('sidePanel.products')}
           </h3>
           <div className="space-y-1">
             {company.products.slice(0, 4).map((p) => (
@@ -154,7 +156,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
 
         {/* Revenue Pie */}
         <div>
-          <h3 className="text-sm font-bold text-cf-text-primary mb-2">Revenue Breakdown</h3>
+          <h3 className="text-sm font-bold text-cf-text-primary mb-2">{t('sidePanel.revenueBreakdown')}</h3>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -199,7 +201,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
         {/* Related Companies */}
         <div>
           <h3 className="text-sm font-bold text-cf-text-primary mb-2 flex items-center gap-2">
-            <Users className="w-4 h-4" /> Related Companies
+            <Users className="w-4 h-4" /> {t('sidePanel.relatedCompanies')}
           </h3>
           <div className="space-y-2">
             {relatedCompanies.map((rel, i) => (
@@ -224,7 +226,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
                     color: relationshipColors[rel.type],
                   }}
                 >
-                  {rel.type}
+                  {t(`relationships.${rel.type}`)}
                 </span>
               </Link>
             ))}
@@ -237,14 +239,14 @@ function SidePanel({ company, onClose }: SidePanelProps) {
             href={`/company/${company.ticker}`}
             className="cf-btn-primary w-full justify-center gap-2"
           >
-            View Full Profile
+            {t('sidePanel.viewProfile')}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
             href={`/cascade/${company.sector}`}
             className="cf-btn-secondary w-full justify-center gap-2"
           >
-            View Cascade
+            {t('sidePanel.viewCascade')}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -264,7 +266,8 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
   const [containerWidth, setContainerWidth] = useState(800);
-  const graphRef = useRef<{ zoomToFit: (ms?: number) => void }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const graphRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -279,6 +282,15 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  // Push nodes further apart
+  useEffect(() => {
+    if (graphRef.current) {
+      graphRef.current.d3Force('charge')?.strength(-400);
+      graphRef.current.d3Force('link')?.distance(120);
+      graphRef.current.d3Force('center')?.strength(0.05);
+    }
+  }, [mounted, selectedSector, searchQuery]);
+
   const filteredCompanies = useMemo(() => {
     let filtered = companies;
     if (selectedSector !== 'all') {
@@ -286,11 +298,12 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          c.ticker.toLowerCase().includes(q)
-      );
+      filtered = filtered.filter((c) => {
+        if (c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q)) return true;
+        const localizedNames = companyNamesI18n[c.ticker];
+        if (localizedNames?.some((name) => name.toLowerCase().includes(q))) return true;
+        return false;
+      });
     }
     return filtered;
   }, [selectedSector, searchQuery]);
@@ -376,7 +389,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 : 'bg-white text-cf-text-secondary hover:bg-gray-50 border border-gray-200'
             }`}
           >
-            All
+            {t('sectors.all')}
           </button>
           {sectors.map((s) => (
             <button
@@ -391,7 +404,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 selectedSector === s.id ? { backgroundColor: s.color } : undefined
               }
             >
-              {s.name}
+              {t(`sectors.${s.id}`)}
             </button>
           ))}
         </div>
@@ -400,14 +413,14 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
       {/* Legend */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-2">
         <div className="flex flex-wrap gap-4 text-xs text-cf-text-secondary">
-          <span className="font-medium">Relationships:</span>
+          <span className="font-medium">{t('filters')}:</span>
           {Object.entries(relationshipColors).map(([type, color]) => (
-            <span key={type} className="flex items-center gap-1.5 capitalize">
+            <span key={type} className="flex items-center gap-1.5">
               <span
-                className="w-3 h-0.5 rounded"
+                className="w-5 h-1 rounded-full"
                 style={{ backgroundColor: color }}
               />
-              {type}
+              {t(`relationships.${type}`)}
             </span>
           ))}
         </div>
@@ -418,7 +431,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
         <div ref={containerRef} className="cf-card relative overflow-hidden" style={{ height: '600px' }}>
           {mounted && graphData.nodes.length > 0 ? (
             <ForceGraph2D
-              ref={graphRef as React.MutableRefObject<never>}
+              ref={graphRef}
               graphData={graphData}
               nodeLabel={(node: Record<string, unknown>) =>
                 `${node.name as string} (${node.ticker as string})`
@@ -426,11 +439,16 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
               nodeColor={(node: Record<string, unknown>) => node.color as string}
               nodeVal={(node: Record<string, unknown>) => node.val as number}
               linkColor={(link: Record<string, unknown>) => link.color as string}
-              linkWidth={1.5}
+              linkWidth={3}
               linkDirectionalParticles={2}
-              linkDirectionalParticleSpeed={0.005}
-              linkDirectionalParticleWidth={2}
+              linkDirectionalParticleSpeed={0.004}
+              linkDirectionalParticleWidth={3}
+              d3AlphaDecay={0.02}
+              d3VelocityDecay={0.3}
               onNodeClick={handleNodeClick}
+              onEngineStop={() => {
+                if (graphRef.current) graphRef.current.zoomToFit(400);
+              }}
               nodeCanvasObject={(
                 node: Record<string, unknown>,
                 ctx: CanvasRenderingContext2D,
@@ -441,12 +459,12 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 const val = (node.val as number) || 6;
                 const color = (node.color as string) || '#888';
                 const label = (node.ticker as string) || '';
-                const r = Math.sqrt(val) * 3;
+                const r = Math.sqrt(val) * 4;
 
                 // Outer glow
                 ctx.beginPath();
-                ctx.arc(x, y, r + 2, 0, 2 * Math.PI);
-                ctx.fillStyle = color + '30';
+                ctx.arc(x, y, r + 4, 0, 2 * Math.PI);
+                ctx.fillStyle = color + '20';
                 ctx.fill();
 
                 // Main circle
@@ -455,22 +473,50 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 ctx.fillStyle = color;
                 ctx.fill();
 
+                // Border
+                ctx.strokeStyle = color + '80';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
                 // Label
-                const fontSize = Math.max(10 / globalScale, 3);
+                const fontSize = Math.max(12 / globalScale, 4);
                 ctx.font = `bold ${fontSize}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#fff';
                 ctx.fillText(label, x, y);
               }}
+              linkCanvasObject={(
+                link: Record<string, unknown>,
+                ctx: CanvasRenderingContext2D
+              ) => {
+                const source = link.source as Record<string, unknown>;
+                const target = link.target as Record<string, unknown>;
+                if (!source || !target) return;
+                const sx = source.x as number;
+                const sy = source.y as number;
+                const tx = target.x as number;
+                const ty = target.y as number;
+                const color = (link.color as string) || '#ccc';
+
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(tx, ty);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
+                ctx.globalAlpha = 0.7;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+              }}
               backgroundColor="transparent"
+              cooldownTicks={100}
               width={containerWidth}
               height={600}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
               <p className="text-cf-text-secondary">
-                {mounted ? 'No companies match your filters' : 'Loading graph...'}
+                {mounted ? t('noCompaniesMatch') : t('loadingGraph')}
               </p>
             </div>
           )}
@@ -498,7 +544,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
       {/* Company list below graph for mobile */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <h2 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
-          {filteredCompanies.length} Companies
+          {t('companiesCount', { count: filteredCompanies.length })}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {filteredCompanies.map((c) => (

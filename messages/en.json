@@ -13,7 +13,8 @@
     "settings": "Settings",
     "language": "Language",
     "menu": "Menu",
-    "close": "Close"
+    "close": "Close",
+    "feedback": "Feedback"
   },
   "hero": {
     "title": "Uncover Hidden Supply Chain Risks",
@@ -52,7 +53,33 @@
     "noResults": "No results found. Try adjusting your search or filters.",
     "mapView": "Map View",
     "listView": "List View",
-    "graphView": "Graph View"
+    "graphView": "Graph View",
+    "sectors": {
+      "all": "All",
+      "semiconductors": "Semiconductors",
+      "ai-cloud": "AI / Cloud",
+      "ev-battery": "EV / Battery",
+      "defense": "Defense",
+      "pharma-biotech": "Pharma / Biotech"
+    },
+    "relationships": {
+      "supplier": "Supplier",
+      "customer": "Customer",
+      "partner": "Partner",
+      "competitor": "Competitor"
+    },
+    "sidePanel": {
+      "products": "Products",
+      "revenueBreakdown": "Revenue Breakdown",
+      "relatedCompanies": "Related Companies",
+      "cap": "Cap",
+      "role": "Role",
+      "viewProfile": "View Full Profile",
+      "viewCascade": "View Cascade"
+    },
+    "loadingGraph": "Loading graph...",
+    "noCompaniesMatch": "No companies match your filters",
+    "companiesCount": "{count} Companies"
   },
   "company": {
     "overview": "Overview",
@@ -78,7 +105,39 @@
     "geopoliticalRisk": "Geopolitical Risk",
     "disruptionHistory": "Disruption History",
     "supplyChainDepth": "Supply Chain Depth",
-    "singleSourceRisk": "Single-Source Risk"
+    "singleSourceRisk": "Single-Source Risk",
+    "notFound": "Company not found",
+    "notFoundDesc": "No company found with ticker \"{ticker}\".",
+    "backToExplorer": "Back to Explorer",
+    "productsAndRevenue": "Products & Revenue",
+    "productRevenueShare": "Product Revenue Share",
+    "revenueBreakdown": "Revenue Breakdown",
+    "segment": "Segment",
+    "share": "Share",
+    "supplyChainRelationships": "Supply Chain Relationships",
+    "partners": "Partners",
+    "impact": "Impact",
+    "institutionalSignals": "Institutional Signals",
+    "institution": "Institution",
+    "action": "Action",
+    "shares": "Shares",
+    "value": "Value",
+    "date": "Date",
+    "aiAnalysis": "AI Analysis",
+    "getAiAnalysis": "Get AI Analysis",
+    "analyzing": "Analyzing...",
+    "aiPrompt": "Click \"Get AI Analysis\" for an AI-powered supply chain analysis of {company}.",
+    "companyInfo": "Company Info",
+    "newsGapScore": "News Gap Score",
+    "gapScore": "Gap Score",
+    "lowGap": "Low Gap",
+    "highGap": "High Gap",
+    "ibActivity": "IB Activity",
+    "mediaScore": "Media Score",
+    "cascadePosition": "Cascade Position",
+    "roleInCascade": "Role in Cascade",
+    "typicalDelay": "Typical Delay",
+    "viewFullCascade": "View Full Cascade"
   },
   "cascade": {
     "title": "Cascade Visualizer",
@@ -105,7 +164,33 @@
       "supplierBankruptcy": "Supplier Bankruptcy",
       "portClosure": "Port / Route Closure",
       "rawMaterialShortage": "Raw Material Shortage"
-    }
+    },
+    "tracker": "Cascade Tracker",
+    "leaderToMidcap": "Leader-to-Midcap Cascade Tracker",
+    "cascadeDescription": "When a leader stock moves, the signal cascades through suppliers, customers, and mid-cap names over days.",
+    "leader": "Leader",
+    "steps": "{count} steps",
+    "events": "{count} events",
+    "more": "+{count} more",
+    "cascadeFlow": "Cascade Flow",
+    "historicalOccurrences": "Historical Occurrences",
+    "earningsCascade": "Earnings Cascade",
+    "stepsAndEvents": "{steps} steps · {events} historical events",
+    "roleLabels": {
+      "leader": "Leader",
+      "first_follower": "First Follower",
+      "mid_cap": "Mid-Chain",
+      "late_mover": "Late Mover"
+    },
+    "trigger": "Trigger",
+    "leaderMove": "Leader Move",
+    "cascadeResult": "Cascade Result",
+    "currentStatus": "Current Status",
+    "currentStatusDesc": "No active cascade detected. The next potential trigger is {ticker} earnings. Monitor for guidance changes or pre-announcement signals.",
+    "monitoring": "Monitoring",
+    "notFound": "Cascade not found",
+    "notFoundDesc": "No cascade pattern found for sector \"{sector}\".",
+    "backToCascades": "Back to Cascades"
   },
   "signals": {
     "title": "Institutional Signals",
@@ -136,7 +221,30 @@
     "today": "Today",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
-    "thisQuarter": "This Quarter"
+    "thisQuarter": "This Quarter",
+    "filters": "Filters",
+    "allSectors": "All Sectors",
+    "allActions": "All Actions",
+    "actions": {
+      "accumulating": "Accumulating",
+      "reducing": "Reducing",
+      "new_position": "New Position",
+      "exit": "Exit"
+    },
+    "sortByDate": "Sort by Date",
+    "sortByValue": "Sort by Value",
+    "sortByGap": "Sort by Gap Score",
+    "sectorActivity": "Sector Activity",
+    "mostActiveInstitutions": "Most Active Institutions",
+    "signalsCount": "{count} signals",
+    "company": "Company",
+    "institution": "Institution",
+    "action": "Action",
+    "sharesChanged": "Shares Changed",
+    "value": "Value",
+    "gapScore": "Gap Score",
+    "filingDate": "Filing Date",
+    "noSignalsMatch": "No signals match your filters. Try adjusting the criteria."
   },
   "newsGap": {
     "title": "News Gap Analyzer",
@@ -153,7 +261,65 @@
     "potentialImpact": "Potential Impact",
     "readMore": "Read Full Analysis",
     "shareInsight": "Share Insight",
-    "saveToWatchlist": "Save to Watchlist"
+    "saveToWatchlist": "Save to Watchlist",
+    "silenceIsSignal": "The Silence <accent>IS</accent> the Signal",
+    "heroExplanation": "When institutional investors are quietly accumulating a stock that the media is ignoring, that divergence often precedes significant price movement. We measure this gap.",
+    "ibVsMedia": "IB Activity vs Media Coverage",
+    "ibVsMediaDesc": "Companies in the <accent>top-left quadrant</accent> (high IB activity, low media) are the strongest signals.",
+    "mediaCoverageScore": "Media Coverage Score",
+    "ibActivityScore": "IB Activity Score",
+    "highGapSignal": "High Gap (Signal Zone)",
+    "normal": "Normal",
+    "sortBy": "Sort by",
+    "ibActivity": "IB Activity",
+    "mediaCoverage": "Media Coverage",
+    "mediaLowFirst": "Media (Low First)",
+    "mediaSays": "Media Says",
+    "ibsAreDoing": "IBs Are Doing",
+    "minimalCoverage": "Minimal coverage",
+    "howNewsGapWorks": "How the News Gap Works",
+    "theTheory": "The Theory",
+    "theTheoryText": "Institutional investors file 13F reports quarterly, disclosing their holdings. These filings reveal what the most sophisticated investors are buying and selling. Meanwhile, media coverage reflects what the general public and retail investors are paying attention to.",
+    "whySilenceMatters": "Why Silence Matters",
+    "whySilenceMattersText": "When there is a large gap between institutional buying activity and media attention, it often means smart money has identified an opportunity that the broader market has not yet recognized. The silence is not random - it is a signal that the market has mispriced something."
+  },
+  "home": {
+    "heroHeadline": "Track where <accent>smart money</accent> flows through the supply chain",
+    "exploreSupplyChains": "Explore Supply Chains",
+    "viewSignals": "View Signals",
+    "livePreview": "Live Supply Chain Preview",
+    "socialProof": {
+      "investors": "Investors Tracking Supply Chains",
+      "companies": "Companies Mapped",
+      "sectors": "Sectors Covered",
+      "flows": "Institutional Flows Tracked"
+    },
+    "featuredSectors": "Featured Sectors",
+    "featuredSectorsDesc": "Dive into supply chain maps and cascade patterns for each major sector.",
+    "explore": "Explore",
+    "companies": "{count} companies",
+    "latestSignals": "Latest Institutional Signals",
+    "latestSignalsDesc": "Recent 13F filings showing significant institutional activity.",
+    "viewAllSignals": "View All Signals",
+    "fourLenses": "Four Lenses on Supply Chain Alpha",
+    "fourLensesDesc": "ChainFlow combines supply chain mapping, institutional signal detection, cascade analysis, and news gap scoring into one platform.",
+    "featureCards": {
+      "supplyChainMaps": "Supply Chain Maps",
+      "institutionalFlowSignals": "Institutional Flow Signals",
+      "leaderToMidcapCascade": "Leader-to-Midcap Cascade",
+      "newsGapAnalyzer": "News Gap Analyzer"
+    },
+    "howItWorks": "How It Works",
+    "steps": {
+      "mapTheChain": "Map the Chain",
+      "mapTheChainDesc": "Explore interactive supply chain graphs showing how companies are connected through supplier, customer, and partner relationships.",
+      "detectTheSignal": "Detect the Signal",
+      "detectTheSignalDesc": "Monitor institutional 13F filings for unusual accumulation patterns. Cross-reference with media coverage to find the news gap.",
+      "tradeTheCascade": "Trade the Cascade",
+      "tradeTheCascadeDesc": "When a leader stock moves, use our cascade tracker to identify which downstream stocks will follow and when."
+    },
+    "startExploringNow": "Start Exploring Now",
+    "disclaimer": "ChainFlow provides supply chain data for informational purposes only. It does not constitute financial advice. Past institutional activity does not guarantee future returns. Always conduct your own research before making investment decisions."
   },
   "feedback": {
     "title": "Send Feedback",
@@ -171,7 +337,17 @@
     "messagePlaceholder": "Tell us what's on your mind...",
     "submit": "Submit Feedback",
     "success": "Thank you for your feedback!",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "sendFeedback": "Send Feedback",
+    "helpImprove": "Help us improve ChainFlow",
+    "feedbackType": "Feedback Type",
+    "bugReport": "Bug Report",
+    "featureRequest": "Feature Request",
+    "generalFeedback": "General Feedback",
+    "message": "Message",
+    "tellUs": "Tell us what's on your mind...",
+    "cancel": "Cancel",
+    "submitBtn": "Submit"
   },
   "common": {
     "loading": "Loading...",
@@ -206,7 +382,10 @@
     "new": "New",
     "comingSoon": "Coming Soon",
     "pro": "Pro",
-    "free": "Free"
+    "free": "Free",
+    "share": "Share",
+    "copied": "Copied!",
+    "home": "Home"
   },
   "footer": {
     "tagline": "Mapping the world's supply chains, one connection at a time.",
@@ -218,7 +397,31 @@
     "status": "System Status",
     "documentation": "Documentation",
     "api": "API Access",
-    "disclaimer": "ChainFlow provides supply chain data for informational purposes only. It does not constitute financial advice. Always conduct your own research before making investment decisions."
+    "disclaimer": "ChainFlow provides supply chain data for informational purposes only. It does not constitute financial advice. Always conduct your own research before making investment decisions.",
+    "product": "Product",
+    "resources": "Resources",
+    "legal": "Legal",
+    "company": "Company",
+    "explore": "Explore",
+    "cascade": "Cascade",
+    "signals": "Signals",
+    "newsGap": "News Gap",
+    "blog": "Blog",
+    "howToUse": "How to Use",
+    "faq": "FAQ",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "emailCta": {
+    "title": "Get Weekly Supply Chain Insights",
+    "description": "Institutional flow signals, cascade alerts, and news gap analysis delivered to your inbox every Monday.",
+    "placeholder": "you@example.com",
+    "subscribe": "Subscribe",
+    "subscribed": "You are subscribed!",
+    "subscribedDesc": "We will send you weekly supply chain insights. Stay tuned.",
+    "invalidEmail": "Please enter a valid email address."
   },
   "seo": {
     "homeTitle": "ChainFlow \u2014 Supply Chain Intelligence Platform",
