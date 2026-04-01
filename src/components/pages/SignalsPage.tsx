@@ -1,0 +1,320 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { institutionalSignals, type InstitutionalSignal } from '@/data/institutional-signals';
+import { sectors } from '@/data/sectors';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts';
+import {
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  LogOut,
+  Filter,
+  ArrowUpDown,
+  Activity,
+  AlertTriangle,
+} from 'lucide-react';
+
+const actionColors: Record<string, { text: string; bg: string; label: string }> = {
+  accumulating: { text: 'text-green-600', bg: 'bg-green-50', label: 'Accumulating' },
+  reducing: { text: 'text-red-600', bg: 'bg-red-50', label: 'Reducing' },
+  new_position: { text: 'text-blue-600', bg: 'bg-blue-50', label: 'New Position' },
+  exit: { text: 'text-orange-600', bg: 'bg-orange-50', label: 'Exit' },
+};
+
+const actionIcons: Record<string, React.ReactNode> = {
+  accumulating: <TrendingUp className="w-3.5 h-3.5" />,
+  reducing: <TrendingDown className="w-3.5 h-3.5" />,
+  new_position: <Plus className="w-3.5 h-3.5" />,
+  exit: <LogOut className="w-3.5 h-3.5" />,
+};
+
+const sectorColors: Record<string, string> = {
+  semiconductors: '#6366f1',
+  'ai-cloud': '#3b82f6',
+  'ev-battery': '#22c55e',
+  defense: '#ef4444',
+  'pharma-biotech': '#a855f7',
+};
+
+type SortKey = 'date' | 'value' | 'gap';
+
+export default function SignalsPage() {
+  const t = useTranslations('signals');
+  const [sectorFilter, setSectorFilter] = useState<string>('all');
+  const [actionFilter, setActionFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<SortKey>('date');
+
+  const filtered = useMemo(() => {
+    let result = [...institutionalSignals];
+    if (sectorFilter !== 'all') {
+      result = result.filter((s) => s.sector === sectorFilter);
+    }
+    if (actionFilter !== 'all') {
+      result = result.filter((s) => s.action === actionFilter);
+    }
+
+    result.sort((a, b) => {
+      if (sortBy === 'date') return b.filingDate.localeCompare(a.filingDate);
+      if (sortBy === 'gap') return b.newsGapScore - a.newsGapScore;
+      // sort by value - parse the estimated value
+      const parseVal = (v: string) => {
+        const num = parseFloat(v.replace(/[^0-9.-]/g, ''));
+        return isNaN(num) ? 0 : Math.abs(num);
+      };
+      return parseVal(b.estimatedValue) - parseVal(a.estimatedValue);
+    });
+
+    return result;
+  }, [sectorFilter, actionFilter, sortBy]);
+
+  // Sector breakdown for bar chart
+  const sectorBreakdown = useMemo(() => {
+    const map: Record<string, { accumulating: number; reducing: number }> = {};
+    for (const s of institutionalSignals) {
+      if (!map[s.sector]) map[s.sector] = { accumulating: 0, reducing: 0 };
+      if (s.action === 'accumulating' || s.action === 'new_position') {
+        map[s.sector].accumulating += 1;
+      } else {
+        map[s.sector].reducing += 1;
+      }
+    }
+    return Object.entries(map).map(([sector, data]) => ({
+      sector: sector.replace('-', '/').slice(0, 12),
+      sectorId: sector,
+      Accumulating: data.accumulating,
+      Reducing: data.reducing,
+    }));
+  }, []);
+
+  // Top institutions
+  const topInstitutions = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const s of institutionalSignals) {
+      map[s.institution] = (map[s.institution] || 0) + 1;
+    }
+    return Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+  }, []);
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cf-secondary/10 text-cf-secondary text-sm font-medium mb-4">
+          <Activity className="w-4 h-4" />
+          {t('title')}
+        </div>
+        <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-2">
+          {t('title')}
+        </h1>
+        <p className="text-lg text-cf-text-secondary">{t('subtitle')}</p>
+      </div>
+
+      {/* Filters */}
+      <div className="cf-card p-4 mb-8">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-cf-text-secondary" />
+            <span className="text-sm font-medium text-cf-text-secondary">Filters:</span>
+          </div>
+
+          <select
+            value={sectorFilter}
+            onChange={(e) => setSectorFilter(e.target.value)}
+            className="cf-input w-auto text-sm py-1.5"
+          >
+            <option value="all">All Sectors</option>
+            {sectors.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value)}
+            className="cf-input w-auto text-sm py-1.5"
+          >
+            <option value="all">All Actions</option>
+            <option value="accumulating">Accumulating</option>
+            <option value="reducing">Reducing</option>
+            <option value="new_position">New Position</option>
+            <option value="exit">Exit</option>
+          </select>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <ArrowUpDown className="w-4 h-4 text-cf-text-secondary" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortKey)}
+              className="cf-input w-auto text-sm py-1.5"
+            >
+              <option value="date">Sort by Date</option>
+              <option value="value">Sort by Value</option>
+              <option value="gap">Sort by Gap Score</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Sector breakdown chart */}
+        <div className="cf-card p-6">
+          <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
+            Sector Activity
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={sectorBreakdown} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis type="number" tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="sector" width={80} tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Bar dataKey="Accumulating" fill="#5CB88A" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="Reducing" fill="#D97171" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Top Institutions */}
+        <div className="cf-card p-6 lg:col-span-2">
+          <h3 className="text-lg font-heading font-bold text-cf-text-primary mb-4">
+            Most Active Institutions
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {topInstitutions.map(([name, count], i) => (
+              <div
+                key={name}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-cf-primary/10 text-cf-primary text-xs font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-cf-text-primary font-medium truncate">
+                    {name}
+                  </span>
+                </div>
+                <span className="text-xs text-cf-text-secondary bg-white px-2 py-1 rounded-full">
+                  {count} signals
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Signal table/cards */}
+      <div className="cf-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b border-cf-border">
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
+                  Company
+                </th>
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
+                  Institution
+                </th>
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
+                  Action
+                </th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
+                  Shares Changed
+                </th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
+                  Value
+                </th>
+                <th className="text-center py-3 px-4 text-cf-text-secondary font-medium">
+                  Gap Score
+                </th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
+                  Filing Date
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((sig) => {
+                const action = actionColors[sig.action];
+                return (
+                  <tr
+                    key={sig.id}
+                    className="border-b border-cf-border/50 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="py-3 px-4">
+                      <Link
+                        href={`/company/${sig.ticker}`}
+                        className="hover:text-cf-primary transition-colors"
+                      >
+                        <span className="font-mono font-bold text-cf-primary text-xs mr-2">
+                          {sig.ticker}
+                        </span>
+                        <span className="text-cf-text-primary">{sig.companyName}</span>
+                      </Link>
+                    </td>
+                    <td className="py-3 px-4 text-cf-text-secondary">{sig.institution}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${action.bg} ${action.text}`}
+                      >
+                        {actionIcons[sig.action]}
+                        {action.label}
+                      </span>
+                    </td>
+                    <td className="text-right py-3 px-4 font-mono text-xs text-cf-text-secondary">
+                      {sig.sharesChanged.toLocaleString()}
+                    </td>
+                    <td className="text-right py-3 px-4 font-medium text-cf-text-primary">
+                      {sig.estimatedValue}
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      <div className="flex items-center justify-center gap-1.5">
+                        {sig.newsGapScore >= 70 && (
+                          <AlertTriangle className="w-3.5 h-3.5 text-cf-accent" />
+                        )}
+                        <span
+                          className={`text-xs font-bold ${
+                            sig.newsGapScore >= 70
+                              ? 'text-cf-accent'
+                              : sig.newsGapScore >= 40
+                              ? 'text-cf-primary'
+                              : 'text-cf-text-secondary'
+                          }`}
+                        >
+                          {sig.newsGapScore}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-right py-3 px-4 text-xs text-cf-text-secondary">
+                      {sig.filingDate}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {filtered.length === 0 && (
+          <div className="py-12 text-center text-cf-text-secondary">
+            No signals match your filters. Try adjusting the criteria.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

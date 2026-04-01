@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cf-primary: #4F8FBF;
+  --cf-secondary: #6CB4A8;
+  --cf-background: #F5F7FA;
+  --cf-surface: #FFFFFF;
+  --cf-text-primary: #1A2332;
+  --cf-text-secondary: #6B7B8D;
+  --cf-accent: #E8A945;
+  --cf-success: #5CB88A;
+  --cf-danger: #D97171;
+  --cf-border: #E2E8F0;
+  --cf-glass-bg: rgba(255, 255, 255, 0.72);
+  --cf-glass-border: rgba(255, 255, 255, 0.18);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--cf-text-primary);
+  background: var(--cf-background);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cf-background);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cf-text-secondary);
+  border-radius: 4px;
+  transition: background 200ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cf-primary);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cf-text-secondary) var(--cf-background);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    background: var(--cf-glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cf-glass-border);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+@layer components {
+  .cf-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 transition-shadow duration-200;
+  }
+
+  .cf-card:hover {
+    @apply shadow-md;
+  }
+
+  .cf-btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+           bg-cf-primary text-white font-medium text-sm
+           transition-all duration-200
+           hover:bg-cf-primary/90 hover:shadow-md
+           active:scale-[0.98]
+           focus:outline-none focus:ring-2 focus:ring-cf-primary/40 focus:ring-offset-2;
+  }
+
+  .cf-btn-secondary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+           bg-white text-cf-text-primary font-medium text-sm
+           border border-gray-200
+           transition-all duration-200
+           hover:bg-gray-50 hover:shadow-sm hover:border-gray-300
+           active:scale-[0.98]
+           focus:outline-none focus:ring-2 focus:ring-cf-primary/20 focus:ring-offset-2;
+  }
+
+  .cf-input {
+    @apply w-full px-4 py-2.5 rounded-lg
+           bg-white border border-gray-200
+           text-cf-text-primary text-sm placeholder:text-cf-text-secondary/60
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-cf-primary/30 focus:border-cf-primary;
+  }
+}
