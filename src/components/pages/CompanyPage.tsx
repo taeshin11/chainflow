@@ -35,6 +35,8 @@ import {
   Gauge,
   Loader2,
 } from 'lucide-react';
+import ShareButtons from '@/components/ShareButtons';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const COLORS = ['#4F8FBF', '#6CB4A8', '#E8A945', '#D97171', '#5CB88A', '#7C5CFC'];
 
@@ -146,6 +148,8 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <Breadcrumbs overrides={{ [company.ticker]: { label: company.name } }} />
+
       {/* Back */}
       <Link
         href="/explore"
@@ -171,7 +175,8 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 {company.role}
               </span>
             </div>
-            <p className="text-cf-text-secondary leading-relaxed">{company.description}</p>
+            <p className="text-cf-text-secondary leading-relaxed mb-4">{company.description}</p>
+            <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | ChainFlow`} />
           </div>
 
           {/* Products & Revenue */}

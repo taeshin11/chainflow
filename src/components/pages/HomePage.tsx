@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { sectors } from '@/data/sectors';
+import { institutionalSignals } from '@/data/institutional-signals';
 import {
   ArrowRight,
   Network,
@@ -14,8 +15,15 @@ import {
   Zap,
   Shield,
   FlaskConical,
+  Users,
+  BarChart3,
+  Globe,
+  Plus,
+  LogOut,
+  TrendingDown,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import EmailCTA from '@/components/EmailCTA';
 
 const sectorIcons: Record<string, React.ReactNode> = {
   Cpu: <Cpu className="w-6 h-6" />,
@@ -25,6 +33,36 @@ const sectorIcons: Record<string, React.ReactNode> = {
   FlaskConical: <FlaskConical className="w-6 h-6" />,
   Zap: <Zap className="w-6 h-6" />,
 };
+
+const actionIcons: Record<string, React.ReactNode> = {
+  accumulating: <TrendingUp className="w-3.5 h-3.5" />,
+  reducing: <TrendingDown className="w-3.5 h-3.5" />,
+  new_position: <Plus className="w-3.5 h-3.5" />,
+  exit: <LogOut className="w-3.5 h-3.5" />,
+};
+
+const actionColors: Record<string, string> = {
+  accumulating: 'text-green-600 bg-green-50',
+  reducing: 'text-red-600 bg-red-50',
+  new_position: 'text-blue-600 bg-blue-50',
+  exit: 'text-orange-600 bg-orange-50',
+};
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, visible };
+}
 
 function MiniGraph() {
   const [mounted, setMounted] = useState(false);
@@ -102,6 +140,17 @@ export default function HomePage() {
   const t = useTranslations('hero');
   const tCommon = useTranslations('common');
 
+  const socialProof = useInView();
+  const featuredSectors = useInView();
+  const latestSignals = useInView();
+  const features = useInView();
+  const howItWorks = useInView();
+
+  // Get the 5 most recent/interesting signals
+  const topSignals = institutionalSignals
+    .filter((s) => s.action === 'accumulating' || s.action === 'new_position')
+    .slice(0, 5);
+
   return (
     <div>
       {/* Hero */}
@@ -134,11 +183,11 @@ export default function HomePage() {
                 {t('description')}
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/explore" className="cf-btn-primary text-base px-8 py-3 gap-2">
+                <Link href="/explore" className="cf-btn-primary text-base px-8 py-3.5 gap-2 shadow-lg shadow-cf-primary/25 hover:shadow-xl hover:shadow-cf-primary/30 transition-all">
                   Explore Supply Chains
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/signals" className="cf-btn-secondary text-base px-8 py-3">
+                <Link href="/signals" className="cf-btn-secondary text-base px-8 py-3.5">
                   View Signals
                 </Link>
               </div>
@@ -153,8 +202,151 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Social Proof */}
+      <section
+        ref={socialProof.ref}
+        className={`border-y border-cf-border bg-white transition-all duration-700 ${
+          socialProof.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { value: '10,000+', label: 'Investors Tracking Supply Chains', icon: <Users className="w-5 h-5" /> },
+              { value: '30+', label: 'Companies Mapped', icon: <Network className="w-5 h-5" /> },
+              { value: '5', label: 'Sectors Covered', icon: <Globe className="w-5 h-5" /> },
+              { value: '$12B+', label: 'Institutional Flows Tracked', icon: <BarChart3 className="w-5 h-5" /> },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-cf-primary/10 text-cf-primary mb-3">
+                  {stat.icon}
+                </div>
+                <p className="text-2xl md:text-3xl font-heading font-bold text-cf-text-primary">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-cf-text-secondary mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Sectors */}
+      <section
+        ref={featuredSectors.ref}
+        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${
+          featuredSectors.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
+            Featured Sectors
+          </h2>
+          <p className="text-cf-text-secondary max-w-2xl mx-auto">
+            Dive into supply chain maps and cascade patterns for each major sector.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {sectors.map((sector) => (
+            <Link
+              key={sector.id}
+              href={`/explore/${sector.id}`}
+              className="cf-card p-6 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center border-2 border-transparent hover:border-current/10"
+              style={{ '--tw-border-opacity': '0.1', borderColor: 'transparent' } as React.CSSProperties}
+            >
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110"
+                style={{ backgroundColor: sector.color + '15', color: sector.color }}
+              >
+                {sectorIcons[sector.icon] || <Network className="w-6 h-6" />}
+              </div>
+              <h3 className="font-heading font-bold text-cf-text-primary text-base mb-2 group-hover:text-cf-primary transition-colors">
+                {sector.name}
+              </h3>
+              <p className="text-xs text-cf-text-secondary mb-3 line-clamp-2">
+                {sector.description.split('.')[0]}.
+              </p>
+              <div className="flex items-center justify-center gap-1 text-sm font-medium text-cf-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                Explore
+                <ArrowRight className="w-4 h-4" />
+              </div>
+              <p className="text-xs text-cf-text-secondary mt-2">
+                {sector.companyCount} companies
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Latest Signals */}
+      <section
+        ref={latestSignals.ref}
+        className={`bg-white py-20 transition-all duration-700 ${
+          latestSignals.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-2">
+                Latest Institutional Signals
+              </h2>
+              <p className="text-cf-text-secondary">
+                Recent 13F filings showing significant institutional activity.
+              </p>
+            </div>
+            <Link href="/signals" className="cf-btn-secondary gap-2 hidden md:inline-flex">
+              View All Signals
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {topSignals.map((signal) => (
+              <Link
+                key={signal.id}
+                href={`/company/${signal.ticker}`}
+                className="cf-card p-5 group hover:shadow-lg transition-all"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-mono font-bold text-cf-primary text-lg">
+                    {signal.ticker}
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${actionColors[signal.action]}`}
+                  >
+                    {actionIcons[signal.action]}
+                    {signal.action.replace('_', ' ')}
+                  </span>
+                </div>
+                <p className="text-sm text-cf-text-primary font-medium mb-1 truncate">
+                  {signal.companyName}
+                </p>
+                <p className="text-xs text-cf-text-secondary mb-3">
+                  {signal.institution}
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-cf-text-secondary">{signal.filingDate}</span>
+                  <span className="font-bold text-cf-text-primary">{signal.estimatedValue}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 text-center md:hidden">
+            <Link href="/signals" className="cf-btn-secondary gap-2">
+              View All Signals
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+      <section
+        ref={features.ref}
+        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${
+          features.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
         <div className="text-center mb-12">
           <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
             Four Lenses on Supply Chain Alpha
@@ -215,7 +407,12 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="bg-white py-20">
+      <section
+        ref={howItWorks.ref}
+        className={`bg-white py-20 transition-all duration-700 ${
+          howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
@@ -251,42 +448,17 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+          <div className="text-center mt-10">
+            <Link href="/explore" className="cf-btn-primary text-base px-10 py-3.5 gap-2 shadow-lg shadow-cf-primary/25">
+              Start Exploring Now
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Sector Selector */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-heading font-bold text-cf-text-primary mb-4">
-            Explore by Sector
-          </h2>
-          <p className="text-cf-text-secondary">
-            Dive into supply chain maps and cascade patterns for each major sector.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {sectors.map((sector) => (
-            <Link
-              key={sector.id}
-              href={`/explore/${sector.id}`}
-              className="cf-card p-5 group hover:shadow-lg transition-all text-center"
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
-                style={{ backgroundColor: sector.color + '15', color: sector.color }}
-              >
-                {sectorIcons[sector.icon] || <Network className="w-6 h-6" />}
-              </div>
-              <h3 className="font-heading font-bold text-cf-text-primary text-sm mb-1 group-hover:text-cf-primary transition-colors">
-                {sector.name}
-              </h3>
-              <p className="text-xs text-cf-text-secondary">
-                {sector.companyCount} companies
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Email CTA */}
+      <EmailCTA />
 
       {/* Disclaimer */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">

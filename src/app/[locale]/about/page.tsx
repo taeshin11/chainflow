@@ -1,43 +1,187 @@
-'use client';
+import { Mail, ExternalLink, Shield, Eye, Users, Heart, BarChart3, Globe, Zap, Database, TrendingUp, Network } from 'lucide-react';
+import { generateSeoMetadata } from '@/lib/seo';
+import type { Metadata } from 'next';
 
-import { useTranslations } from 'next-intl';
-import { Mail, ExternalLink, Shield, Eye, Users, Heart } from 'lucide-react';
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return generateSeoMetadata({
+    title: 'About ChainFlow',
+    description:
+      'Learn about ChainFlow by SPINAI. Free supply chain institutional flow tracker for retail investors.',
+    path: '/about',
+    locale: params.locale,
+    keywords: [
+      'about ChainFlow',
+      'SPINAI',
+      'supply chain intelligence',
+      'retail investor tools',
+    ],
+  });
+}
 
 export default function AboutPage() {
-  const t = useTranslations('about');
-
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          {t('title')}
+          About ChainFlow
         </h1>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           Supply chain intelligence for the modern investor
         </p>
       </div>
 
-      {/* Mission */}
+      {/* What is ChainFlow */}
       <section className="cf-card p-8 mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          {t('mission')}
+          What Is ChainFlow?
         </h2>
-        <p className="text-cf-text-secondary leading-relaxed">{t('missionText')}</p>
+        <div className="space-y-4 text-cf-text-secondary leading-relaxed">
+          <p>
+            ChainFlow is a free, web-based supply chain intelligence platform that tracks how institutional
+            buying flows through supply chain relationships — before the headlines catch up. Built for
+            investors, analysts, researchers, and anyone who wants a clearer view of global trade dynamics,
+            ChainFlow transforms complex, fragmented supply chain data into actionable visual insights that
+            were previously available only to hedge funds and large institutional trading desks.
+          </p>
+          <p>
+            At its core, ChainFlow solves a fundamental problem in modern investing: the information
+            asymmetry between institutional investors and everyone else. When a major fund begins
+            accumulating positions in a semiconductor supplier, the ripple effects travel through dozens of
+            interconnected companies — from raw material providers to logistics firms to end-product
+            manufacturers. Traditional financial tools show you price movements after the fact. ChainFlow
+            shows you the supply chain connections that explain why those movements happen, often before the
+            broader market recognizes the pattern.
+          </p>
+          <p>
+            The platform aggregates data from SEC filings, earnings call transcripts, trade databases,
+            shipping records, and alternative data sources to build a living map of global supply chain
+            relationships. By cross-referencing institutional flow data with these supply chain maps,
+            ChainFlow identifies early warning signals — such as unusual accumulation patterns in a
+            cluster of related companies, or divergences between media coverage and actual supply chain
+            activity — that may indicate emerging opportunities or risks.
+          </p>
+          <p>
+            Whether you are a retail investor looking for an edge, a supply chain professional monitoring
+            disruption risk, a journalist investigating corporate interconnections, or an academic
+            researcher studying global trade networks, ChainFlow provides a powerful, intuitive interface
+            for exploring the hidden architecture of the global economy. And because we believe supply chain
+            transparency should not be a privilege reserved for the few, ChainFlow is entirely free to use.
+          </p>
+        </div>
       </section>
 
-      {/* Story */}
+      {/* Who Is ChainFlow For */}
       <section className="cf-card p-8 mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          {t('story')}
+          Who Is ChainFlow For?
         </h2>
-        <p className="text-cf-text-secondary leading-relaxed">{t('storyText')}</p>
+        <div className="space-y-4 text-cf-text-secondary leading-relaxed">
+          <p>
+            ChainFlow is designed for a broad range of users who need visibility into supply chain
+            relationships and institutional capital flows. Our platform serves several key audiences:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cf-primary/10 flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-cf-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Retail Investors</h3>
+                <p className="text-sm">Individual investors seeking institutional-grade supply chain intelligence to make more informed investment decisions and identify emerging trends before they become widely recognized.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cf-secondary/10 flex items-center justify-center flex-shrink-0">
+                <BarChart3 className="w-5 h-5 text-cf-secondary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Financial Analysts</h3>
+                <p className="text-sm">Equity researchers and buy-side analysts who need comprehensive supply chain mapping to understand company exposure, concentration risks, and second-order effects of market events.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cf-accent/10 flex items-center justify-center flex-shrink-0">
+                <Network className="w-5 h-5 text-cf-accent" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Supply Chain Professionals</h3>
+                <p className="text-sm">Procurement managers, logistics coordinators, and supply chain risk officers who need real-time visibility into disruption propagation and vendor relationship networks.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cf-success/10 flex items-center justify-center flex-shrink-0">
+                <Globe className="w-5 h-5 text-cf-success" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Researchers &amp; Journalists</h3>
+                <p className="text-sm">Academics, investigative journalists, and policy analysts studying global trade patterns, corporate interconnections, and the systemic risks embedded in modern supply chains.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Technology */}
+      <section className="cf-card p-8 mb-8">
+        <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
+          Our Technology &amp; Methodology
+        </h2>
+        <div className="space-y-4 text-cf-text-secondary leading-relaxed">
+          <p>
+            ChainFlow employs a multi-layered approach to supply chain intelligence that combines data
+            aggregation, network analysis, and signal detection into a unified platform. Our methodology
+            is built on several key technological pillars:
+          </p>
+          <div className="space-y-6 mt-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-cf-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <Database className="w-5 h-5 text-cf-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Multi-Source Data Aggregation</h3>
+                <p className="text-sm">We ingest and normalize data from SEC filings (13F, 10-K, 10-Q, 8-K), earnings call transcripts, international trade databases, shipping and logistics records, patent filings, corporate press releases, and curated alternative data feeds. This creates a comprehensive, continuously updated picture of who supplies whom, and how capital is flowing through these networks.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-cf-secondary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <Network className="w-5 h-5 text-cf-secondary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Supply Chain Graph Modeling</h3>
+                <p className="text-sm">At the heart of ChainFlow is a dynamic graph database that models companies, suppliers, customers, and intermediaries as nodes in an interconnected network. Edges represent supply relationships, capital flows, shared risk exposures, and competitive dynamics. This graph structure allows us to compute cascade effects, identify concentration risks, and surface non-obvious connections between seemingly unrelated entities.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-cf-accent/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <Zap className="w-5 h-5 text-cf-accent" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">Institutional Signal Detection</h3>
+                <p className="text-sm">Our signal detection engine monitors institutional trading patterns, insider activity, and filing anomalies to identify early indicators of supply chain-relevant events. By correlating these signals with our supply chain graph, we can detect when smart money is positioning around supply chain themes — such as reshoring, diversification, or anticipated disruptions — often weeks before mainstream coverage.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-cf-success/10 flex items-center justify-center flex-shrink-0 mt-1">
+                <BarChart3 className="w-5 h-5 text-cf-success" />
+              </div>
+              <div>
+                <h3 className="font-medium text-cf-text-primary mb-1">News Gap Analysis</h3>
+                <p className="text-sm">ChainFlow continuously compares the magnitude of supply chain events (as measured by our data feeds and graph analysis) with the level of media and analyst coverage those events have received. When we detect a significant gap — a material event with minimal coverage — we flag it as a potential alpha-generating opportunity for our users.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Values */}
       <section className="mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-6 text-center">
-          {t('values')}
+          Our Values
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="cf-card p-6 text-center">
@@ -45,27 +189,27 @@ export default function AboutPage() {
               <Eye className="w-6 h-6 text-cf-primary" />
             </div>
             <h3 className="font-heading font-bold text-cf-text-primary mb-2">
-              {t('valuesTransparency')}
+              Transparency
             </h3>
-            <p className="text-sm text-cf-text-secondary">{t('valuesTransparencyText')}</p>
+            <p className="text-sm text-cf-text-secondary">We believe information asymmetry creates unfair markets. Our goal is to level the playing field by making supply chain data accessible to all participants, regardless of their institutional resources or trading volume.</p>
           </div>
           <div className="cf-card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-cf-secondary/10 flex items-center justify-center mx-auto mb-4">
               <Shield className="w-6 h-6 text-cf-secondary" />
             </div>
             <h3 className="font-heading font-bold text-cf-text-primary mb-2">
-              {t('valuesAccuracy')}
+              Accuracy
             </h3>
-            <p className="text-sm text-cf-text-secondary">{t('valuesAccuracyText')}</p>
+            <p className="text-sm text-cf-text-secondary">Every data point is verified and cross-referenced against multiple sources. We would rather display fewer data points than risk presenting inaccurate information. Trust is the foundation of everything we build.</p>
           </div>
           <div className="cf-card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-cf-accent/10 flex items-center justify-center mx-auto mb-4">
               <Users className="w-6 h-6 text-cf-accent" />
             </div>
             <h3 className="font-heading font-bold text-cf-text-primary mb-2">
-              {t('valuesAccessibility')}
+              Accessibility
             </h3>
-            <p className="text-sm text-cf-text-secondary">{t('valuesAccessibilityText')}</p>
+            <p className="text-sm text-cf-text-secondary">Powerful analytical tools should be available to everyone, not just institutions with deep pockets. ChainFlow is free because we believe democratizing financial intelligence leads to fairer, more efficient markets.</p>
           </div>
         </div>
       </section>
@@ -75,14 +219,24 @@ export default function AboutPage() {
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
           About SPINAI
         </h2>
-        <p className="text-cf-text-secondary leading-relaxed">
-          SPINAI is a technology company focused on building AI-powered tools that democratize
-          access to institutional-grade financial intelligence. We believe that supply chain
-          transparency and investment signal detection should not be exclusive to hedge funds and
-          investment banks. ChainFlow is our flagship product, combining alternative data
-          analysis, supply chain mapping, and AI-driven insights to level the playing field for
-          all investors.
-        </p>
+        <div className="space-y-4 text-cf-text-secondary leading-relaxed">
+          <p>
+            SPINAI is a technology company focused on building AI-powered tools that democratize
+            access to institutional-grade financial intelligence. We believe that supply chain
+            transparency and investment signal detection should not be exclusive to hedge funds and
+            investment banks. Our mission is to harness artificial intelligence, alternative data
+            analysis, and intuitive design to create products that give every market participant —
+            from individual retail investors to independent research firms — the analytical
+            capabilities that were once the exclusive domain of Wall Street.
+          </p>
+          <p>
+            ChainFlow is the flagship product of SPINAI, representing our core belief that the most
+            valuable investment insights often lie not in traditional financial statements, but in the
+            complex web of supply chain relationships that underpin the global economy. We are
+            committed to continuous improvement of our platform, incorporating user feedback and
+            expanding our data coverage to deliver ever-more-comprehensive supply chain intelligence.
+          </p>
+        </div>
       </section>
 
       {/* Disclaimer */}
@@ -104,15 +258,21 @@ export default function AboutPage() {
       {/* Contact */}
       <section className="cf-card p-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-6">
-          {t('contact')}
+          Get in Touch
         </h2>
+        <p className="text-cf-text-secondary leading-relaxed mb-6">
+          We value feedback from our users and are always looking for ways to improve ChainFlow.
+          Whether you have a question about the platform, a feature suggestion, a bug report, or a
+          business inquiry, we would love to hear from you. Our team reviews every message and
+          strives to respond promptly.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-lg bg-cf-primary/10 flex items-center justify-center flex-shrink-0">
               <Heart className="w-5 h-5 text-cf-primary" />
             </div>
             <div>
-              <h3 className="font-medium text-cf-text-primary mb-1">Feedback & Suggestions</h3>
+              <h3 className="font-medium text-cf-text-primary mb-1">Feedback &amp; Suggestions</h3>
               <a
                 href="mailto:taeshinkim11@gmail.com"
                 className="text-cf-primary hover:underline flex items-center gap-1 text-sm"

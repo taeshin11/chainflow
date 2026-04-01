@@ -1,6 +1,84 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import FeedbackWidget from '@/components/FeedbackWidget';
+import { generateSeoMetadata } from '@/lib/seo';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return generateSeoMetadata({
+    title: 'Supply Chain Institutional Flow Tracker',
+    description:
+      'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.',
+    locale: params.locale,
+    keywords: [
+      'supply chain',
+      'institutional buying',
+      'cascade trading',
+      '13F filings',
+      'mid-cap stocks',
+    ],
+  });
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://chainflow-mu.vercel.app/#organization',
+      name: 'SPINAI',
+      url: 'https://chainflow-mu.vercel.app',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://chainflow-mu.vercel.app/og-default.png',
+      },
+      sameAs: [],
+    },
+    {
+      '@type': 'WebApplication',
+      '@id': 'https://chainflow-mu.vercel.app/#webapp',
+      name: 'ChainFlow',
+      url: 'https://chainflow-mu.vercel.app',
+      description:
+        'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+      creator: {
+        '@type': 'Organization',
+        name: 'SPINAI',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://chainflow-mu.vercel.app/#website',
+      url: 'https://chainflow-mu.vercel.app',
+      name: 'ChainFlow',
+      publisher: {
+        '@id': 'https://chainflow-mu.vercel.app/#organization',
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate:
+            'https://chainflow-mu.vercel.app/en/explore?q={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+};
 
 export default async function LocaleLayout({
   children,
@@ -15,22 +93,12 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <Navbar />
       <main className="min-h-screen">{children}</main>
-      <footer className="border-t border-cf-border bg-white py-8 mt-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-sm text-cf-text-secondary">
-          <p className="font-heading font-bold text-cf-text-primary mb-2">
-            Chain<span className="text-cf-primary">Flow</span>
-          </p>
-          <p className="mb-4">Mapping the world&apos;s supply chains, one connection at a time.</p>
-          <p className="text-xs">
-            &copy; {new Date().getFullYear()} ChainFlow by SPINAI. All rights reserved.
-          </p>
-          <p className="text-xs mt-2 max-w-2xl mx-auto opacity-70">
-            ChainFlow provides supply chain data for informational purposes only. It does not
-            constitute financial advice. Always conduct your own research before making investment
-            decisions.
-          </p>
-        </div>
-      </footer>
+      <Footer />
+      <FeedbackWidget />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </NextIntlClientProvider>
   );
 }

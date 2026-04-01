@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Menu, X, Link as LinkIcon } from 'lucide-react';
+import { Menu, X, Link as LinkIcon, MessageCircle } from 'lucide-react';
 
 const navLinks = [
   { href: '/explore', key: 'explore' },
@@ -71,6 +71,15 @@ export default function Navbar() {
                   {t(link.key)}
                 </Link>
               ))}
+              <a
+                href="mailto:taeshinkim11@gmail.com"
+                className="px-3 py-2 rounded-lg text-xs font-medium text-cf-text-secondary/70
+                           hover:text-cf-primary hover:bg-cf-primary/5
+                           transition-all duration-200 flex items-center gap-1"
+              >
+                <MessageCircle className="w-3 h-3" />
+                Feedback
+              </a>
             </div>
 
             {/* Mobile hamburger */}

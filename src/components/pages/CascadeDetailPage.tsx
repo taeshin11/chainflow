@@ -14,6 +14,8 @@ import {
   Zap,
   CheckCircle2,
 } from 'lucide-react';
+import ShareButtons from '@/components/ShareButtons';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const roleColors: Record<string, { bg: string; text: string; border: string }> = {
   leader: { bg: 'bg-cf-primary/10', text: 'text-cf-primary', border: 'border-cf-primary' },
@@ -103,6 +105,8 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <Breadcrumbs overrides={{ [sector]: { label: `${primary.sectorName} Cascade` } }} />
+
       <Link
         href="/cascade"
         className="inline-flex items-center gap-2 text-sm text-cf-text-secondary hover:text-cf-primary transition-colors mb-6"
@@ -113,9 +117,12 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
 
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-3xl font-heading font-bold text-cf-text-primary mb-2">
-          {primary.sectorName} Cascade
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+          <h1 className="text-3xl font-heading font-bold text-cf-text-primary">
+            {primary.sectorName} Cascade
+          </h1>
+          <ShareButtons title={`${primary.sectorName} Cascade Analysis | ChainFlow`} />
+        </div>
         <p className="text-lg text-cf-text-secondary max-w-3xl">{primary.description}</p>
       </div>
 

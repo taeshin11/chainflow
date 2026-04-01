@@ -26,7 +26,10 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-[500px]">Loading graph...</div>,
+});
 
 const sectorColorMap: Record<string, string> = {
   semiconductors: '#6366f1',
@@ -260,9 +263,21 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(800);
   const graphRef = useRef<{ zoomToFit: (ms?: number) => void }>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const filteredCompanies = useMemo(() => {
     let filtered = companies;
@@ -400,7 +415,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
 
       {/* Graph */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="cf-card relative overflow-hidden" style={{ height: '600px' }}>
+        <div ref={containerRef} className="cf-card relative overflow-hidden" style={{ height: '600px' }}>
           {mounted && graphData.nodes.length > 0 ? (
             <ForceGraph2D
               ref={graphRef as React.MutableRefObject<never>}
@@ -449,7 +464,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 ctx.fillText(label, x, y);
               }}
               backgroundColor="transparent"
-              width={undefined}
+              width={containerWidth}
               height={600}
             />
           ) : (

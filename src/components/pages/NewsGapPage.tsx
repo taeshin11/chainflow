@@ -24,6 +24,7 @@ import {
   ArrowRight,
   Search,
 } from 'lucide-react';
+import ShareButtons from '@/components/ShareButtons';
 
 function GapBar({ score }: { score: number }) {
   const getColor = () => {
@@ -93,6 +94,9 @@ export default function NewsGapPage() {
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
           The Silence <span className="text-cf-accent">IS</span> the Signal
         </h1>
+        <div className="flex justify-center mb-4">
+          <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | ChainFlow" />
+        </div>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           When institutional investors are quietly accumulating a stock that the media is
           ignoring, that divergence often precedes significant price movement. We measure this

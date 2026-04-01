@@ -3,6 +3,9 @@
 import { Link } from '@/i18n/routing';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import type { BlogPost } from '@/data/blog-posts';
+import ShareButtons from '@/components/ShareButtons';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import EmailCTA from '@/components/EmailCTA';
 
 const sectorColors: Record<string, string> = {
   semiconductors: 'bg-blue-100 text-blue-700',
@@ -60,6 +63,8 @@ function renderContent(content: string) {
 export default function BlogArticleClient({ post }: { post: BlogPost }) {
   return (
     <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
+      <Breadcrumbs overrides={{ [post.slug]: { label: post.title } }} />
+
       <Link
         href="/blog"
         className="inline-flex items-center gap-2 text-sm text-cf-text-secondary hover:text-cf-primary transition-colors mb-8"
@@ -91,12 +96,15 @@ export default function BlogArticleClient({ post }: { post: BlogPost }) {
           </span>
         </div>
 
-        <h1 className="text-4xl font-heading font-bold text-cf-text-primary leading-tight">
+        <h1 className="text-4xl font-heading font-bold text-cf-text-primary leading-tight mb-4">
           {post.title}
         </h1>
+        <ShareButtons title={`${post.title} | ChainFlow Blog`} />
       </header>
 
       <div className="prose-cf">{renderContent(post.content)}</div>
+
+      <EmailCTA />
 
       <footer className="mt-12 pt-8 border-t border-cf-border">
         <div className="cf-card p-6 bg-cf-primary/5 border-cf-primary/20">
