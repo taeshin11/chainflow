@@ -286,9 +286,9 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   useEffect(() => {
     if (graphRef.current) {
       const isMobile = containerWidth < 768;
-      graphRef.current.d3Force('charge')?.strength(isMobile ? -150 : -300);
-      graphRef.current.d3Force('link')?.distance(isMobile ? 60 : 100);
-      graphRef.current.d3Force('center')?.strength(0.3);
+      graphRef.current.d3Force('charge')?.strength(isMobile ? -250 : -500);
+      graphRef.current.d3Force('link')?.distance(isMobile ? 80 : 150);
+      graphRef.current.d3Force('center')?.strength(0.2);
       // Auto-fit after a short delay
       setTimeout(() => {
         if (graphRef.current) graphRef.current.zoomToFit(600, 40);
