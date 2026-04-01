@@ -389,8 +389,8 @@
   },
   "footer": {
     "tagline": "逐步繪製全球供應鏈版圖。",
-    "builtBy": "由 SPINAI 精心打造",
-    "copyright": "© {year} ChainFlow by SPINAI. All rights reserved.",
+    "builtBy": "由 THE ELIOT FINANCIAL 精心打造",
+    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
     "terms": "服務條款",
     "privacy": "隱私權政策",
     "contact": "聯絡我們",
@@ -434,7 +434,7 @@
     "signalsDescription": "從 SEC 文件、內部人交易和法說會中追蹤聰明資金動向與預警指標。",
     "newsGapTitle": "新聞盲區分析器 — ChainFlow",
     "newsGapDescription": "發現尚未獲得充分媒體報導的重大供應鏈事件。從報導不足的領域中尋找阿爾法。",
-    "aboutTitle": "關於 ChainFlow — SPINAI 旗下供應鏈情報平台",
+    "aboutTitle": "關於 ChainFlow — THE ELIOT FINANCIAL 旗下供應鏈情報平台",
     "aboutDescription": "瞭解 ChainFlow 致力於供應鏈情報民主化、讓全球貿易網路透明化的使命。"
   },
   "pro": {

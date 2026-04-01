@@ -351,8 +351,8 @@
   },
   "footer": {
     "tagline": "전 세계 공급망을 하나의 연결 고리씩 매핑합니다.",
-    "builtBy": "SPINAI가 정성껏 만들었습니다",
-    "copyright": "© {year} ChainFlow by SPINAI. All rights reserved.",
+    "builtBy": "THE ELIOT FINANCIAL가 정성껏 만들었습니다",
+    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
     "terms": "이용약관",
     "privacy": "개인정보 처리방침",
     "contact": "문의하기",
@@ -386,7 +386,7 @@
     "signalsDescription": "SEC 공시, 내부자 거래, 실적 발표에서 스마트 머니의 움직임과 조기 경보 지표를 추적합니다.",
     "newsGapTitle": "뉴스 갭 분석기 — ChainFlow",
     "newsGapDescription": "충분한 미디어 보도를 받지 못한 중대한 공급망 이벤트를 발견합니다. 과소 보도된 이슈에서 알파를 찾으세요.",
-    "aboutTitle": "소개 — SPINAI의 공급망 인텔리전스, ChainFlow",
+    "aboutTitle": "소개 — THE ELIOT FINANCIAL의 공급망 인텔리전스, ChainFlow",
     "aboutDescription": "공급망 인텔리전스를 민주화하고 글로벌 무역 네트워크를 투명하게 만들기 위한 ChainFlow의 미션을 알아보세요."
   },
   "pro": {

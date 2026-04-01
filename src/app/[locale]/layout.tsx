@@ -32,7 +32,7 @@ const jsonLd = {
     {
       '@type': 'Organization',
       '@id': 'https://chainflow-mu.vercel.app/#organization',
-      name: 'SPINAI',
+      name: 'THE ELIOT FINANCIAL',
       url: 'https://chainflow-mu.vercel.app',
       logo: {
         '@type': 'ImageObject',
@@ -56,7 +56,7 @@ const jsonLd = {
       },
       creator: {
         '@type': 'Organization',
-        name: 'SPINAI',
+        name: 'THE ELIOT FINANCIAL',
       },
     },
     {

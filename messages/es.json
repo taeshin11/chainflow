@@ -389,8 +389,8 @@
   },
   "footer": {
     "tagline": "Mapeando las cadenas de suministro del mundo, una conexión a la vez.",
-    "builtBy": "Desarrollado con dedicación por SPINAI",
-    "copyright": "© {year} ChainFlow by SPINAI. Todos los derechos reservados.",
+    "builtBy": "Desarrollado con dedicación por THE ELIOT FINANCIAL",
+    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. Todos los derechos reservados.",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "contact": "Contáctanos",
@@ -434,7 +434,7 @@
     "signalsDescription": "Rastrea movimientos de dinero inteligente e indicadores de alerta temprana desde reportes SEC, operaciones de insiders y conferencias de resultados.",
     "newsGapTitle": "Analizador de Brecha Informativa — ChainFlow",
     "newsGapDescription": "Descubre eventos materiales en cadenas de suministro que no han recibido cobertura mediática adecuada. Encuentra alpha en historias subinformadas.",
-    "aboutTitle": "Acerca de ChainFlow — Inteligencia de Cadena de Suministro por SPINAI",
+    "aboutTitle": "Acerca de ChainFlow — Inteligencia de Cadena de Suministro por THE ELIOT FINANCIAL",
     "aboutDescription": "Conoce la misión de ChainFlow de democratizar la inteligencia de cadena de suministro y hacer transparentes las redes de comercio global."
   },
   "pro": {

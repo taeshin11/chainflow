@@ -389,8 +389,8 @@
   },
   "footer": {
     "tagline": "Dünyanın tedarik zincirlerini bağlantı bağlantı haritalandırıyoruz.",
-    "builtBy": "SPINAI tarafından özenle geliştirilmiştir",
-    "copyright": "© {year} ChainFlow by SPINAI. Tüm hakları saklıdır.",
+    "builtBy": "THE ELIOT FINANCIAL tarafından özenle geliştirilmiştir",
+    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. Tüm hakları saklıdır.",
     "terms": "Kullanım Koşulları",
     "privacy": "Gizlilik Politikası",
     "contact": "İletişim",
@@ -433,7 +433,7 @@
     "signalsDescription": "SEC dosyalamalarından, içeriden öğrenen işlemlerinden ve kazanç görüşmelerinden akıllı para hareketlerini ve erken uyarı göstergelerini takip edin.",
     "newsGapTitle": "Haber Boşluğu Analiz Aracı — ChainFlow",
     "newsGapDescription": "Yeterli medya ilgisi görmemiş önemli tedarik zinciri olaylarını keşfedin. Yetersiz haberlerden alfa bulun.",
-    "aboutTitle": "ChainFlow Hakkında — SPINAI Tedarik Zinciri İstihbaratı",
+    "aboutTitle": "ChainFlow Hakkında — THE ELIOT FINANCIAL Tedarik Zinciri İstihbaratı",
     "aboutDescription": "ChainFlow'un tedarik zinciri istihbaratını demokratikleştirme ve küresel ticaret ağlarını şeffaflaştırma misyonunu öğrenin."
   },
   "pro": {

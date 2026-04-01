@@ -33,9 +33,9 @@ export function generateSeoMetadata({
       'investment tracker',
       ...keywords,
     ],
-    authors: [{ name: 'SPINAI' }],
-    creator: 'SPINAI',
-    publisher: 'SPINAI',
+    authors: [{ name: 'THE ELIOT FINANCIAL' }],
+    creator: 'THE ELIOT FINANCIAL',
+    publisher: 'THE ELIOT FINANCIAL',
     metadataBase: new URL(BASE_URL),
     alternates: {
       canonical: url,
