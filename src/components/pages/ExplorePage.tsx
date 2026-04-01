@@ -282,14 +282,22 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  // Push nodes further apart
+  // Configure forces — less aggressive on mobile
   useEffect(() => {
     if (graphRef.current) {
-      graphRef.current.d3Force('charge')?.strength(-400);
-      graphRef.current.d3Force('link')?.distance(120);
-      graphRef.current.d3Force('center')?.strength(0.05);
+      const isMobile = containerWidth < 768;
+      graphRef.current.d3Force('charge')?.strength(isMobile ? -150 : -300);
+      graphRef.current.d3Force('link')?.distance(isMobile ? 60 : 100);
+      graphRef.current.d3Force('center')?.strength(0.3);
+      // Auto-fit after a short delay
+      setTimeout(() => {
+        if (graphRef.current) graphRef.current.zoomToFit(600, 40);
+      }, 500);
+      setTimeout(() => {
+        if (graphRef.current) graphRef.current.zoomToFit(400, 40);
+      }, 2000);
     }
-  }, [mounted, selectedSector, searchQuery]);
+  }, [mounted, selectedSector, searchQuery, containerWidth]);
 
   const filteredCompanies = useMemo(() => {
     let filtered = companies;
@@ -443,11 +451,12 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
               linkDirectionalParticles={2}
               linkDirectionalParticleSpeed={0.004}
               linkDirectionalParticleWidth={3}
-              d3AlphaDecay={0.02}
-              d3VelocityDecay={0.3}
+              d3AlphaDecay={0.05}
+              d3VelocityDecay={0.4}
+              warmupTicks={50}
               onNodeClick={handleNodeClick}
               onEngineStop={() => {
-                if (graphRef.current) graphRef.current.zoomToFit(400);
+                if (graphRef.current) graphRef.current.zoomToFit(400, 40);
               }}
               nodeCanvasObject={(
                 node: Record<string, unknown>,
@@ -509,7 +518,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                 ctx.globalAlpha = 1;
               }}
               backgroundColor="transparent"
-              cooldownTicks={100}
+              cooldownTicks={60}
               width={containerWidth}
               height={600}
             />

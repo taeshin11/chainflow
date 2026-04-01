@@ -75,6 +75,7 @@ function CascadeFlowStep({ step, index, total }: { step: CascadeStep; index: num
 
 export default function CascadeDetailPage({ sector }: { sector: string }) {
   const t = useTranslations('cascade');
+  const tExplore = useTranslations('explore');
 
   const patterns = useMemo(
     () => cascadePatterns.filter((p) => p.sector === sector),
@@ -101,7 +102,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <Breadcrumbs overrides={{ [sector]: { label: `${primary.sectorName} Cascade` } }} />
+      <Breadcrumbs overrides={{ [sector]: { label: `${tExplore(`sectors.${sector}`)} ${t('title')}` } }} />
 
       <Link
         href="/cascade"
@@ -115,11 +116,11 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
       <div className="mb-10">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
           <h1 className="text-3xl font-heading font-bold text-cf-text-primary">
-            {primary.sectorName} Cascade
+            {tExplore(`sectors.${sector}`)} {t('title')}
           </h1>
-          <ShareButtons title={`${primary.sectorName} Cascade Analysis | ChainFlow`} />
+          <ShareButtons title={`${tExplore(`sectors.${sector}`)} ${t('title')} | ChainFlow`} />
         </div>
-        <p className="text-lg text-cf-text-secondary max-w-3xl">{primary.description}</p>
+        <p className="text-lg text-cf-text-secondary max-w-3xl">{t('cascadeDescription')}</p>
       </div>
 
       {patterns.map((pattern) => (
