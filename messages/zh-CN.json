@@ -60,7 +60,10 @@
       "ai-cloud": "AI / 云计算",
       "ev-battery": "电动车 / 电池",
       "defense": "国防",
-      "pharma-biotech": "医药 / 生物科技"
+      "pharma-biotech": "医药 / 生物科技",
+      "consumer-defensive": "必需消费品",
+      "financials": "金融",
+      "energy": "能源"
     },
     "relationships": {
       "supplier": "供应商",

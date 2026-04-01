@@ -60,7 +60,10 @@
       "ai-cloud": "AI / คลาวด์",
       "ev-battery": "EV / แบตเตอรี่",
       "defense": "กลาโหม",
-      "pharma-biotech": "ยา / ไบโอเทค"
+      "pharma-biotech": "ยา / ไบโอเทค",
+      "consumer-defensive": "สินค้าจำเป็น",
+      "financials": "การเงิน",
+      "energy": "พลังงาน"
     },
     "relationships": {
       "supplier": "ผู้จัดหา",

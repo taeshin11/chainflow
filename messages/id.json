@@ -60,7 +60,10 @@
       "ai-cloud": "AI / Cloud",
       "ev-battery": "EV / Baterai",
       "defense": "Pertahanan",
-      "pharma-biotech": "Farmasi / Bioteknologi"
+      "pharma-biotech": "Farmasi / Bioteknologi",
+      "consumer-defensive": "Konsumen Defensif",
+      "financials": "Keuangan",
+      "energy": "Energi"
     },
     "relationships": {
       "supplier": "Pemasok",

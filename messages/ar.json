@@ -60,7 +60,10 @@
       "ai-cloud": "الذكاء الاصطناعي / السحابة",
       "ev-battery": "السيارات الكهربائية / البطاريات",
       "defense": "الدفاع",
-      "pharma-biotech": "الأدوية / التكنولوجيا الحيوية"
+      "pharma-biotech": "الأدوية / التكنولوجيا الحيوية",
+      "consumer-defensive": "السلع الاستهلاكية الأساسية",
+      "financials": "القطاع المالي",
+      "energy": "الطاقة"
     },
     "relationships": {
       "supplier": "مورّد",

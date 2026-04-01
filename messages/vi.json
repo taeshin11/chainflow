@@ -60,7 +60,10 @@
       "ai-cloud": "AI / Đám mây",
       "ev-battery": "Xe điện / Pin",
       "defense": "Quốc phòng",
-      "pharma-biotech": "Dược phẩm / Công nghệ sinh học"
+      "pharma-biotech": "Dược phẩm / Công nghệ sinh học",
+      "consumer-defensive": "Hàng tiêu dùng thiết yếu",
+      "financials": "Tài chính",
+      "energy": "Năng lượng"
     },
     "relationships": {
       "supplier": "Nhà cung cấp",

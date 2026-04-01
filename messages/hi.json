@@ -60,7 +60,10 @@
       "ai-cloud": "AI / क्लाउड",
       "ev-battery": "EV / बैटरी",
       "defense": "रक्षा",
-      "pharma-biotech": "फार्मा / बायोटेक"
+      "pharma-biotech": "फार्मा / बायोटेक",
+      "consumer-defensive": "आवश्यक उपभोक्ता वस्तुएं",
+      "financials": "वित्तीय",
+      "energy": "ऊर्जा"
     },
     "relationships": {
       "supplier": "आपूर्तिकर्ता",

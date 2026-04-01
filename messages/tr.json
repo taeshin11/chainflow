@@ -60,7 +60,10 @@
       "ai-cloud": "AI / Bulut",
       "ev-battery": "EV / Batarya",
       "defense": "Savunma",
-      "pharma-biotech": "İlaç / Biyoteknoloji"
+      "pharma-biotech": "İlaç / Biyoteknoloji",
+      "consumer-defensive": "Temel Tüketim",
+      "financials": "Finans",
+      "energy": "Enerji"
     },
     "relationships": {
       "supplier": "Tedarikçi",

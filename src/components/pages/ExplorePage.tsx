@@ -262,6 +262,7 @@ interface ExplorePageProps {
 export default function ExplorePage({ initialSector }: ExplorePageProps) {
   const t = useTranslations('explore');
   const [selectedSector, setSelectedSector] = useState<string>(initialSector || 'all');
+  const [selectedCap, setSelectedCap] = useState<string>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -297,12 +298,15 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
         if (graphRef.current) graphRef.current.zoomToFit(400, 40);
       }, 2000);
     }
-  }, [mounted, selectedSector, searchQuery, containerWidth]);
+  }, [mounted, selectedSector, selectedCap, searchQuery, containerWidth]);
 
   const filteredCompanies = useMemo(() => {
     let filtered = companies;
     if (selectedSector !== 'all') {
       filtered = filtered.filter((c) => c.sector === selectedSector);
+    }
+    if (selectedCap !== 'all') {
+      filtered = filtered.filter((c) => c.marketCap === selectedCap);
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -314,7 +318,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
       });
     }
     return filtered;
-  }, [selectedSector, searchQuery]);
+  }, [selectedSector, selectedCap, searchQuery]);
 
   const graphData = useMemo(() => {
     const nodeIds = new Set(filteredCompanies.map((c) => c.id));
@@ -413,6 +417,23 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
               }
             >
               {t(`sectors.${s.id}`)}
+            </button>
+          ))}
+        </div>
+
+        {/* Market Cap filter */}
+        <div className="flex flex-wrap gap-2">
+          {['all', 'mega', 'large', 'mid', 'small'].map((cap) => (
+            <button
+              key={cap}
+              onClick={() => setSelectedCap(cap)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                selectedCap === cap
+                  ? 'bg-cf-text-primary text-white shadow-sm'
+                  : 'bg-white text-cf-text-secondary hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              {cap === 'all' ? t('sectors.all') : cap === 'mega' ? 'Mega ($200B+)' : cap === 'large' ? 'Large ($10B+)' : cap === 'mid' ? 'Mid ($2B-$10B)' : 'Small (<$2B)'}
             </button>
           ))}
         </div>

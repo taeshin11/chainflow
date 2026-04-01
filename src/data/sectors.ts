@@ -59,6 +59,36 @@ export const sectors: Sector[] = [
     companyCount: 10,
     leaderTicker: "LLY",
   },
+  {
+    id: "consumer-defensive",
+    name: "Consumer Defensive",
+    description:
+      "Essential consumer goods and services that perform well regardless of economic conditions. Spans household products (Procter & Gamble), beverages (Coca-Cola, PepsiCo), warehouse retail (Costco, Walmart), and packaged food (General Mills).",
+    icon: "ShoppingCart",
+    color: "#8B5CF6",
+    companyCount: 10,
+    leaderTicker: "PG",
+  },
+  {
+    id: "financials",
+    name: "Financials",
+    description:
+      "Banks, insurance, asset management, and financial services companies. Includes diversified banking (JPMorgan), investment banking (Goldman Sachs, Morgan Stanley), payments (Visa), and exchanges (ICE, Tradeweb).",
+    icon: "Landmark",
+    color: "#F59E0B",
+    companyCount: 10,
+    leaderTicker: "JPM",
+  },
+  {
+    id: "energy",
+    name: "Energy",
+    description:
+      "Oil, gas, renewable energy companies and energy infrastructure. Spans integrated majors (ExxonMobil, Chevron), exploration & production (ConocoPhillips, EOG), oilfield services (Schlumberger), renewables (NextEra, First Solar), and LNG export (Cheniere).",
+    icon: "Flame",
+    color: "#DC2626",
+    companyCount: 10,
+    leaderTicker: "XOM",
+  },
 ];
 
 export function getSectorById(id: string): Sector | undefined {

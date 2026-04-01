@@ -116,6 +116,42 @@ export const companyNamesI18n: Record<string, string[]> = {
   ALNY: ['알나일람', 'アルナイラム', '阿尼拉姆', 'Alnylam'],
   CRSP: ['크리스퍼', 'クリスパー', '基因编辑', 'CRISPR Therapeutics'],
   IONS: ['아이오니스', 'アイオニス', '离子制药', 'Ionis'],
+
+  // Consumer Defensive
+  PG: ['프록터앤갬블', 'P&G', 'プロクター・アンド・ギャンブル', '宝洁', '寶潔'],
+  KO: ['코카콜라', 'コカ・コーラ', '可口可乐', '可口可樂', 'Coca-Cola'],
+  PEP: ['펩시코', 'ペプシコ', '百事可乐', '百事可樂', 'PepsiCo'],
+  WMT: ['월마트', 'ウォルマート', '沃尔玛', '沃爾瑪', 'Walmart'],
+  COST: ['코스트코', 'コストコ', '好市多', '開市客', 'Costco'],
+  CL: ['콜게이트팜올리브', 'コルゲート・パーモリブ', '高露洁', '高露潔', 'Colgate'],
+  GIS: ['제너럴밀스', 'ゼネラルミルズ', '通用磨坊', 'General Mills'],
+  KMB: ['킴벌리클라크', 'キンバリークラーク', '金伯利克拉克', '金百利克拉克', 'Kimberly-Clark'],
+  CHD: ['처치앤드와이트', 'チャーチ・アンド・ドワイト', '丘奇和德怀特', 'Church & Dwight'],
+  LW: ['램웨스턴', 'ラムウェストン', '蓝威斯顿', '藍威斯頓', 'Lamb Weston'],
+
+  // Financials
+  JPM: ['JP모건', 'JPモルガン', '摩根大通', 'JPMorgan'],
+  GS: ['골드만삭스', 'ゴールドマン・サックス', '高盛', 'Goldman Sachs'],
+  MS: ['모건스탠리', 'モルガン・スタンレー', '摩根士丹利', 'Morgan Stanley'],
+  BLK: ['블랙록', 'ブラックロック', '贝莱德', '貝萊德', 'BlackRock'],
+  V: ['비자', 'ビザ', '维萨', '威士', 'Visa'],
+  SPGI: ['S&P글로벌', 'S&Pグローバル', '标普全球', '標普全球', 'S&P Global'],
+  SCHW: ['찰스슈왑', 'チャールズ・シュワブ', '嘉信理财', '嘉信理財', 'Schwab'],
+  ICE: ['인터컨티넨탈거래소', 'インターコンチネンタル取引所', '洲际交易所', '洲際交易所', 'ICE'],
+  TW: ['트레이드웹', 'トレードウェブ', '交易网', '交易網', 'Tradeweb'],
+  COIN: ['코인베이스', 'コインベース', '币安基地', 'Coinbase'],
+
+  // Energy
+  XOM: ['엑슨모빌', 'エクソンモービル', '埃克森美孚', 'ExxonMobil'],
+  CVX: ['셰브론', 'シェブロン', '雪佛龙', '雪佛龍', 'Chevron'],
+  NEE: ['넥스트에라에너지', 'ネクステラ・エナジー', '新纪元能源', '新紀元能源', 'NextEra'],
+  COP: ['코노코필립스', 'コノコフィリップス', '康菲石油', 'ConocoPhillips'],
+  SLB: ['슐럼버거', 'シュルンベルジェ', '斯伦贝谢', '斯倫貝謝', 'Schlumberger', 'SLB'],
+  EOG: ['EOG리소시즈', 'EOGリソーシズ', 'EOG资源', 'EOG Resources'],
+  ENB: ['엔브리지', 'エンブリッジ', '安桥', '安橋', 'Enbridge'],
+  FSLR: ['퍼스트솔라', 'ファーストソーラー', '第一太阳能', '第一太陽能', 'First Solar'],
+  SHLS: ['숄즈테크놀로지', 'ショールズテクノロジー', '肖尔斯科技', 'Shoals Technologies'],
+  LNG: ['셰니에르에너지', 'シェニエール・エナジー', '切尼尔能源', 'Cheniere Energy'],
 };
 
 // Localized sector names for search
@@ -125,4 +161,7 @@ export const sectorNamesI18n: Record<string, string[]> = {
   'ev-battery': ['전기차', '배터리', 'EV', '电动汽车', '電動車', '電池', 'EVバッテリー', 'vehículo eléctrico', 'Elektrofahrzeug', 'véhicule électrique', 'elétrico', 'электромобиль'],
   defense: ['방위', '방산', '국방', '防务', '防衛', 'ディフェンス', 'defensa', 'Verteidigung', 'défense', 'defesa', 'оборона', 'savunma'],
   'pharma-biotech': ['제약', '바이오', '製薬', 'バイオテック', '制药', '生物技术', '製藥', '生物科技', 'farmacéutica', 'Pharma', 'pharmacie', 'farmacêutica', 'фармацевтика', 'ilaç'],
+  'consumer-defensive': ['경기방어주', '필수소비재', '生活必需品', '必需消费品', '必需消費品', 'consumo defensivo', 'Basiskonsumgüter', 'consommation défensive', 'consumo básico', 'потребительский сектор', 'temel tüketim'],
+  financials: ['금융', '金融', '金融', 'ファイナンシャル', 'finanzas', 'Finanzen', 'finances', 'finanças', 'финансы', 'finans'],
+  energy: ['에너지', 'エネルギー', '能源', '能源', 'energía', 'Energie', 'énergie', 'energia', 'энергетика', 'enerji'],
 };

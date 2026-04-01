@@ -60,7 +60,10 @@
       "ai-cloud": "KI / Cloud",
       "ev-battery": "E-Auto / Batterie",
       "defense": "Verteidigung",
-      "pharma-biotech": "Pharma / Biotech"
+      "pharma-biotech": "Pharma / Biotech",
+      "consumer-defensive": "Basiskonsumgüter",
+      "financials": "Finanzen",
+      "energy": "Energie"
     },
     "relationships": {
       "supplier": "Zulieferer",

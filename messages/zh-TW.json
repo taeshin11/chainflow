@@ -60,7 +60,10 @@
       "ai-cloud": "AI / 雲端",
       "ev-battery": "電動車 / 電池",
       "defense": "國防",
-      "pharma-biotech": "製藥 / 生技"
+      "pharma-biotech": "製藥 / 生技",
+      "consumer-defensive": "必需消費品",
+      "financials": "金融",
+      "energy": "能源"
     },
     "relationships": {
       "supplier": "供應商",

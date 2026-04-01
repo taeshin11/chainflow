@@ -60,7 +60,10 @@
       "ai-cloud": "AI / Облако",
       "ev-battery": "ЭВ / Аккумуляторы",
       "defense": "Оборона",
-      "pharma-biotech": "Фарма / Биотех"
+      "pharma-biotech": "Фарма / Биотех",
+      "consumer-defensive": "Потребительский сектор",
+      "financials": "Финансы",
+      "energy": "Энергетика"
     },
     "relationships": {
       "supplier": "Поставщик",
