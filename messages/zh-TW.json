@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "追蹤<accent>聰明資金</accent>在供應鏈中的流向",
     "exploreSupplyChains": "探索供應鏈",
-    "viewSignals": "檢視訊號",
+    "viewSignals": "追蹤機構建倉",
     "livePreview": "即時供應鏈預覽",
     "socialProof": {
       "investors": "追蹤供應鏈的投資人",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "逐步繪製全球供應鏈版圖。",
-    "builtBy": "由 THE ELIOT FINANCIAL 精心打造",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
+    "builtBy": "由 THE ELIOT K FINANCIAL 精心打造",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "服務條款",
     "privacy": "隱私權政策",
     "contact": "聯絡我們",
@@ -437,7 +437,7 @@
     "signalsDescription": "從 SEC 文件、內部人交易和法說會中追蹤聰明資金動向與預警指標。",
     "newsGapTitle": "新聞盲區分析器 — ChainFlow",
     "newsGapDescription": "發現尚未獲得充分媒體報導的重大供應鏈事件。從報導不足的領域中尋找阿爾法。",
-    "aboutTitle": "關於 ChainFlow — THE ELIOT FINANCIAL 旗下供應鏈情報平台",
+    "aboutTitle": "關於 ChainFlow — THE ELIOT K FINANCIAL 旗下供應鏈情報平台",
     "aboutDescription": "瞭解 ChainFlow 致力於供應鏈情報民主化、讓全球貿易網路透明化的使命。"
   },
   "pro": {

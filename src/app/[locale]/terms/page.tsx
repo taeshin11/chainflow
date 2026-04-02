@@ -40,7 +40,7 @@ export default function TermsOfServicePage() {
             Welcome to ChainFlow. These Terms of Service (&quot;Terms&quot;) govern your access to and use of
             the ChainFlow website located at https://chainflow-mu.vercel.app (the &quot;Site&quot;) and the
             supply chain intelligence services provided through the Site (the &quot;Service&quot;). ChainFlow is
-            operated by THE ELIOT FINANCIAL (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing or using the Site and Service,
+            operated by THE ELIOT K FINANCIAL (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing or using the Site and Service,
             you agree to be bound by these Terms. If you do not agree to these Terms, you must not
             access or use the Site or Service.
           </p>
@@ -56,7 +56,7 @@ export default function TermsOfServicePage() {
               By accessing, browsing, or using the Site or Service in any manner, you acknowledge that
               you have read, understood, and agree to be bound by these Terms, as well as our Privacy
               Policy, which is incorporated herein by reference. These Terms constitute a legally
-              binding agreement between you and THE ELIOT FINANCIAL. If you are using the Service on behalf of an
+              binding agreement between you and THE ELIOT K FINANCIAL. If you are using the Service on behalf of an
               organization, you represent and warrant that you have the authority to bind that
               organization to these Terms, and &quot;you&quot; refers to both you individually and the
               organization.
@@ -131,13 +131,13 @@ export default function TermsOfServicePage() {
             <p>
               The Site and Service, including all content, features, functionality, software, text,
               images, graphics, logos, icons, data compilations, and the selection and arrangement
-              thereof, are the exclusive property of THE ELIOT FINANCIAL and are protected by United States and
+              thereof, are the exclusive property of THE ELIOT K FINANCIAL and are protected by United States and
               international copyright, trademark, trade secret, and other intellectual property or
               proprietary rights laws.
             </p>
             <p>
               The ChainFlow name, logo, and all related names, logos, product and service names,
-              designs, and slogans are trademarks of THE ELIOT FINANCIAL. You may not use such marks without our
+              designs, and slogans are trademarks of THE ELIOT K FINANCIAL. You may not use such marks without our
               prior written permission. All other names, logos, product and service names, designs,
               and slogans on the Site are the trademarks of their respective owners.
             </p>
@@ -195,7 +195,7 @@ export default function TermsOfServicePage() {
           </h2>
           <div className="space-y-4 text-cf-text-secondary leading-relaxed">
             <p>
-              TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE ELIOT FINANCIAL, ITS
+              TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE ELIOT K FINANCIAL, ITS
               DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, AFFILIATES, SUCCESSORS, OR ASSIGNS BE LIABLE
               FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING
               BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES,
@@ -225,7 +225,7 @@ export default function TermsOfServicePage() {
             7. Indemnification
           </h2>
           <p className="text-cf-text-secondary leading-relaxed">
-            You agree to indemnify, defend, and hold harmless THE ELIOT FINANCIAL, its directors, officers,
+            You agree to indemnify, defend, and hold harmless THE ELIOT K FINANCIAL, its directors, officers,
             employees, agents, affiliates, successors, and assigns from and against any and all
             claims, liabilities, damages, losses, costs, and expenses (including reasonable
             attorneys&apos; fees) arising out of or in connection with: (a) your use of the Site or
@@ -245,7 +245,7 @@ export default function TermsOfServicePage() {
             <p>
               THE SITE AND SERVICE ARE PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS, WITHOUT
               WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED
-              BY APPLICABLE LAW, THE ELIOT FINANCIAL DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+              BY APPLICABLE LAW, THE ELIOT K FINANCIAL DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
               NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
               TITLE, AND NON-INFRINGEMENT.
             </p>
@@ -273,7 +273,7 @@ export default function TermsOfServicePage() {
             indemnification, and limitations of liability. You may stop using the Service at any
             time. No termination of your access shall relieve you of any obligations arising or
             accruing prior to such termination, or limit any liability that you otherwise may have
-            to THE ELIOT FINANCIAL, including without limitation any indemnification obligations.
+            to THE ELIOT K FINANCIAL, including without limitation any indemnification obligations.
           </p>
         </section>
 
@@ -339,9 +339,9 @@ export default function TermsOfServicePage() {
           </h2>
           <p className="text-cf-text-secondary leading-relaxed">
             These Terms, together with our Privacy Policy, constitute the entire agreement between
-            you and THE ELIOT FINANCIAL with respect to the Site and Service and supersede all prior or
+            you and THE ELIOT K FINANCIAL with respect to the Site and Service and supersede all prior or
             contemporaneous communications, proposals, and agreements, whether oral or written,
-            between you and THE ELIOT FINANCIAL regarding the Site and Service. No waiver of any provision of
+            between you and THE ELIOT K FINANCIAL regarding the Site and Service. No waiver of any provision of
             these Terms shall be deemed a further or continuing waiver of such provision or any
             other provision.
           </p>
@@ -357,7 +357,7 @@ export default function TermsOfServicePage() {
               If you have any questions or concerns about these Terms, please contact us at:
             </p>
             <div className="bg-cf-background rounded-lg p-4">
-              <p className="font-medium text-cf-text-primary">THE ELIOT FINANCIAL — ChainFlow</p>
+              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — ChainFlow</p>
               <p>Email: <a href="mailto:taeshinkim11@gmail.com" className="text-cf-primary hover:underline">taeshinkim11@gmail.com</a></p>
               <p>Website: <a href="https://chainflow-mu.vercel.app" className="text-cf-primary hover:underline">https://chainflow-mu.vercel.app</a></p>
             </div>

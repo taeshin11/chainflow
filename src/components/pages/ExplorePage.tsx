@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import dynamic from 'next/dynamic';
-import { companies, type Company } from '@/data/companies';
+import { allCompanies, type Company } from '@/data/companies';
 import { sectors } from '@/data/sectors';
 import { companyNamesI18n } from '@/data/company-names-i18n';
 import {
@@ -48,6 +48,7 @@ const relationshipColors: Record<string, string> = {
 };
 
 const marketCapSizes: Record<string, number> = {
+  titan: 16,
   mega: 12,
   large: 10,
   mid: 8,
@@ -77,7 +78,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
   const relatedCompanies = company.relationships
     .slice(0, 6)
     .map((r) => {
-      const target = companies.find(
+      const target = allCompanies.find(
         (c) => c.id === r.targetId || c.ticker === r.targetId
       );
       return { ...r, target };
@@ -287,9 +288,9 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   useEffect(() => {
     if (graphRef.current) {
       const isMobile = containerWidth < 768;
-      graphRef.current.d3Force('charge')?.strength(isMobile ? -250 : -500);
-      graphRef.current.d3Force('link')?.distance(isMobile ? 80 : 150);
-      graphRef.current.d3Force('center')?.strength(0.2);
+      graphRef.current.d3Force('charge')?.strength(isMobile ? -600 : -1500);
+      graphRef.current.d3Force('link')?.distance(isMobile ? 200 : 450);
+      graphRef.current.d3Force('center')?.strength(0.15);
       // Auto-fit after a short delay
       setTimeout(() => {
         if (graphRef.current) graphRef.current.zoomToFit(600, 40);
@@ -301,7 +302,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   }, [mounted, selectedSector, selectedCap, searchQuery, containerWidth]);
 
   const filteredCompanies = useMemo(() => {
-    let filtered = companies;
+    let filtered = allCompanies;
     if (selectedSector !== 'all') {
       filtered = filtered.filter((c) => c.sector === selectedSector);
     }
@@ -359,7 +360,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
     (node: Record<string, unknown>) => {
       const id = node.id as string | undefined;
       if (id) {
-        const company = companies.find((c) => c.id === id);
+        const company = allCompanies.find((c) => c.id === id);
         if (company) setSelectedCompany(company);
       }
     },
@@ -423,7 +424,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
 
         {/* Market Cap filter */}
         <div className="flex flex-wrap gap-2">
-          {['all', 'mega', 'large', 'mid', 'small'].map((cap) => (
+          {['all', 'titan', 'mega', 'large', 'mid', 'small'].map((cap) => (
             <button
               key={cap}
               onClick={() => setSelectedCap(cap)}
@@ -433,7 +434,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                   : 'bg-white text-cf-text-secondary hover:bg-gray-50 border border-gray-200'
               }`}
             >
-              {cap === 'all' ? t('sectors.all') : cap === 'mega' ? 'Mega ($200B+)' : cap === 'large' ? 'Large ($10B+)' : cap === 'mid' ? 'Mid ($2B-$10B)' : 'Small (<$2B)'}
+              {cap === 'all' ? t('sectors.all') : cap === 'titan' ? 'Titan ($1T+)' : cap === 'mega' ? 'Mega ($200B+)' : cap === 'large' ? 'Large ($10B+)' : cap === 'mid' ? 'Mid ($2B-$10B)' : 'Small (<$2B)'}
             </button>
           ))}
         </div>

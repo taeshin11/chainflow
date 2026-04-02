@@ -354,8 +354,8 @@
   },
   "footer": {
     "tagline": "世界のサプライチェーンを、一つのつながりから紐解きます。",
-    "builtBy": "THE ELIOT FINANCIALが心を込めて開発",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
+    "builtBy": "THE ELIOT K FINANCIALが心を込めて開発",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "contact": "お問い合わせ",
@@ -389,7 +389,7 @@
     "signalsDescription": "SEC提出書類、インサイダー取引、決算説明会からスマートマネーの動きと早期警戒指標を追跡。",
     "newsGapTitle": "ニュースギャップ・アナライザー — ChainFlow",
     "newsGapDescription": "十分なメディア報道を受けていない重要なサプライチェーンイベントを発見。報道不足の情報からアルファを見つけましょう。",
-    "aboutTitle": "概要 — THE ELIOT FINANCIALによるサプライチェーン・インテリジェンス、ChainFlow",
+    "aboutTitle": "概要 — THE ELIOT K FINANCIALによるサプライチェーン・インテリジェンス、ChainFlow",
     "aboutDescription": "サプライチェーン・インテリジェンスの民主化とグローバル貿易ネットワークの透明化というChainFlowのミッションについて。"
   },
   "pro": {
@@ -436,7 +436,7 @@
   "home": {
     "heroHeadline": "<accent>スマートマネー</accent>がサプライチェーンを通じてどこに流れるかを追跡",
     "exploreSupplyChains": "サプライチェーンを探索",
-    "viewSignals": "シグナルを見る",
+    "viewSignals": "機関の買い集め追跡",
     "livePreview": "リアルタイムサプライチェーンプレビュー",
     "socialProof": {
       "investors": "サプライチェーンを追跡する投資家",

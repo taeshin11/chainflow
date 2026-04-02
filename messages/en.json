@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "Track where <accent>smart money</accent> flows through the supply chain",
     "exploreSupplyChains": "Explore Supply Chains",
-    "viewSignals": "View Signals",
+    "viewSignals": "Track Institutional Accumulation",
     "livePreview": "Live Supply Chain Preview",
     "socialProof": {
       "investors": "Investors Tracking Supply Chains",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "Mapping the world's supply chains, one connection at a time.",
-    "builtBy": "Built with care by THE ELIOT FINANCIAL",
-    "copyright": "\u00a9 {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
+    "builtBy": "Built with care by THE ELIOT K FINANCIAL",
+    "copyright": "\u00a9 {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "contact": "Contact Us",
@@ -437,7 +437,7 @@
     "signalsDescription": "Track smart money movements and early warning indicators from SEC filings, insider trades, and earnings calls.",
     "newsGapTitle": "News Gap Analyzer \u2014 ChainFlow",
     "newsGapDescription": "Discover material supply chain events that haven't received adequate media coverage. Find alpha in underreported stories.",
-    "aboutTitle": "About ChainFlow \u2014 Supply Chain Intelligence by THE ELIOT FINANCIAL",
+    "aboutTitle": "About ChainFlow \u2014 Supply Chain Intelligence by THE ELIOT K FINANCIAL",
     "aboutDescription": "Learn about ChainFlow's mission to democratize supply chain intelligence and make global trade networks transparent."
   },
   "pro": {

@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "Lacak ke mana <accent>uang pintar</accent> mengalir melalui rantai pasok",
     "exploreSupplyChains": "Jelajahi Rantai Pasok",
-    "viewSignals": "Lihat Sinyal",
+    "viewSignals": "Lacak Akumulasi Institusional",
     "livePreview": "Pratinjau Langsung",
     "socialProof": {
       "investors": "Investor Melacak Rantai",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "Memetakan rantai pasok dunia, satu koneksi pada satu waktu.",
-    "builtBy": "Dibuat dengan penuh dedikasi oleh THE ELIOT FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. Hak cipta dilindungi.",
+    "builtBy": "Dibuat dengan penuh dedikasi oleh THE ELIOT K FINANCIAL",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Hak cipta dilindungi.",
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
     "contact": "Kontak",
@@ -436,7 +436,7 @@
     "signalsDescription": "Lacak pergerakan uang pintar dan indikator peringatan dini dari pengajuan SEC, perdagangan orang dalam, dan laporan pendapatan.",
     "newsGapTitle": "Penganalisis Kesenjangan Berita — ChainFlow",
     "newsGapDescription": "Temukan peristiwa rantai pasok material yang kurang mendapat liputan media. Temukan alpha dalam cerita yang kurang dilaporkan.",
-    "aboutTitle": "Tentang ChainFlow — Intelijen Rantai Pasok oleh THE ELIOT FINANCIAL",
+    "aboutTitle": "Tentang ChainFlow — Intelijen Rantai Pasok oleh THE ELIOT K FINANCIAL",
     "aboutDescription": "Pelajari misi ChainFlow untuk mendemokratisasi intelijen rantai pasok dan menjadikan jaringan perdagangan global transparan."
   },
   "pro": {

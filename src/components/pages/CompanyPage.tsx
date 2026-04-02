@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { companies, type Company } from '@/data/companies';
+import { allCompanies, type Company } from '@/data/companies';
 import { institutionalSignals } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { cascadePatterns } from '@/data/cascades';
@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import SupplyChainMap from '@/components/SupplyChainMap';
 
 const COLORS = ['#4F8FBF', '#6CB4A8', '#E8A945', '#D97171', '#5CB88A', '#7C5CFC'];
 
@@ -65,9 +66,10 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
   const t = useTranslations('company');
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [terminalView, setTerminalView] = useState(false);
 
   const company = useMemo(
-    () => companies.find((c) => c.ticker.toUpperCase() === ticker.toUpperCase()),
+    () => allCompanies.find((c) => c.ticker.toUpperCase() === ticker.toUpperCase()),
     [ticker]
   );
 
@@ -159,26 +161,42 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
         {t('backToExplorer')}
       </Link>
 
+      {/* Header — always visible */}
+      <div className="mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <h1 className="text-3xl font-heading font-bold text-cf-text-primary">
+            {company.name}
+          </h1>
+          <span className="font-mono text-sm font-bold bg-cf-primary/10 text-cf-primary px-3 py-1 rounded-lg">
+            {company.ticker}
+          </span>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-cf-text-secondary capitalize">
+            {company.role}
+          </span>
+        </div>
+        <p className="text-cf-text-secondary leading-relaxed mb-4">{company.description}</p>
+        <div className="flex items-center gap-3">
+          <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | ChainFlow`} />
+          <button
+            onClick={() => setTerminalView((v) => !v)}
+            className={`inline-flex items-center gap-2 text-xs font-mono font-bold px-3 py-1.5 rounded transition-colors ${
+              terminalView
+                ? 'bg-amber-500 text-black hover:bg-amber-400'
+                : 'bg-gray-800 text-amber-400 hover:bg-gray-700 border border-gray-600'
+            }`}
+          >
+            <span className="text-[10px]">▣</span>
+            {terminalView ? 'Standard View' : 'Terminal View'}
+          </button>
+        </div>
+      </div>
+
+      {terminalView ? (
+        <SupplyChainMap company={company} />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Header */}
-          <div>
-            <div className="flex flex-wrap items-center gap-3 mb-3">
-              <h1 className="text-3xl font-heading font-bold text-cf-text-primary">
-                {company.name}
-              </h1>
-              <span className="font-mono text-sm font-bold bg-cf-primary/10 text-cf-primary px-3 py-1 rounded-lg">
-                {company.ticker}
-              </span>
-              <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-cf-text-secondary capitalize">
-                {company.role}
-              </span>
-            </div>
-            <p className="text-cf-text-secondary leading-relaxed mb-4">{company.description}</p>
-            <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | ChainFlow`} />
-          </div>
-
           {/* Products & Revenue */}
           <div className="cf-card p-6">
             <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6">
@@ -314,7 +332,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {rels.map((rel, i) => {
-                    const target = companies.find(
+                    const target = allCompanies.find(
                       (c) => c.id === rel.targetId || c.ticker === rel.targetId
                     );
                     return (
@@ -581,6 +599,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

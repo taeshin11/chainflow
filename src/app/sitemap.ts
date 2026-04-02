@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { companies } from '@/data/companies';
+import { allCompanies } from '@/data/companies';
 import { sectors } from '@/data/sectors';
 import { blogPosts } from '@/data/blog-posts';
 
@@ -39,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
 
     // Company pages
-    for (const company of companies) {
+    for (const company of allCompanies) {
       routes.push({
         url: `${BASE_URL}/${locale}/company/${company.ticker}`,
         lastModified: new Date(),

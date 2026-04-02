@@ -16,7 +16,7 @@ export async function generateMetadata({
     locale: params.locale,
     keywords: [
       'about ChainFlow',
-      'THE ELIOT FINANCIAL',
+      'THE ELIOT K FINANCIAL',
       'supply chain intelligence',
       'retail investor tools',
     ],
@@ -215,14 +215,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* About THE ELIOT FINANCIAL */}
+      {/* About THE ELIOT K FINANCIAL */}
       <section className="cf-card p-8 mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          About THE ELIOT FINANCIAL
+          About THE ELIOT K FINANCIAL
         </h2>
         <div className="space-y-4 text-cf-text-secondary leading-relaxed">
           <p>
-            THE ELIOT FINANCIAL is a technology company focused on building AI-powered tools that democratize
+            THE ELIOT K FINANCIAL is a technology company focused on building AI-powered tools that democratize
             access to institutional-grade financial intelligence. We believe that supply chain
             transparency and investment signal detection should not be exclusive to hedge funds and
             investment banks. Our mission is to harness artificial intelligence, alternative data
@@ -231,7 +231,7 @@ export default function AboutPage() {
             capabilities that were once the exclusive domain of Wall Street.
           </p>
           <p>
-            ChainFlow is the flagship product of THE ELIOT FINANCIAL, representing our core belief that the most
+            ChainFlow is the flagship product of THE ELIOT K FINANCIAL, representing our core belief that the most
             valuable investment insights often lie not in traditional financial statements, but in the
             complex web of supply chain relationships that underpin the global economy. We are
             committed to continuous improvement of our platform, incorporating user feedback and

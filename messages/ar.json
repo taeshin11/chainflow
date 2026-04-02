@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "تتبع أين يتدفق <accent>المال الذكي</accent> عبر سلسلة التوريد",
     "exploreSupplyChains": "استكشف سلاسل التوريد",
-    "viewSignals": "عرض الإشارات",
+    "viewSignals": "تتبع التجميع المؤسسي",
     "livePreview": "معاينة مباشرة",
     "socialProof": {
       "investors": "مستثمرون يتتبعون السلاسل",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "نرسم خريطة سلاسل التوريد العالمية، رابطاً تلو الآخر.",
-    "builtBy": "صُنع بعناية بواسطة THE ELIOT FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. جميع الحقوق محفوظة.",
+    "builtBy": "صُنع بعناية بواسطة THE ELIOT K FINANCIAL",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. جميع الحقوق محفوظة.",
     "terms": "شروط الخدمة",
     "privacy": "سياسة الخصوصية",
     "contact": "اتصل بنا",
@@ -436,7 +436,7 @@
     "signalsDescription": "تتبّع تحركات الأموال الذكية ومؤشرات الإنذار المبكر من إيداعات SEC وتداول المطّلعين ومكالمات الأرباح.",
     "newsGapTitle": "محلل الفجوات الإخبارية — ChainFlow",
     "newsGapDescription": "اكتشف أحداث سلسلة التوريد الجوهرية التي لم تحظَ بتغطية إعلامية كافية. اعثر على فرص في القصص غير المُبلّغ عنها.",
-    "aboutTitle": "من نحن — ذكاء سلسلة التوريد بواسطة THE ELIOT FINANCIAL، ChainFlow",
+    "aboutTitle": "من نحن — ذكاء سلسلة التوريد بواسطة THE ELIOT K FINANCIAL، ChainFlow",
     "aboutDescription": "تعرّف على مهمة ChainFlow في إتاحة ذكاء سلسلة التوريد للجميع وجعل شبكات التجارة العالمية شفافة."
   },
   "pro": {

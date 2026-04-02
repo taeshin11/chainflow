@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
         {/* Introduction */}
         <section>
           <p className="text-cf-text-secondary leading-relaxed">
-            ChainFlow (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is operated by THE ELIOT FINANCIAL. This Privacy Policy
+            ChainFlow (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is operated by THE ELIOT K FINANCIAL. This Privacy Policy
             explains how we collect, use, disclose, and safeguard your information when you visit our
             website at https://chainflow-mu.vercel.app (the &quot;Site&quot;) and use our supply chain
             intelligence platform (the &quot;Service&quot;). Please read this Privacy Policy carefully. By
@@ -334,7 +334,7 @@ export default function PrivacyPolicyPage() {
               data practices, please contact us at:
             </p>
             <div className="bg-cf-background rounded-lg p-4">
-              <p className="font-medium text-cf-text-primary">THE ELIOT FINANCIAL — ChainFlow</p>
+              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — ChainFlow</p>
               <p>Email: <a href="mailto:taeshinkim11@gmail.com" className="text-cf-primary hover:underline">taeshinkim11@gmail.com</a></p>
               <p>Website: <a href="https://chainflow-mu.vercel.app" className="text-cf-primary hover:underline">https://chainflow-mu.vercel.app</a></p>
             </div>

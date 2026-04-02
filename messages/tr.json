@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "<accent>Akıllı paranın</accent> tedarik zincirinde nereye aktığını takip edin",
     "exploreSupplyChains": "Tedarik Zincirlerini Keşfedin",
-    "viewSignals": "Sinyalleri Gör",
+    "viewSignals": "Kurumsal Birikimi Takip Et",
     "livePreview": "Canlı Önizleme",
     "socialProof": {
       "investors": "Zincirleri Takip Eden Yatırımcı",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "Dünyanın tedarik zincirlerini bağlantı bağlantı haritalandırıyoruz.",
-    "builtBy": "THE ELIOT FINANCIAL tarafından özenle geliştirilmiştir",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. Tüm hakları saklıdır.",
+    "builtBy": "THE ELIOT K FINANCIAL tarafından özenle geliştirilmiştir",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Tüm hakları saklıdır.",
     "terms": "Kullanım Koşulları",
     "privacy": "Gizlilik Politikası",
     "contact": "İletişim",
@@ -436,7 +436,7 @@
     "signalsDescription": "SEC dosyalamalarından, içeriden öğrenen işlemlerinden ve kazanç görüşmelerinden akıllı para hareketlerini ve erken uyarı göstergelerini takip edin.",
     "newsGapTitle": "Haber Boşluğu Analiz Aracı — ChainFlow",
     "newsGapDescription": "Yeterli medya ilgisi görmemiş önemli tedarik zinciri olaylarını keşfedin. Yetersiz haberlerden alfa bulun.",
-    "aboutTitle": "ChainFlow Hakkında — THE ELIOT FINANCIAL Tedarik Zinciri İstihbaratı",
+    "aboutTitle": "ChainFlow Hakkında — THE ELIOT K FINANCIAL Tedarik Zinciri İstihbaratı",
     "aboutDescription": "ChainFlow'un tedarik zinciri istihbaratını demokratikleştirme ve küresel ticaret ağlarını şeffaflaştırma misyonunu öğrenin."
   },
   "pro": {

@@ -1,3 +1,9 @@
+import { companiesBatch1 } from './companies-batch1';
+import { companiesBatch2 } from './companies-batch2';
+import { companiesBatch3 } from './companies-batch3';
+import { companiesBatch4 } from './companies-batch4';
+import { companiesBatch5 } from './companies-batch5';
+
 export interface Product {
   name: string;
   description: string;
@@ -22,7 +28,7 @@ export interface Company {
   ticker: string;
   sector: string;
   subSector: string;
-  marketCap: "mega" | "large" | "mid" | "small";
+  marketCap: "titan" | "mega" | "large" | "mid" | "small";
   role: "leader" | "intermediary" | "supplier" | "customer";
   products: Product[];
   revenue: RevenueBreakdown;
@@ -44,7 +50,7 @@ export const companies: Company[] = [
     ticker: "NVDA",
     sector: "semiconductors",
     subSector: "GPU / AI Accelerators",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "leader",
     products: [
       { name: "H100 / H200 GPUs", description: "Data-center AI training and inference accelerators based on the Hopper architecture", revenueShare: 52 },
@@ -87,7 +93,7 @@ export const companies: Company[] = [
     ticker: "TSM",
     sector: "semiconductors",
     subSector: "Foundry / Fabrication",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "supplier",
     products: [
       { name: "3nm Process (N3E/N3P)", description: "Cutting-edge 3-nanometer FinFET fabrication for mobile and HPC chips", revenueShare: 28 },
@@ -393,7 +399,7 @@ export const companies: Company[] = [
     ticker: "MSFT",
     sector: "ai-cloud",
     subSector: "Cloud Infrastructure & Software",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "leader",
     products: [
       { name: "Azure Cloud", description: "Public cloud platform offering IaaS, PaaS, and AI-as-a-Service", revenueShare: 38 },
@@ -430,7 +436,7 @@ export const companies: Company[] = [
     ticker: "GOOGL",
     sector: "ai-cloud",
     subSector: "Search / Cloud / AI",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "leader",
     products: [
       { name: "Google Search & Ads", description: "Search engine and associated advertising platform", revenueShare: 56 },
@@ -468,7 +474,7 @@ export const companies: Company[] = [
     ticker: "AMZN",
     sector: "ai-cloud",
     subSector: "Cloud Infrastructure & E-Commerce",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "leader",
     products: [
       { name: "AWS (Amazon Web Services)", description: "Market-leading IaaS/PaaS cloud platform with 200+ services", revenueShare: 18 },
@@ -506,7 +512,7 @@ export const companies: Company[] = [
     ticker: "META",
     sector: "ai-cloud",
     subSector: "Social / AI / Metaverse",
-    marketCap: "mega",
+    marketCap: "titan",
     role: "customer",
     products: [
       { name: "Facebook / Instagram Ads", description: "Social-media advertising across the family of apps", revenueShare: 78 },
@@ -4001,4 +4007,13 @@ export const companies: Company[] = [
     employees: "1,800+",
     website: "https://www.cheniere.com",
   },
+];
+
+export const allCompanies: Company[] = [
+  ...companies,
+  ...companiesBatch1,
+  ...companiesBatch2,
+  ...companiesBatch3,
+  ...companiesBatch4,
+  ...companiesBatch5,
 ];

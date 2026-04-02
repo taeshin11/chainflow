@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "ट्रैक करें कि <accent>स्मार्ट मनी</accent> आपूर्ति श्रृंखला में कहाँ बहता है",
     "exploreSupplyChains": "आपूर्ति श्रृंखला एक्सप्लोर करें",
-    "viewSignals": "संकेत देखें",
+    "viewSignals": "संस्थागत संचय ट्रैक करें",
     "livePreview": "लाइव प्रीव्यू",
     "socialProof": {
       "investors": "आपूर्ति श्रृंखला ट्रैक करने वाले निवेशक",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "दुनिया की सप्लाई चेन को एक-एक कनेक्शन से मैप कर रहे हैं।",
-    "builtBy": "THE ELIOT FINANCIAL द्वारा स्नेहपूर्वक निर्मित",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. सर्वाधिकार सुरक्षित।",
+    "builtBy": "THE ELIOT K FINANCIAL द्वारा स्नेहपूर्वक निर्मित",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. सर्वाधिकार सुरक्षित।",
     "terms": "सेवा की शर्तें",
     "privacy": "गोपनीयता नीति",
     "contact": "संपर्क करें",
@@ -436,7 +436,7 @@
     "signalsDescription": "SEC फाइलिंग, इनसाइडर ट्रेड और अर्निंग्स कॉल से स्मार्ट मनी मूवमेंट और प्रारंभिक चेतावनी संकेतकों को ट्रैक करें।",
     "newsGapTitle": "न्यूज़ गैप विश्लेषक — ChainFlow",
     "newsGapDescription": "पर्याप्त मीडिया कवरेज नहीं मिली महत्वपूर्ण सप्लाई चेन घटनाएँ खोजें। कम रिपोर्ट की गई खबरों में अल्फ़ा खोजें।",
-    "aboutTitle": "हमारे बारे में — THE ELIOT FINANCIAL द्वारा सप्लाई चेन इंटेलिजेंस, ChainFlow",
+    "aboutTitle": "हमारे बारे में — THE ELIOT K FINANCIAL द्वारा सप्लाई चेन इंटेलिजेंस, ChainFlow",
     "aboutDescription": "सप्लाई चेन इंटेलिजेंस को लोकतांत्रिक बनाने और वैश्विक व्यापार नेटवर्क को पारदर्शी बनाने के ChainFlow के मिशन के बारे में जानें।"
   },
   "pro": {

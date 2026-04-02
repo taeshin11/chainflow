@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "Отслеживайте, куда течёт <accent>умный капитал</accent> через цепочку поставок",
     "exploreSupplyChains": "Исследовать цепочки",
-    "viewSignals": "Смотреть сигналы",
+    "viewSignals": "Отслеживание институциональных покупок",
     "livePreview": "Предпросмотр в реальном времени",
     "socialProof": {
       "investors": "Инвесторы отслеживают цепочки",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "Картируем мировые цепочки поставок, связь за связью.",
-    "builtBy": "Создано с заботой командой THE ELIOT FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. Все права защищены.",
+    "builtBy": "Создано с заботой командой THE ELIOT K FINANCIAL",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Все права защищены.",
     "terms": "Условия использования",
     "privacy": "Политика конфиденциальности",
     "contact": "Контакты",
@@ -436,7 +436,7 @@
     "signalsDescription": "Отслеживайте движения умных денег и индикаторы раннего предупреждения из отчётов SEC, инсайдерских сделок и отчётных звонков.",
     "newsGapTitle": "Анализатор информационных пробелов — ChainFlow",
     "newsGapDescription": "Находите существенные события цепочки поставок с недостаточным медиаосвещением. Ищите альфу в недоосвещённых новостях.",
-    "aboutTitle": "О ChainFlow — Аналитика цепочек поставок от THE ELIOT FINANCIAL",
+    "aboutTitle": "О ChainFlow — Аналитика цепочек поставок от THE ELIOT K FINANCIAL",
     "aboutDescription": "Узнайте о миссии ChainFlow по демократизации аналитики цепочек поставок и обеспечению прозрачности мировых торговых сетей."
   },
   "pro": {

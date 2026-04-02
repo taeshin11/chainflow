@@ -289,7 +289,7 @@
   "home": {
     "heroHeadline": "追踪<accent>聪明资金</accent>在供应链中的流向",
     "exploreSupplyChains": "探索供应链",
-    "viewSignals": "查看信号",
+    "viewSignals": "追踪机构建仓",
     "livePreview": "实时供应链预览",
     "socialProof": {
       "investors": "追踪供应链的投资者",
@@ -392,8 +392,8 @@
   },
   "footer": {
     "tagline": "逐步绘制全球供应链版图。",
-    "builtBy": "由 THE ELIOT FINANCIAL 精心打造",
-    "copyright": "© {year} ChainFlow by THE ELIOT FINANCIAL. All rights reserved.",
+    "builtBy": "由 THE ELIOT K FINANCIAL 精心打造",
+    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "服务条款",
     "privacy": "隐私政策",
     "contact": "联系我们",
@@ -437,7 +437,7 @@
     "signalsDescription": "从 SEC 文件、内部人士交易和财报电话会议中追踪聪明资金动向与预警指标。",
     "newsGapTitle": "新闻盲区分析器 — ChainFlow",
     "newsGapDescription": "发现尚未获得充分媒体报道的重大供应链事件。从报道不足的领域中寻找阿尔法。",
-    "aboutTitle": "关于 ChainFlow — THE ELIOT FINANCIAL 旗下供应链情报平台",
+    "aboutTitle": "关于 ChainFlow — THE ELIOT K FINANCIAL 旗下供应链情报平台",
     "aboutDescription": "了解 ChainFlow 致力于供应链情报民主化、让全球贸易网络透明化的使命。"
   },
   "pro": {
