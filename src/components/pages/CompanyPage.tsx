@@ -38,6 +38,12 @@ import {
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import SupplyChainMap from '@/components/SupplyChainMap';
+import { useTranslatedText } from '@/hooks/useTranslatedText';
+
+function T({ text }: { text: string }) {
+  const translated = useTranslatedText(text);
+  return <>{translated}</>;
+}
 
 const COLORS = ['#4F8FBF', '#6CB4A8', '#E8A945', '#D97171', '#5CB88A', '#7C5CFC'];
 
@@ -174,7 +180,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             {company.role}
           </span>
         </div>
-        <p className="text-cf-text-secondary leading-relaxed mb-4">{company.description}</p>
+        <p className="text-cf-text-secondary leading-relaxed mb-4"><T text={company.description} /></p>
         <div className="flex items-center gap-3">
           <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | ChainFlow`} />
           <button
@@ -585,7 +591,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                   </p>
                 </div>
                 <p className="text-xs text-cf-text-secondary leading-relaxed">
-                  {cascadePosition.step.reason}
+                  <T text={cascadePosition.step.reason} />
                 </p>
                 <Link
                   href={`/cascade/${cascadePosition.pattern.sector}`}

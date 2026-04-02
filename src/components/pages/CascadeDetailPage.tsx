@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { cascadePatterns, type CascadeStep } from '@/data/cascades';
+import { useTranslatedText } from '@/hooks/useTranslatedText';
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +17,11 @@ import {
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
+
+function T({ text }: { text: string }) {
+  const translated = useTranslatedText(text);
+  return <>{translated}</>;
+}
 
 const roleColors: Record<string, { bg: string; text: string; border: string }> = {
   leader: { bg: 'bg-cf-primary/10', text: 'text-cf-primary', border: 'border-cf-primary' },
@@ -64,10 +70,10 @@ function CascadeFlowStep({ step, index, total }: { step: CascadeStep; index: num
         <div className="flex items-center gap-2 mb-2">
           <Clock className="w-3.5 h-3.5 text-cf-text-secondary" />
           <span className="text-xs text-cf-text-secondary font-medium">
-            {step.typicalDelay}
+            <T text={step.typicalDelay} />
           </span>
         </div>
-        <p className="text-sm text-cf-text-secondary leading-relaxed">{step.reason}</p>
+        <p className="text-sm text-cf-text-secondary leading-relaxed"><T text={step.reason} /></p>
       </div>
     </div>
   );
@@ -215,7 +221,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
                           <p className="text-xs font-medium text-cf-text-secondary uppercase tracking-wider mb-1">
                             {t('trigger')}
                           </p>
-                          <p className="text-sm text-cf-text-primary">{event.trigger}</p>
+                          <p className="text-sm text-cf-text-primary"><T text={event.trigger} /></p>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -227,7 +233,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
                               isPositive ? 'text-cf-success' : 'text-cf-danger'
                             }`}
                           >
-                            {event.leaderMove}
+                            <T text={event.leaderMove} />
                           </span>
                         </div>
 
@@ -236,7 +242,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
                             {t('cascadeResult')}
                           </p>
                           <p className="text-sm text-cf-text-secondary leading-relaxed">
-                            {event.cascadeResult}
+                            <T text={event.cascadeResult} />
                           </p>
                         </div>
                       </div>
