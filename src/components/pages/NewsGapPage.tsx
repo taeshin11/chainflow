@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { type NewsGapEntry, edgarTicker } from '@/data/news-gap';
+import { sectorContextMap } from '@/data/sector-context';
 import {
   ScatterChart,
   Scatter,
@@ -20,6 +21,8 @@ import {
   Eye,
   EyeOff,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Newspaper,
   Zap,
   Database,
@@ -28,6 +31,8 @@ import {
   Building2,
   ExternalLink,
   Calendar,
+  Globe,
+  BarChart2,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 
@@ -152,7 +157,8 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
 
       {/* Expanded content */}
       {expanded && (
-        <div className="border-t border-cf-border/50 bg-gray-50/60 p-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="border-t border-cf-border/50 bg-gray-50/60 p-5 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* 미디어 보도 전체 */}
           <div>
             <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -278,6 +284,89 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 섹터 현황 */}
+        {(() => {
+          const sc = sectorContextMap[entry.sector];
+          if (!sc) return null;
+          return (
+            <div className="bg-white rounded-xl border border-cf-border/60 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <BarChart2 className="w-3.5 h-3.5" /> 섹터 현황 — {sc.name}
+                </h4>
+                <a href={sc.googleNewsUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-cf-primary hover:underline">
+                  <Globe className="w-3 h-3" /> 섹터 뉴스
+                </a>
+              </div>
+
+              {/* Phase */}
+              <div className="bg-cf-primary/5 rounded-lg px-3 py-2 mb-3 text-xs font-medium text-cf-primary">
+                현재 국면: {sc.phase}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Key data */}
+                <div>
+                  <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">핵심 지표</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {sc.keyData.map((kd, i) => (
+                      <div key={i} className="bg-gray-50 rounded-lg p-2 border border-cf-border/30">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="text-xs text-cf-text-muted leading-tight">{kd.label}</span>
+                          {kd.trend === 'up' ? <TrendingUp className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            : kd.trend === 'down' ? <TrendingDown className="w-3 h-3 text-red-500 flex-shrink-0" />
+                            : <Minus className="w-3 h-3 text-gray-400 flex-shrink-0" />}
+                        </div>
+                        <p className="text-xs font-bold text-cf-text-primary">{kd.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Themes */}
+                <div>
+                  <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">핵심 테마</p>
+                  <ul className="space-y-1">
+                    {sc.themes.map((theme, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-cf-text-secondary leading-relaxed">
+                        <span className="text-cf-primary font-bold flex-shrink-0 mt-0.5">·</span>
+                        {theme}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* ETFs + Catalysts */}
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">관련 ETF</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {sc.etfs.map((etf) => (
+                        <span key={etf} className="px-2 py-0.5 rounded-full bg-cf-primary/10 text-cf-primary text-xs font-mono font-bold">
+                          {etf}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">다음 주요 이벤트</p>
+                    <ul className="space-y-1">
+                      {sc.nextCatalysts.map((cat, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-xs text-cf-text-secondary leading-relaxed">
+                          <Calendar className="w-3 h-3 text-cf-accent flex-shrink-0 mt-0.5" />
+                          {cat}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
         </div>
       )}
     </div>
