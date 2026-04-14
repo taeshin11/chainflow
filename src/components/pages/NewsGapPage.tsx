@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { newsGapData, type NewsGapEntry } from '@/data/news-gap';
+import { type NewsGapEntry } from '@/data/news-gap';
 import {
   ScatterChart,
   Scatter,
@@ -21,8 +21,8 @@ import {
   EyeOff,
   TrendingUp,
   Newspaper,
-  ArrowRight,
-  Search,
+  Zap,
+  Database,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 
@@ -44,19 +44,31 @@ function GapBar({ score }: { score: number }) {
   );
 }
 
-export default function NewsGapPage() {
+interface NewsGapPageProps {
+  initialEntries: NewsGapEntry[];
+  lastUpdated: string;
+  source: 'live' | 'cached' | 'static';
+  updatedTickers: number;
+}
+
+export default function NewsGapPage({
+  initialEntries,
+  lastUpdated,
+  source,
+  updatedTickers,
+}: NewsGapPageProps) {
   const t = useTranslations('newsGap');
   const [sortBy, setSortBy] = useState<'gap' | 'ib' | 'media'>('gap');
 
   const sorted = useMemo(() => {
-    const copy = [...newsGapData];
+    const copy = [...initialEntries];
     if (sortBy === 'gap') copy.sort((a, b) => b.gapScore - a.gapScore);
     else if (sortBy === 'ib') copy.sort((a, b) => b.ibActivityScore - a.ibActivityScore);
     else copy.sort((a, b) => a.mediaScore - b.mediaScore);
     return copy;
-  }, [sortBy]);
+  }, [sortBy, initialEntries]);
 
-  const scatterData = newsGapData.map((d) => ({
+  const scatterData = initialEntries.map((d) => ({
     x: d.mediaScore,
     y: d.ibActivityScore,
     z: d.gapScore,
@@ -65,13 +77,19 @@ export default function NewsGapPage() {
     isSignal: d.gapScore >= 60,
   }));
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: typeof scatterData[0] }> }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: Array<{ payload: (typeof scatterData)[0] }>;
+  }) => {
     if (!active || !payload?.[0]) return null;
     const data = payload[0].payload;
     return (
       <div className="bg-white p-3 rounded-lg shadow-lg border border-cf-border text-sm">
         <p className="font-bold text-cf-text-primary">
-          {data.ticker} - {data.name}
+          {data.ticker} — {data.name}
         </p>
         <p className="text-cf-text-secondary">
           Media: {data.x} | IB Activity: {data.y}
@@ -92,10 +110,36 @@ export default function NewsGapPage() {
           {t('title')}
         </div>
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          {t.rich('silenceIsSignal', { accent: (chunks) => <span className="text-cf-accent">{chunks}</span> })}
+          {t.rich('silenceIsSignal', {
+            accent: (chunks) => <span className="text-cf-accent">{chunks}</span>,
+          })}
         </h1>
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center items-center gap-3 mb-4">
           <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | ChainFlow" />
+          {source === 'cached' ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-200">
+              <Database className="w-3.5 h-3.5" />
+              {updatedTickers} tickers live
+            </div>
+          ) : source === 'live' ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
+              <Zap className="w-3.5 h-3.5" />
+              Live — {updatedTickers} tickers refreshed
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
+              <Database className="w-3.5 h-3.5" />
+              Static data
+            </div>
+          )}
+          <span className="text-xs text-cf-text-muted">
+            {new Date(lastUpdated).toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
         </div>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           {t('heroExplanation')}
@@ -108,7 +152,9 @@ export default function NewsGapPage() {
           {t('ibVsMedia')}
         </h2>
         <p className="text-sm text-cf-text-secondary mb-6">
-          {t.rich('ibVsMediaDesc', { accent: (chunks) => <span className="font-bold text-cf-accent">{chunks}</span> })}
+          {t.rich('ibVsMediaDesc', {
+            accent: (chunks) => <span className="font-bold text-cf-accent">{chunks}</span>,
+          })}
         </p>
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
@@ -279,10 +325,7 @@ export default function NewsGapPage() {
                       {t('mediaSays')}
                     </p>
                     {entry.recentHeadlines.slice(0, 2).map((h, i) => (
-                      <p
-                        key={i}
-                        className="text-xs text-cf-text-secondary mb-1.5 leading-relaxed"
-                      >
+                      <p key={i} className="text-xs text-cf-text-secondary mb-1.5 leading-relaxed">
                         &quot;{h}&quot;
                       </p>
                     ))}
@@ -315,15 +358,11 @@ export default function NewsGapPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-cf-text-secondary leading-relaxed">
           <div>
             <h3 className="font-bold text-cf-text-primary mb-2">{t('theTheory')}</h3>
-            <p>
-              {t('theTheoryText')}
-            </p>
+            <p>{t('theTheoryText')}</p>
           </div>
           <div>
             <h3 className="font-bold text-cf-text-primary mb-2">{t('whySilenceMatters')}</h3>
-            <p>
-              {t('whySilenceMattersText')}
-            </p>
+            <p>{t('whySilenceMattersText')}</p>
           </div>
         </div>
       </div>

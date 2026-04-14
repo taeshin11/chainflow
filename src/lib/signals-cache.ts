@@ -4,6 +4,7 @@ export interface TickerNewsCache {
   score: number;
   articles: number;
   updatedAt: string;
+  headlines?: string[];
 }
 
 // Redis key for news gap cache

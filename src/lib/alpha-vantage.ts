@@ -57,13 +57,13 @@ export async function fetchInstitutionalOwnership(
 }
 
 /**
- * Fetch news article count for a ticker in the last 30 days.
+ * Fetch news article count + recent headlines for a ticker in the last 30 days.
  * Returns null on rate-limit or error.
  */
-export async function fetchNewsCount(
+export async function fetchNewsData(
   ticker: string,
   apiKey: string
-): Promise<number | null> {
+): Promise<{ count: number; headlines: string[] } | null> {
   try {
     const from = new Date();
     from.setDate(from.getDate() - 30);
@@ -77,12 +77,28 @@ export async function fetchNewsCount(
     const data = await res.json();
     if (isRateLimited(data)) return null;
 
+    const feed = Array.isArray(data.feed) ? (data.feed as Record<string, unknown>[]) : [];
     const items = parseInt(String(data.items ?? ''), 10);
-    if (!isNaN(items)) return items;
-    return Array.isArray(data.feed) ? data.feed.length : null;
+    const count = !isNaN(items) ? items : feed.length;
+
+    const headlines = feed
+      .slice(0, 3)
+      .map((item) => String(item.title ?? ''))
+      .filter(Boolean);
+
+    return { count, headlines };
   } catch {
     return null;
   }
+}
+
+/** @deprecated Use fetchNewsData instead */
+export async function fetchNewsCount(
+  ticker: string,
+  apiKey: string
+): Promise<number | null> {
+  const result = await fetchNewsData(ticker, apiKey);
+  return result?.count ?? null;
 }
 
 /**

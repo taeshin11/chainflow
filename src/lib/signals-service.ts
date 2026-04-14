@@ -1,5 +1,5 @@
 import { institutionalSignals, type InstitutionalSignal } from '@/data/institutional-signals';
-import { fetchNewsCount, computeNewsGapScore } from '@/lib/alpha-vantage';
+import { fetchNewsData, computeNewsGapScore } from '@/lib/alpha-vantage';
 import {
   getNewsGapCache,
   setNewsGapCache,
@@ -17,12 +17,13 @@ import {
 const US_TICKERS_BY_PRIORITY = [
   // Mid/small caps — news gap signal is strongest here
   'MU',   'AMAT', 'LRCX', 'KLAC', 'ALB',
-  'RTX',  'NOC',  'LHX',  'REGN', 'MRNA',
-  'PFE',  'ORCL', 'NVO',  'TSM',  'ASML',
+  'KTOS', 'MRVL', 'RTX',  'NOC',  'LHX',
+  'REGN', 'MRNA', 'PFE',  'ORCL', 'NVO',
+  'TSM',  'ASML',
   // Large caps — still useful but always in the news
   'NVDA', 'MSFT', 'GOOGL', 'META', 'AMZN',
   'TSLA', 'LLY',  'LMT',
-];
+]; // 25 tickers = Alpha Vantage free tier daily limit
 
 export interface SignalsResult {
   signals: InstitutionalSignal[];
@@ -49,7 +50,7 @@ async function refreshNewsGaps(
     const batch = US_TICKERS_BY_PRIORITY.slice(i, i + BATCH);
 
     const results = await Promise.allSettled(
-      batch.map((ticker) => fetchNewsCount(ticker, apiKey))
+      batch.map((ticker) => fetchNewsData(ticker, apiKey))
     );
 
     for (let j = 0; j < batch.length; j++) {
@@ -57,8 +58,9 @@ async function refreshNewsGaps(
       const r = results[j];
       if (r.status === 'fulfilled' && r.value !== null) {
         result[ticker] = {
-          score: computeNewsGapScore(r.value),
-          articles: r.value,
+          score: computeNewsGapScore(r.value.count),
+          articles: r.value.count,
+          headlines: r.value.headlines,
           updatedAt: now,
         };
       }
