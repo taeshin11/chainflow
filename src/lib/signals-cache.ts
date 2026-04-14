@@ -1,14 +1,15 @@
 import { Redis } from '@upstash/redis';
+import { type NewsArticle } from '@/lib/alpha-vantage';
 
 export interface TickerNewsCache {
   score: number;
   articles: number;
   updatedAt: string;
-  headlines?: string[];
+  recentArticles?: NewsArticle[];
 }
 
 // Redis key for news gap cache
-const KEY = 'chainflow:news-gap:v1';
+const KEY = 'chainflow:news-gap:v2';
 // 26-hour TTL — ensures data refreshes daily even if cron fires slightly late
 const TTL = 26 * 60 * 60;
 
@@ -44,10 +45,6 @@ export async function setNewsGapCache(
   }
 }
 
-/**
- * Merge incoming fresh data into existing cache.
- * Preserves entries for tickers not in the new batch (e.g. if partial refresh).
- */
 export function mergeNewsGapCache(
   existing: Record<string, TickerNewsCache> | null,
   incoming: Record<string, TickerNewsCache>

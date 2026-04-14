@@ -8,8 +8,25 @@ export interface AVHolder {
   changeShares: number;
 }
 
+export interface NewsArticle {
+  title: string;
+  /** Human-readable date, e.g. "Apr 14, 2026" */
+  date: string;
+  source: string;
+  url: string;
+}
+
 function isRateLimited(data: Record<string, unknown>): boolean {
   return !!(data['Note'] || data['Information'] || data['Error Message']);
+}
+
+/** Parse AV time_published "20260315T135900" → "Mar 15, 2026" */
+function parseAvDate(raw: string): string {
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const year = raw.slice(0, 4);
+  const month = parseInt(raw.slice(4, 6), 10) - 1;
+  const day = parseInt(raw.slice(6, 8), 10);
+  return `${MONTHS[month] ?? '?'} ${day}, ${year}`;
 }
 
 /**
@@ -28,7 +45,6 @@ export async function fetchInstitutionalOwnership(
     const data = await res.json();
     if (isRateLimited(data)) return null;
 
-    // Handle various possible response shapes
     const quarterly: unknown[] =
       data?.quarterlyReports ??
       data?.institutionOwnership?.quarterlyReports ??
@@ -57,17 +73,17 @@ export async function fetchInstitutionalOwnership(
 }
 
 /**
- * Fetch news article count + recent headlines for a ticker in the last 30 days.
+ * Fetch news articles (count + per-article title/date/source/url) for a ticker in the last 30 days.
  * Returns null on rate-limit or error.
  */
 export async function fetchNewsData(
   ticker: string,
   apiKey: string
-): Promise<{ count: number; headlines: string[] } | null> {
+): Promise<{ count: number; articles: NewsArticle[] } | null> {
   try {
     const from = new Date();
     from.setDate(from.getDate() - 30);
-    // AV format: YYYYMMDDTHHMM (13 chars). slice(0,13) already produces this.
+    // AV format: YYYYMMDDTHHMM (13 chars)
     const timeFrom = from.toISOString().replace(/[-:]/g, '').slice(0, 13);
 
     const url = `${AV_BASE}?function=NEWS_SENTIMENT&tickers=${encodeURIComponent(ticker)}&time_from=${timeFrom}&limit=200&apikey=${apiKey}`;
@@ -81,12 +97,17 @@ export async function fetchNewsData(
     const items = parseInt(String(data.items ?? ''), 10);
     const count = !isNaN(items) ? items : feed.length;
 
-    const headlines = feed
-      .slice(0, 3)
-      .map((item) => String(item.title ?? ''))
-      .filter(Boolean);
+    const articles: NewsArticle[] = feed
+      .slice(0, 5)
+      .map((item) => ({
+        title: String(item.title ?? ''),
+        date: parseAvDate(String(item.time_published ?? '')),
+        source: String(item.source ?? ''),
+        url: String(item.url ?? ''),
+      }))
+      .filter((a) => a.title);
 
-    return { count, headlines };
+    return { count, articles };
   } catch {
     return null;
   }
@@ -103,8 +124,6 @@ export async function fetchNewsCount(
 
 /**
  * Convert raw article count → news gap score (0–100).
- * Higher article count = more media coverage = lower gap score (less "hidden signal").
- *
  * Formula: score = 100 - sqrt(articles) * 5, clamped [0, 100]
  * Examples: 0 articles → 100 | 25 → 75 | 100 → 50 | 400 → 0
  */

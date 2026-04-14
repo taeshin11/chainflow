@@ -60,7 +60,7 @@ async function refreshNewsGaps(
         result[ticker] = {
           score: computeNewsGapScore(r.value.count),
           articles: r.value.count,
-          headlines: r.value.headlines,
+          recentArticles: r.value.articles,
           updatedAt: now,
         };
       }

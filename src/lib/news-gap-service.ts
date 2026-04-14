@@ -39,7 +39,7 @@ export async function getNewsGapData(): Promise<NewsGapResult> {
       ...entry,
       gapScore: live.score,
       mediaScore,
-      recentHeadlines: live.headlines?.length ? live.headlines : entry.recentHeadlines,
+      recentArticles: live.recentArticles?.length ? live.recentArticles : entry.recentArticles,
     };
   });
 
