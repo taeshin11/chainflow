@@ -67,8 +67,8 @@ export async function fetchNewsData(
   try {
     const from = new Date();
     from.setDate(from.getDate() - 30);
-    const timeFrom =
-      from.toISOString().replace(/[-:]/g, '').slice(0, 13) + '00';
+    // AV format: YYYYMMDDTHHMM (13 chars). slice(0,13) already produces this.
+    const timeFrom = from.toISOString().replace(/[-:]/g, '').slice(0, 13);
 
     const url = `${AV_BASE}?function=NEWS_SENTIMENT&tickers=${encodeURIComponent(ticker)}&time_from=${timeFrom}&limit=200&apikey=${apiKey}`;
     const res = await fetch(url, { next: { revalidate: 86400 } });
