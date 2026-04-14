@@ -124,7 +124,7 @@ export default function CascadeDetailPage({ sector }: { sector: string }) {
           <h1 className="text-3xl font-heading font-bold text-cf-text-primary">
             {tExplore(`sectors.${sector}`)} {t('title')}
           </h1>
-          <ShareButtons title={`${tExplore(`sectors.${sector}`)} ${t('title')} | ChainFlow`} />
+          <ShareButtons title={`${tExplore(`sectors.${sector}`)} ${t('title')} | Flowvium`} />
         </div>
         <p className="text-lg text-cf-text-secondary max-w-3xl">{t('cascadeDescription')}</p>
       </div>

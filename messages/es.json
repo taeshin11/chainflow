@@ -19,7 +19,7 @@
   "hero": {
     "title": "Descubre Riesgos Ocultos en la Cadena de Suministro",
     "subtitle": "Antes de que sean noticia",
-    "description": "ChainFlow mapea las conexiones invisibles entre empresas, proveedores y eventos globales, dándote la ventaja para anticipar disrupciones antes de que se propaguen.",
+    "description": "Flowvium mapea las conexiones invisibles entre empresas, proveedores y eventos globales, dándote la ventaja para anticipar disrupciones antes de que se propaguen.",
     "cta": "Comenzar a Explorar",
     "ctaSecondary": "Ver Demo",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Reportes 13F recientes que muestran actividad institucional significativa.",
     "viewAllSignals": "Ver Todas las Señales",
     "fourLenses": "Cuatro Perspectivas del Alpha en Cadenas de Suministro",
-    "fourLensesDesc": "ChainFlow combina mapeo de cadenas de suministro, detección de señales institucionales, análisis de cascada y puntuación de brecha informativa en una sola plataforma.",
+    "fourLensesDesc": "Flowvium combina mapeo de cadenas de suministro, detección de señales institucionales, análisis de cascada y puntuación de brecha informativa en una sola plataforma.",
     "featureCards": {
       "supplyChainMaps": "Mapas de Cadena de Suministro",
       "institutionalFlowSignals": "Señales de Flujo Institucional",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Cuando una acción líder se mueve, usa nuestro rastreador de cascadas para identificar qué acciones aguas abajo seguirán y cuándo."
     },
     "startExploringNow": "Comienza a Explorar Ahora",
-    "disclaimer": "ChainFlow proporciona datos de cadena de suministro solo con fines informativos. No constituye asesoramiento financiero. La actividad institucional pasada no garantiza rendimientos futuros. Siempre realiza tu propia investigación antes de tomar decisiones de inversión."
+    "disclaimer": "Flowvium proporciona datos de cadena de suministro solo con fines informativos. No constituye asesoramiento financiero. La actividad institucional pasada no garantiza rendimientos futuros. Siempre realiza tu propia investigación antes de tomar decisiones de inversión."
   },
   "feedback": {
     "title": "Enviar Comentarios",
-    "subtitle": "Ayúdanos a mejorar ChainFlow",
+    "subtitle": "Ayúdanos a mejorar Flowvium",
     "nameLabel": "Nombre",
     "namePlaceholder": "Tu nombre",
     "emailLabel": "Correo electrónico",
@@ -342,7 +342,7 @@
     "success": "¡Gracias por tus comentarios!",
     "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
     "sendFeedback": "Enviar Comentarios",
-    "helpImprove": "Ayúdanos a mejorar ChainFlow",
+    "helpImprove": "Ayúdanos a mejorar Flowvium",
     "feedbackType": "Tipo de Comentario",
     "bugReport": "Reporte de Error",
     "featureRequest": "Solicitud de Función",
@@ -380,7 +380,7 @@
     "viewAll": "Ver Todo",
     "noData": "Sin datos disponibles",
     "lastUpdated": "Última actualización {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "Beta",
     "new": "Nuevo",
     "comingSoon": "Próximamente",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Mapeando las cadenas de suministro del mundo, una conexión a la vez.",
     "builtBy": "Desarrollado con dedicación por THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Todos los derechos reservados.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Todos los derechos reservados.",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "contact": "Contáctanos",
     "status": "Estado del Sistema",
     "documentation": "Documentación",
     "api": "Acceso API",
-    "disclaimer": "ChainFlow proporciona datos de cadena de suministro solo con fines informativos. No constituye asesoramiento financiero. Siempre realiza tu propia investigación antes de tomar decisiones de inversión.",
+    "disclaimer": "Flowvium proporciona datos de cadena de suministro solo con fines informativos. No constituye asesoramiento financiero. Siempre realiza tu propia investigación antes de tomar decisiones de inversión.",
     "product": "Producto",
     "resources": "Recursos",
     "legal": "Legal",
@@ -427,21 +427,21 @@
     "invalidEmail": "Por favor, ingresa un correo electrónico válido."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Plataforma de Inteligencia de Cadena de Suministro",
+    "homeTitle": "Flowvium — Plataforma de Inteligencia de Cadena de Suministro",
     "homeDescription": "Descubre riesgos ocultos en la cadena de suministro antes de que sean noticia. Monitoreo en tiempo real, análisis de cascada y detección de señales institucionales.",
-    "exploreTitle": "Explorador de Cadena de Suministro — ChainFlow",
+    "exploreTitle": "Explorador de Cadena de Suministro — Flowvium",
     "exploreDescription": "Busca y mapea relaciones con proveedores en industrias globales. Visualiza redes de cadena de suministro e identifica riesgos de concentración.",
-    "cascadeTitle": "Visualizador de Cascadas — ChainFlow",
+    "cascadeTitle": "Visualizador de Cascadas — Flowvium",
     "cascadeDescription": "Modela cómo las disrupciones se propagan a través de cadenas de suministro interconectadas. Simula escenarios y estima plazos de recuperación.",
-    "signalsTitle": "Señales Institucionales — ChainFlow",
+    "signalsTitle": "Señales Institucionales — Flowvium",
     "signalsDescription": "Rastrea movimientos de dinero inteligente e indicadores de alerta temprana desde reportes SEC, operaciones de insiders y conferencias de resultados.",
-    "newsGapTitle": "Analizador de Brecha Informativa — ChainFlow",
+    "newsGapTitle": "Analizador de Brecha Informativa — Flowvium",
     "newsGapDescription": "Descubre eventos materiales en cadenas de suministro que no han recibido cobertura mediática adecuada. Encuentra alpha en historias subinformadas.",
-    "aboutTitle": "Acerca de ChainFlow — Inteligencia de Cadena de Suministro por THE ELIOT K FINANCIAL",
-    "aboutDescription": "Conoce la misión de ChainFlow de democratizar la inteligencia de cadena de suministro y hacer transparentes las redes de comercio global."
+    "aboutTitle": "Acerca de Flowvium — Inteligencia de Cadena de Suministro por THE ELIOT K FINANCIAL",
+    "aboutDescription": "Conoce la misión de Flowvium de democratizar la inteligencia de cadena de suministro y hacer transparentes las redes de comercio global."
   },
   "pro": {
-    "upgradeTitle": "Desbloquea ChainFlow Pro",
+    "upgradeTitle": "Desbloquea Flowvium Pro",
     "upgradeSubtitle": "Obtén acceso ilimitado a inteligencia avanzada de cadena de suministro",
     "upgradeDescription": "Los miembros Pro obtienen análisis más profundos, alertas en tiempo real, acceso API y soporte prioritario.",
     "upgradeCta": "Actualizar a Pro",
@@ -464,11 +464,11 @@
     "limitDescription": "Actualiza a Pro para acceso ilimitado a esta función."
   },
   "about": {
-    "title": "Acerca de ChainFlow",
+    "title": "Acerca de Flowvium",
     "mission": "Nuestra Misión",
-    "missionText": "Creemos que la transparencia en la cadena de suministro no debería ser un lujo. ChainFlow democratiza el acceso a la inteligencia de cadena de suministro, empoderando a inversores, analistas y empresas para tomar decisiones informadas.",
+    "missionText": "Creemos que la transparencia en la cadena de suministro no debería ser un lujo. Flowvium democratiza el acceso a la inteligencia de cadena de suministro, empoderando a inversores, analistas y empresas para tomar decisiones informadas.",
     "story": "Nuestra Historia",
-    "storyText": "Nacido de la constatación de que las cadenas de suministro globales son la columna vertebral oculta de la economía, ChainFlow fue creado para hacer visibles estas redes invisibles. Combinamos datos alternativos, análisis de IA y visualización intuitiva para revelar las conexiones que importan.",
+    "storyText": "Nacido de la constatación de que las cadenas de suministro globales son la columna vertebral oculta de la economía, Flowvium fue creado para hacer visibles estas redes invisibles. Combinamos datos alternativos, análisis de IA y visualización intuitiva para revelar las conexiones que importan.",
     "team": "Nuestro Equipo",
     "teamText": "Somos un equipo de ingenieros, científicos de datos y expertos en cadena de suministro apasionados por llevar transparencia al comercio global.",
     "values": "Nuestros Valores",

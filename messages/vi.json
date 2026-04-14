@@ -19,7 +19,7 @@
   "hero": {
     "title": "Phát hiện rủi ro chuỗi cung ứng tiềm ẩn",
     "subtitle": "Trước khi chúng trở thành tin nóng",
-    "description": "ChainFlow lập bản đồ các mối liên kết vô hình giữa doanh nghiệp, nhà cung cấp và sự kiện toàn cầu — giúp bạn dự đoán gián đoạn trước khi chúng lan rộng.",
+    "description": "Flowvium lập bản đồ các mối liên kết vô hình giữa doanh nghiệp, nhà cung cấp và sự kiện toàn cầu — giúp bạn dự đoán gián đoạn trước khi chúng lan rộng.",
     "cta": "Bắt đầu khám phá",
     "ctaSecondary": "Xem demo",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Báo cáo 13F gần đây cho thấy hoạt động tổ chức đáng kể.",
     "viewAllSignals": "Xem tất cả tín hiệu",
     "fourLenses": "Bốn góc nhìn về alpha chuỗi cung ứng",
-    "fourLensesDesc": "ChainFlow kết hợp lập bản đồ chuỗi, phát hiện tín hiệu tổ chức, phân tích liên hoàn và chấm điểm khoảng cách tin tức.",
+    "fourLensesDesc": "Flowvium kết hợp lập bản đồ chuỗi, phát hiện tín hiệu tổ chức, phân tích liên hoàn và chấm điểm khoảng cách tin tức.",
     "featureCards": {
       "supplyChainMaps": "Bản đồ chuỗi cung ứng",
       "institutionalFlowSignals": "Tín hiệu dòng tiền tổ chức",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Khi cổ phiếu đầu tàu biến động, sử dụng công cụ theo dõi để xác định cổ phiếu hạ nguồn sẽ theo sau khi nào."
     },
     "startExploringNow": "Bắt đầu khám phá ngay",
-    "disclaimer": "ChainFlow cung cấp dữ liệu chuỗi cung ứng chỉ để tham khảo. Không cấu thành tư vấn tài chính."
+    "disclaimer": "Flowvium cung cấp dữ liệu chuỗi cung ứng chỉ để tham khảo. Không cấu thành tư vấn tài chính."
   },
   "feedback": {
     "title": "Gửi phản hồi",
-    "subtitle": "Giúp chúng tôi cải thiện ChainFlow",
+    "subtitle": "Giúp chúng tôi cải thiện Flowvium",
     "nameLabel": "Tên",
     "namePlaceholder": "Tên của bạn",
     "emailLabel": "Email",
@@ -342,7 +342,7 @@
     "success": "Cảm ơn phản hồi của bạn!",
     "error": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "sendFeedback": "Gửi góp ý",
-    "helpImprove": "Giúp chúng tôi cải thiện ChainFlow",
+    "helpImprove": "Giúp chúng tôi cải thiện Flowvium",
     "feedbackType": "Loại góp ý",
     "bugReport": "Báo lỗi",
     "featureRequest": "Yêu cầu tính năng",
@@ -380,7 +380,7 @@
     "viewAll": "Xem tất cả",
     "noData": "Không có dữ liệu",
     "lastUpdated": "Cập nhật lần cuối: {time}",
-    "poweredBy": "Được cung cấp bởi ChainFlow",
+    "poweredBy": "Được cung cấp bởi Flowvium",
     "beta": "Beta",
     "new": "Mới",
     "comingSoon": "Sắp ra mắt",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Lập bản đồ chuỗi cung ứng toàn cầu, từng kết nối một.",
     "builtBy": "Được xây dựng tận tâm bởi THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Bảo lưu mọi quyền.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Bảo lưu mọi quyền.",
     "terms": "Điều khoản dịch vụ",
     "privacy": "Chính sách bảo mật",
     "contact": "Liên hệ",
     "status": "Trạng thái hệ thống",
     "documentation": "Tài liệu",
     "api": "Truy cập API",
-    "disclaimer": "ChainFlow cung cấp dữ liệu chuỗi cung ứng chỉ nhằm mục đích thông tin. Đây không phải tư vấn tài chính. Luôn tự nghiên cứu trước khi đưa ra quyết định đầu tư.",
+    "disclaimer": "Flowvium cung cấp dữ liệu chuỗi cung ứng chỉ nhằm mục đích thông tin. Đây không phải tư vấn tài chính. Luôn tự nghiên cứu trước khi đưa ra quyết định đầu tư.",
     "product": "Sản phẩm",
     "resources": "Tài nguyên",
     "legal": "Pháp lý",
@@ -426,21 +426,21 @@
     "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Nền tảng thông tin chuỗi cung ứng",
+    "homeTitle": "Flowvium — Nền tảng thông tin chuỗi cung ứng",
     "homeDescription": "Phát hiện rủi ro chuỗi cung ứng tiềm ẩn trước khi trở thành tin nóng. Giám sát thời gian thực, phân tích lan truyền và phát hiện tín hiệu tổ chức.",
-    "exploreTitle": "Trình khám phá chuỗi cung ứng — ChainFlow",
+    "exploreTitle": "Trình khám phá chuỗi cung ứng — Flowvium",
     "exploreDescription": "Tìm kiếm và lập bản đồ quan hệ nhà cung cấp trong các ngành công nghiệp toàn cầu. Trực quan hóa mạng lưới cung ứng và xác định rủi ro tập trung.",
-    "cascadeTitle": "Trực quan hóa lan truyền — ChainFlow",
+    "cascadeTitle": "Trực quan hóa lan truyền — Flowvium",
     "cascadeDescription": "Mô phỏng cách gián đoạn lan truyền qua chuỗi cung ứng liên kết. Chạy kịch bản và ước tính thời gian phục hồi.",
-    "signalsTitle": "Tín hiệu tổ chức — ChainFlow",
+    "signalsTitle": "Tín hiệu tổ chức — Flowvium",
     "signalsDescription": "Theo dõi dòng tiền thông minh và chỉ báo cảnh báo sớm từ hồ sơ SEC, giao dịch nội gián và cuộc gọi thu nhập.",
-    "newsGapTitle": "Phân tích khoảng trống tin tức — ChainFlow",
+    "newsGapTitle": "Phân tích khoảng trống tin tức — Flowvium",
     "newsGapDescription": "Khám phá các sự kiện chuỗi cung ứng quan trọng chưa được truyền thông đưa tin đầy đủ. Tìm alpha từ những câu chuyện bị bỏ lỡ.",
-    "aboutTitle": "Giới thiệu — Thông tin chuỗi cung ứng bởi THE ELIOT K FINANCIAL, ChainFlow",
-    "aboutDescription": "Tìm hiểu sứ mệnh của ChainFlow trong việc phổ cập thông tin chuỗi cung ứng và minh bạch hóa mạng lưới thương mại toàn cầu."
+    "aboutTitle": "Giới thiệu — Thông tin chuỗi cung ứng bởi THE ELIOT K FINANCIAL, Flowvium",
+    "aboutDescription": "Tìm hiểu sứ mệnh của Flowvium trong việc phổ cập thông tin chuỗi cung ứng và minh bạch hóa mạng lưới thương mại toàn cầu."
   },
   "pro": {
-    "upgradeTitle": "Mở khóa ChainFlow Pro",
+    "upgradeTitle": "Mở khóa Flowvium Pro",
     "upgradeSubtitle": "Truy cập không giới hạn vào thông tin chuỗi cung ứng nâng cao",
     "upgradeDescription": "Thành viên Pro nhận phân tích chuyên sâu, cảnh báo thời gian thực, truy cập API và hỗ trợ ưu tiên.",
     "upgradeCta": "Nâng cấp lên Pro",
@@ -463,11 +463,11 @@
     "limitDescription": "Nâng cấp lên Pro để truy cập không giới hạn tính năng này."
   },
   "about": {
-    "title": "Về ChainFlow",
+    "title": "Về Flowvium",
     "mission": "Sứ mệnh của chúng tôi",
-    "missionText": "Chúng tôi tin rằng sự minh bạch chuỗi cung ứng không nên là đặc quyền. ChainFlow phổ cập thông tin chuỗi cung ứng, trao quyền cho nhà đầu tư, nhà phân tích và doanh nghiệp đưa ra quyết định sáng suốt.",
+    "missionText": "Chúng tôi tin rằng sự minh bạch chuỗi cung ứng không nên là đặc quyền. Flowvium phổ cập thông tin chuỗi cung ứng, trao quyền cho nhà đầu tư, nhà phân tích và doanh nghiệp đưa ra quyết định sáng suốt.",
     "story": "Câu chuyện của chúng tôi",
-    "storyText": "Xuất phát từ nhận thức rằng chuỗi cung ứng toàn cầu là xương sống ẩn của nền kinh tế, ChainFlow được xây dựng để biến những mạng lưới vô hình thành hữu hình. Chúng tôi kết hợp dữ liệu thay thế, phân tích AI và trực quan hóa trực giác để hé lộ những mối liên kết quan trọng.",
+    "storyText": "Xuất phát từ nhận thức rằng chuỗi cung ứng toàn cầu là xương sống ẩn của nền kinh tế, Flowvium được xây dựng để biến những mạng lưới vô hình thành hữu hình. Chúng tôi kết hợp dữ liệu thay thế, phân tích AI và trực quan hóa trực giác để hé lộ những mối liên kết quan trọng.",
     "team": "Đội ngũ của chúng tôi",
     "teamText": "Chúng tôi là đội ngũ kỹ sư, nhà khoa học dữ liệu và chuyên gia chuỗi cung ứng đam mê mang lại sự minh bạch cho thương mại toàn cầu.",
     "values": "Giá trị cốt lõi",

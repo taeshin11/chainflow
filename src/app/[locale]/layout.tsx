@@ -26,7 +26,7 @@ export async function generateMetadata({
   });
 }
 
-const BASE_URL = 'https://chainflow-mu.vercel.app';
+const BASE_URL = 'https://flowvium.vercel.app';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -43,13 +43,13 @@ const jsonLd = {
         height: 630,
       },
       sameAs: [
-        'https://twitter.com/chainflow_app',
+        'https://twitter.com/flowvium_app',
       ],
     },
     {
       '@type': 'WebApplication',
       '@id': `${BASE_URL}/#webapp`,
-      name: 'ChainFlow',
+      name: 'Flowvium',
       url: BASE_URL,
       description:
         'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.',
@@ -70,7 +70,7 @@ const jsonLd = {
       '@type': 'WebSite',
       '@id': `${BASE_URL}/#website`,
       url: BASE_URL,
-      name: 'ChainFlow',
+      name: 'Flowvium',
       inLanguage: 'en',
       publisher: {
         '@id': `${BASE_URL}/#organization`,

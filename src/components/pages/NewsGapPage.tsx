@@ -425,7 +425,7 @@ export default function NewsGapPage({
           {t.rich('silenceIsSignal', { accent: (chunks) => <span className="text-cf-accent">{chunks}</span> })}
         </h1>
         <div className="flex justify-center items-center gap-3 mb-4 flex-wrap">
-          <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | ChainFlow" />
+          <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | Flowvium" />
           {source === 'cached' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-200">
               <Database className="w-3.5 h-3.5" />{updatedTickers} tickers live

@@ -19,7 +19,7 @@
   "hero": {
     "title": "發掘隱藏的供應鏈風險",
     "subtitle": "在成為新聞之前",
-    "description": "ChainFlow 追蹤企業、供應商和全球事件之間的隱形關聯，幫助您在連鎖衝擊發生之前提前預判。",
+    "description": "Flowvium 追蹤企業、供應商和全球事件之間的隱形關聯，幫助您在連鎖衝擊發生之前提前預判。",
     "cta": "開始探索",
     "ctaSecondary": "觀看示範",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "呈現重大機構活動的近期 13F 報告。",
     "viewAllSignals": "檢視全部訊號",
     "fourLenses": "供應鏈阿爾法的四個視角",
-    "fourLensesDesc": "ChainFlow 將供應鏈繪製、機構訊號偵測、連鎖分析和新聞盲區評分整合到一個平台。",
+    "fourLensesDesc": "Flowvium 將供應鏈繪製、機構訊號偵測、連鎖分析和新聞盲區評分整合到一個平台。",
     "featureCards": {
       "supplyChainMaps": "供應鏈地圖",
       "institutionalFlowSignals": "機構資金流訊號",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "當龍頭股異動時，利用連鎖追蹤器辨識哪些下游股票將會跟進以及跟進的時機。"
     },
     "startExploringNow": "立即開始探索",
-    "disclaimer": "ChainFlow 僅基於資訊提供目的提供供應鏈數據，不構成投資建議。過往機構活動不代表未來收益。請在做出投資決策前務必自行研究。"
+    "disclaimer": "Flowvium 僅基於資訊提供目的提供供應鏈數據，不構成投資建議。過往機構活動不代表未來收益。請在做出投資決策前務必自行研究。"
   },
   "feedback": {
     "title": "傳送意見回饋",
-    "subtitle": "幫助我們改善 ChainFlow",
+    "subtitle": "幫助我們改善 Flowvium",
     "nameLabel": "姓名",
     "namePlaceholder": "請輸入您的姓名",
     "emailLabel": "電子信箱",
@@ -342,7 +342,7 @@
     "success": "感謝您的回饋！",
     "error": "發生錯誤，請重試。",
     "sendFeedback": "傳送意見回饋",
-    "helpImprove": "幫助我們改善 ChainFlow",
+    "helpImprove": "幫助我們改善 Flowvium",
     "feedbackType": "回饋類型",
     "bugReport": "Bug 回報",
     "featureRequest": "功能建議",
@@ -380,7 +380,7 @@
     "viewAll": "檢視全部",
     "noData": "尚無資料",
     "lastUpdated": "最後更新於 {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "公測版",
     "new": "新功能",
     "comingSoon": "即將推出",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "逐步繪製全球供應鏈版圖。",
     "builtBy": "由 THE ELIOT K FINANCIAL 精心打造",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "服務條款",
     "privacy": "隱私權政策",
     "contact": "聯絡我們",
     "status": "系統狀態",
     "documentation": "文件",
     "api": "API 存取",
-    "disclaimer": "ChainFlow 僅基於資訊提供目的提供供應鏈數據，不構成投資建議。請在做出投資決策前務必自行研究。",
+    "disclaimer": "Flowvium 僅基於資訊提供目的提供供應鏈數據，不構成投資建議。請在做出投資決策前務必自行研究。",
     "product": "產品",
     "resources": "資源",
     "legal": "法律聲明",
@@ -427,21 +427,21 @@
     "invalidEmail": "請輸入有效的電子信箱地址。"
   },
   "seo": {
-    "homeTitle": "ChainFlow — 供應鏈情報平台",
+    "homeTitle": "Flowvium — 供應鏈情報平台",
     "homeDescription": "在成為新聞之前發掘隱藏的供應鏈風險。即時監控、連鎖影響分析和機構訊號偵測。",
-    "exploreTitle": "供應鏈探索器 — ChainFlow",
+    "exploreTitle": "供應鏈探索器 — Flowvium",
     "exploreDescription": "搜尋並繪製全球產業的供應商關係。視覺化供應鏈網路，辨識集中度風險。",
-    "cascadeTitle": "連鎖影響視覺化 — ChainFlow",
+    "cascadeTitle": "連鎖影響視覺化 — Flowvium",
     "cascadeDescription": "模擬中斷如何透過相互關聯的供應鏈傳導擴散。執行情境模擬，預估復原週期。",
-    "signalsTitle": "機構投資人訊號 — ChainFlow",
+    "signalsTitle": "機構投資人訊號 — Flowvium",
     "signalsDescription": "從 SEC 文件、內部人交易和法說會中追蹤聰明資金動向與預警指標。",
-    "newsGapTitle": "新聞盲區分析器 — ChainFlow",
+    "newsGapTitle": "新聞盲區分析器 — Flowvium",
     "newsGapDescription": "發現尚未獲得充分媒體報導的重大供應鏈事件。從報導不足的領域中尋找阿爾法。",
-    "aboutTitle": "關於 ChainFlow — THE ELIOT K FINANCIAL 旗下供應鏈情報平台",
-    "aboutDescription": "瞭解 ChainFlow 致力於供應鏈情報民主化、讓全球貿易網路透明化的使命。"
+    "aboutTitle": "關於 Flowvium — THE ELIOT K FINANCIAL 旗下供應鏈情報平台",
+    "aboutDescription": "瞭解 Flowvium 致力於供應鏈情報民主化、讓全球貿易網路透明化的使命。"
   },
   "pro": {
-    "upgradeTitle": "解鎖 ChainFlow Pro",
+    "upgradeTitle": "解鎖 Flowvium Pro",
     "upgradeSubtitle": "無限制使用進階供應鏈情報功能",
     "upgradeDescription": "Pro 會員可享受深度分析、即時提醒、API 存取和優先支援。",
     "upgradeCta": "升級至 Pro",
@@ -464,11 +464,11 @@
     "limitDescription": "升級至 Pro 即可無限制使用此功能。"
   },
   "about": {
-    "title": "關於 ChainFlow",
+    "title": "關於 Flowvium",
     "mission": "我們的使命",
-    "missionText": "我們相信供應鏈透明度不應該是少數人的特權。ChainFlow 讓供應鏈情報觸手可及，幫助投資人、分析師和企業做出明智的決策。",
+    "missionText": "我們相信供應鏈透明度不應該是少數人的特權。Flowvium 讓供應鏈情報觸手可及，幫助投資人、分析師和企業做出明智的決策。",
     "story": "我們的故事",
-    "storyText": "全球供應鏈是經濟運行的隱形支柱——正是基於這一認知，ChainFlow 應運而生，致力於讓這些看不見的網路變得清晰可見。我們融合替代數據、AI 分析和直覺式視覺化，揭示關鍵的商業關聯。",
+    "storyText": "全球供應鏈是經濟運行的隱形支柱——正是基於這一認知，Flowvium 應運而生，致力於讓這些看不見的網路變得清晰可見。我們融合替代數據、AI 分析和直覺式視覺化，揭示關鍵的商業關聯。",
     "team": "我們的團隊",
     "teamText": "我們由工程師、資料科學家和供應鏈專家組成，致力於為全球貿易帶來更高的透明度。",
     "values": "核心價值觀",

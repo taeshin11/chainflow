@@ -12,7 +12,7 @@ export default function FeedbackWidget() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`[ChainFlow ${feedbackType}] Feedback`);
+    const subject = encodeURIComponent(`[Flowvium ${feedbackType}] Feedback`);
     const body = encodeURIComponent(`Type: ${feedbackType}\n\n${message}`);
     window.location.href = `mailto:taeshinkim11@gmail.com?subject=${subject}&body=${body}`;
     setMessage('');

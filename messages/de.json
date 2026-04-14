@@ -19,7 +19,7 @@
   "hero": {
     "title": "Verborgene Lieferkettenrisiken aufdecken",
     "subtitle": "Bevor sie Schlagzeilen machen",
-    "description": "ChainFlow kartiert die unsichtbaren Verbindungen zwischen Unternehmen, Zulieferern und globalen Ereignissen — und verschafft Ihnen den Vorsprung, Störungen vorherzusehen, bevor sie sich ausbreiten.",
+    "description": "Flowvium kartiert die unsichtbaren Verbindungen zwischen Unternehmen, Zulieferern und globalen Ereignissen — und verschafft Ihnen den Vorsprung, Störungen vorherzusehen, bevor sie sich ausbreiten.",
     "cta": "Jetzt erkunden",
     "ctaSecondary": "Demo ansehen",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Aktuelle 13F-Berichte mit bedeutender institutioneller Aktivität.",
     "viewAllSignals": "Alle Signale anzeigen",
     "fourLenses": "Vier Perspektiven auf Lieferketten-Alpha",
-    "fourLensesDesc": "ChainFlow vereint Lieferketten-Kartierung, institutionelle Signalerkennung, Kaskadenanalyse und Nachrichtenlücken-Bewertung in einer Plattform.",
+    "fourLensesDesc": "Flowvium vereint Lieferketten-Kartierung, institutionelle Signalerkennung, Kaskadenanalyse und Nachrichtenlücken-Bewertung in einer Plattform.",
     "featureCards": {
       "supplyChainMaps": "Lieferketten-Karten",
       "institutionalFlowSignals": "Institutionelle Flusssignale",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Wenn eine Leitaktie sich bewegt, nutzen Sie unseren Kaskaden-Tracker, um zu identifizieren, welche nachgelagerten Aktien folgen werden und wann."
     },
     "startExploringNow": "Jetzt erkunden",
-    "disclaimer": "ChainFlow stellt Lieferkettendaten ausschließlich zu Informationszwecken bereit. Dies stellt keine Anlageberatung dar. Vergangene institutionelle Aktivität garantiert keine zukünftigen Renditen. Führen Sie stets Ihre eigene Recherche durch, bevor Sie Anlageentscheidungen treffen."
+    "disclaimer": "Flowvium stellt Lieferkettendaten ausschließlich zu Informationszwecken bereit. Dies stellt keine Anlageberatung dar. Vergangene institutionelle Aktivität garantiert keine zukünftigen Renditen. Führen Sie stets Ihre eigene Recherche durch, bevor Sie Anlageentscheidungen treffen."
   },
   "feedback": {
     "title": "Feedback senden",
-    "subtitle": "Helfen Sie uns, ChainFlow zu verbessern",
+    "subtitle": "Helfen Sie uns, Flowvium zu verbessern",
     "nameLabel": "Name",
     "namePlaceholder": "Ihr Name",
     "emailLabel": "E-Mail",
@@ -342,7 +342,7 @@
     "success": "Vielen Dank für Ihr Feedback!",
     "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
     "sendFeedback": "Feedback senden",
-    "helpImprove": "Helfen Sie uns, ChainFlow zu verbessern",
+    "helpImprove": "Helfen Sie uns, Flowvium zu verbessern",
     "feedbackType": "Feedback-Typ",
     "bugReport": "Fehlerbericht",
     "featureRequest": "Funktionswunsch",
@@ -380,7 +380,7 @@
     "viewAll": "Alle anzeigen",
     "noData": "Keine Daten verfügbar",
     "lastUpdated": "Zuletzt aktualisiert: {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "Beta",
     "new": "Neu",
     "comingSoon": "Demnächst verfügbar",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Die Lieferketten der Welt kartieren — eine Verbindung nach der anderen.",
     "builtBy": "Mit Sorgfalt entwickelt von THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Alle Rechte vorbehalten.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Alle Rechte vorbehalten.",
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzrichtlinie",
     "contact": "Kontakt",
     "status": "Systemstatus",
     "documentation": "Dokumentation",
     "api": "API-Zugang",
-    "disclaimer": "ChainFlow stellt Lieferkettendaten ausschließlich zu Informationszwecken bereit. Dies stellt keine Anlageberatung dar. Führen Sie stets Ihre eigene Recherche durch, bevor Sie Anlageentscheidungen treffen.",
+    "disclaimer": "Flowvium stellt Lieferkettendaten ausschließlich zu Informationszwecken bereit. Dies stellt keine Anlageberatung dar. Führen Sie stets Ihre eigene Recherche durch, bevor Sie Anlageentscheidungen treffen.",
     "product": "Produkt",
     "resources": "Ressourcen",
     "legal": "Rechtliches",
@@ -427,21 +427,21 @@
     "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Lieferketten-Intelligence-Plattform",
+    "homeTitle": "Flowvium — Lieferketten-Intelligence-Plattform",
     "homeDescription": "Decken Sie verborgene Lieferkettenrisiken auf, bevor sie Schlagzeilen machen. Echtzeit-Überwachung, Kaskadenanalyse und institutionelle Signalerkennung.",
-    "exploreTitle": "Lieferketten-Explorer — ChainFlow",
+    "exploreTitle": "Lieferketten-Explorer — Flowvium",
     "exploreDescription": "Suchen und kartieren Sie Zulieferbeziehungen in globalen Industrien. Visualisieren Sie Lieferkettennetzwerke und identifizieren Sie Konzentrationsrisiken.",
-    "cascadeTitle": "Kaskaden-Visualisierung — ChainFlow",
+    "cascadeTitle": "Kaskaden-Visualisierung — Flowvium",
     "cascadeDescription": "Modellieren Sie, wie sich Störungen durch vernetzte Lieferketten ausbreiten. Simulieren Sie Szenarien und schätzen Sie Erholungszeiträume.",
-    "signalsTitle": "Institutionelle Signale — ChainFlow",
+    "signalsTitle": "Institutionelle Signale — Flowvium",
     "signalsDescription": "Verfolgen Sie Smart-Money-Bewegungen und Frühwarnindikatoren aus SEC-Berichten, Insidergeschäften und Earnings Calls.",
-    "newsGapTitle": "Nachrichtenlücken-Analysator — ChainFlow",
+    "newsGapTitle": "Nachrichtenlücken-Analysator — Flowvium",
     "newsGapDescription": "Entdecken Sie wesentliche Lieferkettenereignisse, die keine ausreichende Medienberichterstattung erhalten haben. Finden Sie Alpha in unterberichteten Geschichten.",
-    "aboutTitle": "Über ChainFlow — Lieferketten-Intelligence von THE ELIOT K FINANCIAL",
-    "aboutDescription": "Erfahren Sie mehr über ChainFlows Mission, Lieferketten-Intelligence zu demokratisieren und globale Handelsnetzwerke transparent zu machen."
+    "aboutTitle": "Über Flowvium — Lieferketten-Intelligence von THE ELIOT K FINANCIAL",
+    "aboutDescription": "Erfahren Sie mehr über Flowviums Mission, Lieferketten-Intelligence zu demokratisieren und globale Handelsnetzwerke transparent zu machen."
   },
   "pro": {
-    "upgradeTitle": "ChainFlow Pro freischalten",
+    "upgradeTitle": "Flowvium Pro freischalten",
     "upgradeSubtitle": "Unbegrenzter Zugang zu fortgeschrittener Lieferketten-Intelligence",
     "upgradeDescription": "Pro-Mitglieder erhalten tiefere Analysen, Echtzeit-Benachrichtigungen, API-Zugang und bevorzugten Support.",
     "upgradeCta": "Auf Pro upgraden",
@@ -464,11 +464,11 @@
     "limitDescription": "Upgraden Sie auf Pro für unbegrenzten Zugang zu dieser Funktion."
   },
   "about": {
-    "title": "Über ChainFlow",
+    "title": "Über Flowvium",
     "mission": "Unsere Mission",
-    "missionText": "Wir glauben, dass Transparenz in der Lieferkette kein Luxus sein sollte. ChainFlow demokratisiert den Zugang zu Lieferketten-Intelligence und befähigt Investoren, Analysten und Unternehmen, fundierte Entscheidungen zu treffen.",
+    "missionText": "Wir glauben, dass Transparenz in der Lieferkette kein Luxus sein sollte. Flowvium demokratisiert den Zugang zu Lieferketten-Intelligence und befähigt Investoren, Analysten und Unternehmen, fundierte Entscheidungen zu treffen.",
     "story": "Unsere Geschichte",
-    "storyText": "Aus der Erkenntnis geboren, dass globale Lieferketten das verborgene Rückgrat der Wirtschaft sind, wurde ChainFlow entwickelt, um diese unsichtbaren Netzwerke sichtbar zu machen. Wir kombinieren alternative Daten, KI-Analyse und intuitive Visualisierung, um die Verbindungen aufzudecken, die zählen.",
+    "storyText": "Aus der Erkenntnis geboren, dass globale Lieferketten das verborgene Rückgrat der Wirtschaft sind, wurde Flowvium entwickelt, um diese unsichtbaren Netzwerke sichtbar zu machen. Wir kombinieren alternative Daten, KI-Analyse und intuitive Visualisierung, um die Verbindungen aufzudecken, die zählen.",
     "team": "Unser Team",
     "teamText": "Wir sind ein Team aus Ingenieuren, Datenwissenschaftlern und Lieferkettenexperten, die sich leidenschaftlich für Transparenz im globalen Handel einsetzen.",
     "values": "Unsere Werte",

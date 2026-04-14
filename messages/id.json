@@ -19,7 +19,7 @@
   "hero": {
     "title": "Temukan Risiko Rantai Pasok Tersembunyi",
     "subtitle": "Sebelum Menjadi Berita Utama",
-    "description": "ChainFlow memetakan koneksi tak terlihat antara perusahaan, pemasok, dan peristiwa global — memberi Anda keunggulan untuk mengantisipasi gangguan sebelum merambat.",
+    "description": "Flowvium memetakan koneksi tak terlihat antara perusahaan, pemasok, dan peristiwa global — memberi Anda keunggulan untuk mengantisipasi gangguan sebelum merambat.",
     "cta": "Mulai Jelajahi",
     "ctaSecondary": "Lihat Demo",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Laporan 13F terbaru yang menunjukkan aktivitas institusional signifikan.",
     "viewAllSignals": "Lihat Semua Sinyal",
     "fourLenses": "Empat Perspektif Alpha Rantai Pasok",
-    "fourLensesDesc": "ChainFlow menggabungkan pemetaan rantai, deteksi sinyal institusional, analisis kaskade, dan skor kesenjangan berita.",
+    "fourLensesDesc": "Flowvium menggabungkan pemetaan rantai, deteksi sinyal institusional, analisis kaskade, dan skor kesenjangan berita.",
     "featureCards": {
       "supplyChainMaps": "Peta Rantai Pasok",
       "institutionalFlowSignals": "Sinyal Arus Institusional",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Saat saham pemimpin bergerak, gunakan pelacak kaskade untuk mengidentifikasi saham hilir yang akan mengikuti."
     },
     "startExploringNow": "Mulai Jelajahi Sekarang",
-    "disclaimer": "ChainFlow menyediakan data rantai pasok hanya untuk tujuan informasi. Bukan merupakan nasihat keuangan."
+    "disclaimer": "Flowvium menyediakan data rantai pasok hanya untuk tujuan informasi. Bukan merupakan nasihat keuangan."
   },
   "feedback": {
     "title": "Kirim Masukan",
-    "subtitle": "Bantu kami meningkatkan ChainFlow",
+    "subtitle": "Bantu kami meningkatkan Flowvium",
     "nameLabel": "Nama",
     "namePlaceholder": "Nama Anda",
     "emailLabel": "Email",
@@ -342,7 +342,7 @@
     "success": "Terima kasih atas masukan Anda!",
     "error": "Terjadi kesalahan. Silakan coba lagi.",
     "sendFeedback": "Kirim Masukan",
-    "helpImprove": "Bantu kami meningkatkan ChainFlow",
+    "helpImprove": "Bantu kami meningkatkan Flowvium",
     "feedbackType": "Jenis Masukan",
     "bugReport": "Laporan Bug",
     "featureRequest": "Permintaan Fitur",
@@ -380,7 +380,7 @@
     "viewAll": "Lihat Semua",
     "noData": "Tidak ada data tersedia",
     "lastUpdated": "Terakhir diperbarui {time}",
-    "poweredBy": "Didukung oleh ChainFlow",
+    "poweredBy": "Didukung oleh Flowvium",
     "beta": "Beta",
     "new": "Baru",
     "comingSoon": "Segera Hadir",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Memetakan rantai pasok dunia, satu koneksi pada satu waktu.",
     "builtBy": "Dibuat dengan penuh dedikasi oleh THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Hak cipta dilindungi.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Hak cipta dilindungi.",
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
     "contact": "Kontak",
     "status": "Status Sistem",
     "documentation": "Dokumentasi",
     "api": "Akses API",
-    "disclaimer": "ChainFlow menyediakan data rantai pasok hanya untuk tujuan informasi. Ini bukan merupakan nasihat keuangan. Selalu lakukan riset sendiri sebelum mengambil keputusan investasi.",
+    "disclaimer": "Flowvium menyediakan data rantai pasok hanya untuk tujuan informasi. Ini bukan merupakan nasihat keuangan. Selalu lakukan riset sendiri sebelum mengambil keputusan investasi.",
     "product": "Produk",
     "resources": "Sumber Daya",
     "legal": "Hukum",
@@ -426,21 +426,21 @@
     "invalidEmail": "Masukkan alamat email yang valid."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Platform Intelijen Rantai Pasok",
+    "homeTitle": "Flowvium — Platform Intelijen Rantai Pasok",
     "homeDescription": "Temukan risiko rantai pasok tersembunyi sebelum menjadi berita utama. Pemantauan real-time, analisis kaskade, dan deteksi sinyal institusional.",
-    "exploreTitle": "Penjelajah Rantai Pasok — ChainFlow",
+    "exploreTitle": "Penjelajah Rantai Pasok — Flowvium",
     "exploreDescription": "Cari dan petakan hubungan pemasok di seluruh industri global. Visualisasikan jaringan rantai pasok dan identifikasi risiko konsentrasi.",
-    "cascadeTitle": "Visualisasi Kaskade — ChainFlow",
+    "cascadeTitle": "Visualisasi Kaskade — Flowvium",
     "cascadeDescription": "Modelkan perambatan gangguan melalui rantai pasok yang saling terhubung. Simulasikan skenario dan estimasi waktu pemulihan.",
-    "signalsTitle": "Sinyal Institusional — ChainFlow",
+    "signalsTitle": "Sinyal Institusional — Flowvium",
     "signalsDescription": "Lacak pergerakan uang pintar dan indikator peringatan dini dari pengajuan SEC, perdagangan orang dalam, dan laporan pendapatan.",
-    "newsGapTitle": "Penganalisis Kesenjangan Berita — ChainFlow",
+    "newsGapTitle": "Penganalisis Kesenjangan Berita — Flowvium",
     "newsGapDescription": "Temukan peristiwa rantai pasok material yang kurang mendapat liputan media. Temukan alpha dalam cerita yang kurang dilaporkan.",
-    "aboutTitle": "Tentang ChainFlow — Intelijen Rantai Pasok oleh THE ELIOT K FINANCIAL",
-    "aboutDescription": "Pelajari misi ChainFlow untuk mendemokratisasi intelijen rantai pasok dan menjadikan jaringan perdagangan global transparan."
+    "aboutTitle": "Tentang Flowvium — Intelijen Rantai Pasok oleh THE ELIOT K FINANCIAL",
+    "aboutDescription": "Pelajari misi Flowvium untuk mendemokratisasi intelijen rantai pasok dan menjadikan jaringan perdagangan global transparan."
   },
   "pro": {
-    "upgradeTitle": "Buka ChainFlow Pro",
+    "upgradeTitle": "Buka Flowvium Pro",
     "upgradeSubtitle": "Akses tanpa batas ke intelijen rantai pasok lanjutan",
     "upgradeDescription": "Anggota Pro mendapatkan analisis mendalam, peringatan real-time, akses API, dan dukungan prioritas.",
     "upgradeCta": "Upgrade ke Pro",
@@ -463,11 +463,11 @@
     "limitDescription": "Upgrade ke Pro untuk akses tanpa batas ke fitur ini."
   },
   "about": {
-    "title": "Tentang ChainFlow",
+    "title": "Tentang Flowvium",
     "mission": "Misi Kami",
-    "missionText": "Kami percaya transparansi rantai pasok bukan seharusnya menjadi kemewahan. ChainFlow mendemokratisasi akses ke intelijen rantai pasok, memberdayakan investor, analis, dan bisnis untuk mengambil keputusan yang tepat.",
+    "missionText": "Kami percaya transparansi rantai pasok bukan seharusnya menjadi kemewahan. Flowvium mendemokratisasi akses ke intelijen rantai pasok, memberdayakan investor, analis, dan bisnis untuk mengambil keputusan yang tepat.",
     "story": "Cerita Kami",
-    "storyText": "Lahir dari kesadaran bahwa rantai pasok global adalah tulang punggung tersembunyi ekonomi, ChainFlow dibangun untuk membuat jaringan tak terlihat ini menjadi terlihat. Kami menggabungkan data alternatif, analisis AI, dan visualisasi intuitif untuk mengungkap koneksi yang penting.",
+    "storyText": "Lahir dari kesadaran bahwa rantai pasok global adalah tulang punggung tersembunyi ekonomi, Flowvium dibangun untuk membuat jaringan tak terlihat ini menjadi terlihat. Kami menggabungkan data alternatif, analisis AI, dan visualisasi intuitif untuk mengungkap koneksi yang penting.",
     "team": "Tim Kami",
     "teamText": "Kami adalah tim insinyur, ilmuwan data, dan ahli rantai pasok yang bersemangat membawa transparansi ke perdagangan global.",
     "values": "Nilai Kami",

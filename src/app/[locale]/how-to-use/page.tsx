@@ -23,7 +23,7 @@ export default function HowToUsePage() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          How to Use ChainFlow
+          How to Use Flowvium
         </h1>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           Your complete guide to tracking institutional supply chain flows and uncovering hidden market signals
@@ -49,7 +49,7 @@ export default function HowToUsePage() {
             </h3>
             <p className="text-sm text-cf-text-secondary leading-relaxed">
               Start by searching for any publicly traded company in the <strong>Explore</strong> tab.
-              ChainFlow will display its complete supply chain map — including upstream suppliers,
+              Flowvium will display its complete supply chain map — including upstream suppliers,
               downstream customers, key logistics partners, and competitive relationships. Use filters
               to narrow by sector, region, or supplier tier to find exactly the connections you need.
             </p>
@@ -169,7 +169,7 @@ export default function HowToUsePage() {
               <div>
                 <h3 className="font-heading font-bold text-cf-text-primary mb-2">News Gap Analyzer</h3>
                 <p className="text-sm text-cf-text-secondary leading-relaxed">
-                  The News Gap Analyzer is ChainFlow&apos;s most unique feature. It cross-references supply
+                  The News Gap Analyzer is Flowvium&apos;s most unique feature. It cross-references supply
                   chain data with media coverage to identify stories the market is missing. Each gap
                   entry includes a gap score (measuring the divergence between event magnitude and media
                   attention), the affected sectors, a brief analysis of the potential impact, and links
@@ -202,17 +202,17 @@ export default function HowToUsePage() {
               movements. When multiple institutions begin accumulating positions in companies linked by
               supply chain relationships, it can indicate that sophisticated investors have identified an
               emerging theme — such as supply chain reshoring, raw material shortages, or sector rotation —
-              before it becomes widely known. ChainFlow helps you spot these patterns early.
+              before it becomes widely known. Flowvium helps you spot these patterns early.
             </p>
           </div>
 
           <div className="cf-card p-6">
             <h3 className="font-heading font-bold text-cf-text-primary mb-2 flex items-start gap-2">
               <HelpCircle className="w-5 h-5 text-cf-primary flex-shrink-0 mt-0.5" />
-              Is ChainFlow free to use? Are there any hidden costs?
+              Is Flowvium free to use? Are there any hidden costs?
             </h3>
             <p className="text-sm text-cf-text-secondary leading-relaxed ml-7">
-              Yes, ChainFlow is completely free to use. There are no hidden fees, no mandatory sign-ups for
+              Yes, Flowvium is completely free to use. There are no hidden fees, no mandatory sign-ups for
               basic features, and no paywall blocking core functionality. We believe that supply chain
               transparency is a public good, and our mission is to make this data accessible to everyone.
               We may introduce optional premium features in the future for power users who need advanced
@@ -223,10 +223,10 @@ export default function HowToUsePage() {
           <div className="cf-card p-6">
             <h3 className="font-heading font-bold text-cf-text-primary mb-2 flex items-start gap-2">
               <HelpCircle className="w-5 h-5 text-cf-primary flex-shrink-0 mt-0.5" />
-              Where does ChainFlow get its supply chain data?
+              Where does Flowvium get its supply chain data?
             </h3>
             <p className="text-sm text-cf-text-secondary leading-relaxed ml-7">
-              ChainFlow aggregates data from a variety of public and alternative sources. These include
+              Flowvium aggregates data from a variety of public and alternative sources. These include
               SEC filings (10-K, 10-Q, 8-K, 13F), corporate earnings call transcripts, international
               trade and customs databases, shipping and logistics records, patent filings, corporate
               press releases, news articles, and curated alternative data feeds. We use natural language
@@ -247,7 +247,7 @@ export default function HowToUsePage() {
               media coverage are monitored continuously. Supply chain relationship maps are updated as
               new corporate disclosures, earnings reports, and trade data become available. Institutional
               signal detection runs on a near-real-time basis during market hours. For most use cases,
-              you can expect the data you see on ChainFlow to be current within the past 24 to 48 hours,
+              you can expect the data you see on Flowvium to be current within the past 24 to 48 hours,
               with critical signals flagged more frequently.
             </p>
           </div>
@@ -255,12 +255,12 @@ export default function HowToUsePage() {
           <div className="cf-card p-6">
             <h3 className="font-heading font-bold text-cf-text-primary mb-2 flex items-start gap-2">
               <HelpCircle className="w-5 h-5 text-cf-primary flex-shrink-0 mt-0.5" />
-              Is ChainFlow providing investment advice?
+              Is Flowvium providing investment advice?
             </h3>
             <p className="text-sm text-cf-text-secondary leading-relaxed ml-7">
-              No. ChainFlow is an informational and educational tool only. We do not provide investment
+              No. Flowvium is an informational and educational tool only. We do not provide investment
               advice, trading recommendations, or financial planning services. The data, analysis, and
-              signals presented on ChainFlow are intended to help you conduct your own research. They
+              signals presented on Flowvium are intended to help you conduct your own research. They
               should never be treated as a recommendation to buy, sell, or hold any security. Always
               consult a licensed financial advisor before making investment decisions, and remember that
               past patterns do not guarantee future results. Supply chain data may contain inaccuracies
@@ -287,13 +287,13 @@ export default function HowToUsePage() {
           <div className="cf-card p-6">
             <h3 className="font-heading font-bold text-cf-text-primary mb-2 flex items-start gap-2">
               <HelpCircle className="w-5 h-5 text-cf-primary flex-shrink-0 mt-0.5" />
-              Can I use ChainFlow data for commercial purposes or research publications?
+              Can I use Flowvium data for commercial purposes or research publications?
             </h3>
             <p className="text-sm text-cf-text-secondary leading-relaxed ml-7">
-              ChainFlow data is provided for personal, informational, and educational use. If you wish
-              to reference ChainFlow in academic research or publications, you are welcome to cite the
+              Flowvium data is provided for personal, informational, and educational use. If you wish
+              to reference Flowvium in academic research or publications, you are welcome to cite the
               platform as a source. However, systematic scraping, bulk downloading, redistribution, or
-              commercial resale of ChainFlow data is prohibited under our Terms of Service. For
+              commercial resale of Flowvium data is prohibited under our Terms of Service. For
               commercial data licensing inquiries or API access for institutional use, please contact
               us at spinaiceo@gmail.com.
             </p>
@@ -322,7 +322,7 @@ export default function HowToUsePage() {
         </h2>
         <p className="text-cf-text-secondary mb-6 max-w-lg mx-auto">
           Start uncovering hidden supply chain connections and institutional flow patterns today.
-          ChainFlow is free and requires no sign-up to begin exploring.
+          Flowvium is free and requires no sign-up to begin exploring.
         </p>
         <a
           href="/explore"

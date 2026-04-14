@@ -19,7 +19,7 @@
   "hero": {
     "title": "发现隐藏的供应链风险",
     "subtitle": "在成为新闻之前",
-    "description": "ChainFlow 追踪企业、供应商和全球事件之间的隐形关联，帮助您在连锁冲击发生之前提前预判。",
+    "description": "Flowvium 追踪企业、供应商和全球事件之间的隐形关联，帮助您在连锁冲击发生之前提前预判。",
     "cta": "开始探索",
     "ctaSecondary": "观看演示",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "显示重大机构活动的近期 13F 报告。",
     "viewAllSignals": "查看全部信号",
     "fourLenses": "供应链阿尔法的四个视角",
-    "fourLensesDesc": "ChainFlow 将供应链绘制、机构信号检测、连锁分析和新闻盲区评分整合到一个平台。",
+    "fourLensesDesc": "Flowvium 将供应链绘制、机构信号检测、连锁分析和新闻盲区评分整合到一个平台。",
     "featureCards": {
       "supplyChainMaps": "供应链地图",
       "institutionalFlowSignals": "机构资金流信号",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "当龙头股异动时，利用连锁追踪器识别哪些下游股票将会跟随以及跟随的时机。"
     },
     "startExploringNow": "立即开始探索",
-    "disclaimer": "ChainFlow 仅出于信息提供目的提供供应链数据，不构成投资建议。过往机构活动不代表未来收益。请在做出投资决策前务必自行研究。"
+    "disclaimer": "Flowvium 仅出于信息提供目的提供供应链数据，不构成投资建议。过往机构活动不代表未来收益。请在做出投资决策前务必自行研究。"
   },
   "feedback": {
     "title": "发送反馈",
-    "subtitle": "帮助我们改进 ChainFlow",
+    "subtitle": "帮助我们改进 Flowvium",
     "nameLabel": "姓名",
     "namePlaceholder": "请输入您的姓名",
     "emailLabel": "邮箱",
@@ -342,7 +342,7 @@
     "success": "感谢您的反馈！",
     "error": "出了点问题，请重试。",
     "sendFeedback": "发送反馈",
-    "helpImprove": "帮助我们改进 ChainFlow",
+    "helpImprove": "帮助我们改进 Flowvium",
     "feedbackType": "反馈类型",
     "bugReport": "Bug 报告",
     "featureRequest": "功能建议",
@@ -380,7 +380,7 @@
     "viewAll": "查看全部",
     "noData": "暂无数据",
     "lastUpdated": "最后更新于 {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "公测版",
     "new": "新功能",
     "comingSoon": "即将推出",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "逐步绘制全球供应链版图。",
     "builtBy": "由 THE ELIOT K FINANCIAL 精心打造",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "服务条款",
     "privacy": "隐私政策",
     "contact": "联系我们",
     "status": "系统状态",
     "documentation": "文档",
     "api": "API 接入",
-    "disclaimer": "ChainFlow 仅出于信息提供目的提供供应链数据，不构成投资建议。请在做出投资决策前务必自行研究。",
+    "disclaimer": "Flowvium 仅出于信息提供目的提供供应链数据，不构成投资建议。请在做出投资决策前务必自行研究。",
     "product": "产品",
     "resources": "资源",
     "legal": "法律声明",
@@ -427,21 +427,21 @@
     "invalidEmail": "请输入有效的邮箱地址。"
   },
   "seo": {
-    "homeTitle": "ChainFlow — 供应链情报平台",
+    "homeTitle": "Flowvium — 供应链情报平台",
     "homeDescription": "在成为新闻之前发现隐藏的供应链风险。实时监控、连锁影响分析和机构信号检测。",
-    "exploreTitle": "供应链探索器 — ChainFlow",
+    "exploreTitle": "供应链探索器 — Flowvium",
     "exploreDescription": "搜索并绘制全球产业的供应商关系。可视化供应链网络，识别集中度风险。",
-    "cascadeTitle": "连锁影响可视化 — ChainFlow",
+    "cascadeTitle": "连锁影响可视化 — Flowvium",
     "cascadeDescription": "模拟中断如何通过相互关联的供应链传导扩散。运行情景模拟，预估恢复周期。",
-    "signalsTitle": "机构投资者信号 — ChainFlow",
+    "signalsTitle": "机构投资者信号 — Flowvium",
     "signalsDescription": "从 SEC 文件、内部人士交易和财报电话会议中追踪聪明资金动向与预警指标。",
-    "newsGapTitle": "新闻盲区分析器 — ChainFlow",
+    "newsGapTitle": "新闻盲区分析器 — Flowvium",
     "newsGapDescription": "发现尚未获得充分媒体报道的重大供应链事件。从报道不足的领域中寻找阿尔法。",
-    "aboutTitle": "关于 ChainFlow — THE ELIOT K FINANCIAL 旗下供应链情报平台",
-    "aboutDescription": "了解 ChainFlow 致力于供应链情报民主化、让全球贸易网络透明化的使命。"
+    "aboutTitle": "关于 Flowvium — THE ELIOT K FINANCIAL 旗下供应链情报平台",
+    "aboutDescription": "了解 Flowvium 致力于供应链情报民主化、让全球贸易网络透明化的使命。"
   },
   "pro": {
-    "upgradeTitle": "解锁 ChainFlow Pro",
+    "upgradeTitle": "解锁 Flowvium Pro",
     "upgradeSubtitle": "无限制使用高级供应链情报功能",
     "upgradeDescription": "Pro 会员可享受深度分析、实时提醒、API 接入和优先支持。",
     "upgradeCta": "升级到 Pro",
@@ -464,11 +464,11 @@
     "limitDescription": "升级到 Pro 即可无限制使用此功能。"
   },
   "about": {
-    "title": "关于 ChainFlow",
+    "title": "关于 Flowvium",
     "mission": "我们的使命",
-    "missionText": "我们相信供应链透明度不应该是少数人的特权。ChainFlow 让供应链情报触手可及，帮助投资者、分析师和企业做出明智的决策。",
+    "missionText": "我们相信供应链透明度不应该是少数人的特权。Flowvium 让供应链情报触手可及，帮助投资者、分析师和企业做出明智的决策。",
     "story": "我们的故事",
-    "storyText": "全球供应链是经济运行的隐形支柱——正是基于这一认知，ChainFlow 应运而生，致力于让这些看不见的网络变得清晰可见。我们融合另类数据、AI 分析和直观可视化，揭示关键的商业关联。",
+    "storyText": "全球供应链是经济运行的隐形支柱——正是基于这一认知，Flowvium 应运而生，致力于让这些看不见的网络变得清晰可见。我们融合另类数据、AI 分析和直观可视化，揭示关键的商业关联。",
     "team": "我们的团队",
     "teamText": "我们由工程师、数据科学家和供应链专家组成，致力于为全球贸易带来更高的透明度。",
     "values": "核心价值观",

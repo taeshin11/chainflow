@@ -19,7 +19,7 @@
   "hero": {
     "title": "Révélez les risques cachés de la chaîne d'approvisionnement",
     "subtitle": "Avant qu'ils ne fassent la une",
-    "description": "ChainFlow cartographie les connexions invisibles entre les entreprises, les fournisseurs et les événements mondiaux — vous donnant l'avantage d'anticiper les perturbations avant qu'elles ne se propagent.",
+    "description": "Flowvium cartographie les connexions invisibles entre les entreprises, les fournisseurs et les événements mondiaux — vous donnant l'avantage d'anticiper les perturbations avant qu'elles ne se propagent.",
     "cta": "Commencer l'exploration",
     "ctaSecondary": "Voir la démo",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Rapports 13F récents montrant une activité institutionnelle significative.",
     "viewAllSignals": "Voir tous les signaux",
     "fourLenses": "Quatre perspectives sur l'alpha des chaînes d'approvisionnement",
-    "fourLensesDesc": "ChainFlow combine cartographie de chaînes d'approvisionnement, détection de signaux institutionnels, analyse en cascade et scoring d'écart médiatique en une seule plateforme.",
+    "fourLensesDesc": "Flowvium combine cartographie de chaînes d'approvisionnement, détection de signaux institutionnels, analyse en cascade et scoring d'écart médiatique en une seule plateforme.",
     "featureCards": {
       "supplyChainMaps": "Cartes de chaînes d'approvisionnement",
       "institutionalFlowSignals": "Signaux de flux institutionnels",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Quand une action leader bouge, utilisez notre suivi de cascade pour identifier quelles actions en aval suivront et quand."
     },
     "startExploringNow": "Commencer maintenant",
-    "disclaimer": "ChainFlow fournit des données de chaîne d'approvisionnement à titre informatif uniquement. Cela ne constitue pas un conseil financier. L'activité institutionnelle passée ne garantit pas les rendements futurs. Effectuez toujours vos propres recherches avant de prendre des décisions d'investissement."
+    "disclaimer": "Flowvium fournit des données de chaîne d'approvisionnement à titre informatif uniquement. Cela ne constitue pas un conseil financier. L'activité institutionnelle passée ne garantit pas les rendements futurs. Effectuez toujours vos propres recherches avant de prendre des décisions d'investissement."
   },
   "feedback": {
     "title": "Envoyer des commentaires",
-    "subtitle": "Aidez-nous à améliorer ChainFlow",
+    "subtitle": "Aidez-nous à améliorer Flowvium",
     "nameLabel": "Nom",
     "namePlaceholder": "Votre nom",
     "emailLabel": "E-mail",
@@ -342,7 +342,7 @@
     "success": "Merci pour votre retour !",
     "error": "Une erreur est survenue. Veuillez réessayer.",
     "sendFeedback": "Envoyer des commentaires",
-    "helpImprove": "Aidez-nous à améliorer ChainFlow",
+    "helpImprove": "Aidez-nous à améliorer Flowvium",
     "feedbackType": "Type de commentaire",
     "bugReport": "Rapport de bug",
     "featureRequest": "Demande de fonctionnalité",
@@ -380,7 +380,7 @@
     "viewAll": "Tout voir",
     "noData": "Aucune donnée disponible",
     "lastUpdated": "Dernière mise à jour : {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "Bêta",
     "new": "Nouveau",
     "comingSoon": "Bientôt disponible",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Cartographier les chaînes d'approvisionnement du monde, une connexion à la fois.",
     "builtBy": "Conçu avec soin par THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Tous droits réservés.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Tous droits réservés.",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
     "contact": "Nous contacter",
     "status": "État du système",
     "documentation": "Documentation",
     "api": "Accès API",
-    "disclaimer": "ChainFlow fournit des données de chaîne d'approvisionnement à titre informatif uniquement. Cela ne constitue pas un conseil financier. Effectuez toujours vos propres recherches avant de prendre des décisions d'investissement.",
+    "disclaimer": "Flowvium fournit des données de chaîne d'approvisionnement à titre informatif uniquement. Cela ne constitue pas un conseil financier. Effectuez toujours vos propres recherches avant de prendre des décisions d'investissement.",
     "product": "Produit",
     "resources": "Ressources",
     "legal": "Mentions légales",
@@ -427,21 +427,21 @@
     "invalidEmail": "Veuillez saisir une adresse e-mail valide."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Plateforme d'intelligence de la chaîne d'approvisionnement",
+    "homeTitle": "Flowvium — Plateforme d'intelligence de la chaîne d'approvisionnement",
     "homeDescription": "Révélez les risques cachés de la chaîne d'approvisionnement avant qu'ils ne fassent la une. Surveillance en temps réel, analyse en cascade et détection de signaux institutionnels.",
-    "exploreTitle": "Explorateur de chaînes d'approvisionnement — ChainFlow",
+    "exploreTitle": "Explorateur de chaînes d'approvisionnement — Flowvium",
     "exploreDescription": "Recherchez et cartographiez les relations fournisseurs dans les industries mondiales. Visualisez les réseaux et identifiez les risques de concentration.",
-    "cascadeTitle": "Visualiseur de cascades — ChainFlow",
+    "cascadeTitle": "Visualiseur de cascades — Flowvium",
     "cascadeDescription": "Modélisez comment les perturbations se propagent dans les chaînes d'approvisionnement interconnectées. Simulez des scénarios et estimez les délais de récupération.",
-    "signalsTitle": "Signaux institutionnels — ChainFlow",
+    "signalsTitle": "Signaux institutionnels — Flowvium",
     "signalsDescription": "Suivez les mouvements du smart money et les indicateurs d'alerte précoce depuis les rapports SEC, les transactions d'initiés et les conférences de résultats.",
-    "newsGapTitle": "Analyseur d'écart médiatique — ChainFlow",
+    "newsGapTitle": "Analyseur d'écart médiatique — Flowvium",
     "newsGapDescription": "Découvrez les événements significatifs de la chaîne d'approvisionnement n'ayant pas reçu une couverture médiatique adéquate. Trouvez de l'alpha dans les histoires sous-médiatisées.",
-    "aboutTitle": "À propos de ChainFlow — Intelligence de la chaîne d'approvisionnement par THE ELIOT K FINANCIAL",
-    "aboutDescription": "Découvrez la mission de ChainFlow : démocratiser l'intelligence de la chaîne d'approvisionnement et rendre les réseaux de commerce mondial transparents."
+    "aboutTitle": "À propos de Flowvium — Intelligence de la chaîne d'approvisionnement par THE ELIOT K FINANCIAL",
+    "aboutDescription": "Découvrez la mission de Flowvium : démocratiser l'intelligence de la chaîne d'approvisionnement et rendre les réseaux de commerce mondial transparents."
   },
   "pro": {
-    "upgradeTitle": "Débloquez ChainFlow Pro",
+    "upgradeTitle": "Débloquez Flowvium Pro",
     "upgradeSubtitle": "Accès illimité à l'intelligence avancée de la chaîne d'approvisionnement",
     "upgradeDescription": "Les membres Pro bénéficient d'analyses approfondies, d'alertes en temps réel, d'un accès API et d'un support prioritaire.",
     "upgradeCta": "Passer à Pro",
@@ -464,11 +464,11 @@
     "limitDescription": "Passez à Pro pour un accès illimité à cette fonctionnalité."
   },
   "about": {
-    "title": "À propos de ChainFlow",
+    "title": "À propos de Flowvium",
     "mission": "Notre mission",
-    "missionText": "Nous croyons que la transparence de la chaîne d'approvisionnement ne devrait pas être un luxe. ChainFlow démocratise l'accès à l'intelligence de la chaîne d'approvisionnement, permettant aux investisseurs, analystes et entreprises de prendre des décisions éclairées.",
+    "missionText": "Nous croyons que la transparence de la chaîne d'approvisionnement ne devrait pas être un luxe. Flowvium démocratise l'accès à l'intelligence de la chaîne d'approvisionnement, permettant aux investisseurs, analystes et entreprises de prendre des décisions éclairées.",
     "story": "Notre histoire",
-    "storyText": "Né de la prise de conscience que les chaînes d'approvisionnement mondiales sont l'épine dorsale invisible de l'économie, ChainFlow a été conçu pour rendre ces réseaux invisibles visibles. Nous combinons données alternatives, analyse par IA et visualisation intuitive pour révéler les connexions qui comptent.",
+    "storyText": "Né de la prise de conscience que les chaînes d'approvisionnement mondiales sont l'épine dorsale invisible de l'économie, Flowvium a été conçu pour rendre ces réseaux invisibles visibles. Nous combinons données alternatives, analyse par IA et visualisation intuitive pour révéler les connexions qui comptent.",
     "team": "Notre équipe",
     "teamText": "Nous sommes une équipe d'ingénieurs, de data scientists et d'experts en chaîne d'approvisionnement passionnés par la transparence du commerce mondial.",
     "values": "Nos valeurs",

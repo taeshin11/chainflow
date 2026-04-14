@@ -21,7 +21,7 @@ export default function BlogClient() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          ChainFlow {t('blog')}
+          Flowvium {t('blog')}
         </h1>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           Deep dives into supply chain investing, institutional flow analysis, and cascade

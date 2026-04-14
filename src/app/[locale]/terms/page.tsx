@@ -37,9 +37,9 @@ export default function TermsOfServicePage() {
         {/* Introduction */}
         <section>
           <p className="text-cf-text-secondary leading-relaxed">
-            Welcome to ChainFlow. These Terms of Service (&quot;Terms&quot;) govern your access to and use of
-            the ChainFlow website located at https://chainflow-mu.vercel.app (the &quot;Site&quot;) and the
-            supply chain intelligence services provided through the Site (the &quot;Service&quot;). ChainFlow is
+            Welcome to Flowvium. These Terms of Service (&quot;Terms&quot;) govern your access to and use of
+            the Flowvium website located at https://flowvium.vercel.app (the &quot;Site&quot;) and the
+            supply chain intelligence services provided through the Site (the &quot;Service&quot;). Flowvium is
             operated by THE ELIOT K FINANCIAL (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing or using the Site and Service,
             you agree to be bound by these Terms. If you do not agree to these Terms, you must not
             access or use the Site or Service.
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
           </h2>
           <div className="space-y-4 text-cf-text-secondary leading-relaxed">
             <p>
-              ChainFlow is a free, web-based supply chain intelligence platform that provides users
+              Flowvium is a free, web-based supply chain intelligence platform that provides users
               with tools to explore supply chain relationships, visualize cascade effects of
               disruption events, track institutional investment signals, and identify underreported
               supply chain news. The Service includes, but is not limited to, the following features:
@@ -136,7 +136,7 @@ export default function TermsOfServicePage() {
               proprietary rights laws.
             </p>
             <p>
-              The ChainFlow name, logo, and all related names, logos, product and service names,
+              The Flowvium name, logo, and all related names, logos, product and service names,
               designs, and slogans are trademarks of THE ELIOT K FINANCIAL. You may not use such marks without our
               prior written permission. All other names, logos, product and service names, designs,
               and slogans on the Site are the trademarks of their respective owners.
@@ -161,7 +161,7 @@ export default function TermsOfServicePage() {
             <div className="bg-cf-accent/5 border-l-4 border-cf-accent p-4 rounded-r-lg">
               <p className="font-medium text-cf-text-primary mb-2">Important Notice</p>
               <p>
-                ChainFlow provides supply chain data, institutional flow analysis, signal detection,
+                Flowvium provides supply chain data, institutional flow analysis, signal detection,
                 and related information for <strong>informational and educational purposes only</strong>.
                 Nothing on the Site or through the Service constitutes financial advice, investment
                 advice, trading advice, tax advice, legal advice, or any other form of professional
@@ -169,8 +169,8 @@ export default function TermsOfServicePage() {
               </p>
             </div>
             <p>
-              You should not treat any content on ChainFlow as a recommendation to buy, sell, or
-              hold any security, financial product, or investment strategy. ChainFlow does not
+              You should not treat any content on Flowvium as a recommendation to buy, sell, or
+              hold any security, financial product, or investment strategy. Flowvium does not
               recommend that any particular security, transaction, or investment strategy is suitable
               for any specific person. Any investment decisions you make are solely your own
               responsibility. You should always conduct your own independent research and due
@@ -178,7 +178,7 @@ export default function TermsOfServicePage() {
               investment decisions.
             </p>
             <p>
-              The data, analysis, signals, and other information presented on ChainFlow may contain
+              The data, analysis, signals, and other information presented on Flowvium may contain
               errors, inaccuracies, or omissions. Supply chain data may be delayed, incomplete, or
               based on estimates and approximations. Historical patterns and signals do not guarantee
               future results. Market conditions can change rapidly, and past performance is not
@@ -357,9 +357,9 @@ export default function TermsOfServicePage() {
               If you have any questions or concerns about these Terms, please contact us at:
             </p>
             <div className="bg-cf-background rounded-lg p-4">
-              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — ChainFlow</p>
+              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — Flowvium</p>
               <p>Email: <a href="mailto:taeshinkim11@gmail.com" className="text-cf-primary hover:underline">taeshinkim11@gmail.com</a></p>
-              <p>Website: <a href="https://chainflow-mu.vercel.app" className="text-cf-primary hover:underline">https://chainflow-mu.vercel.app</a></p>
+              <p>Website: <a href="https://flowvium.vercel.app" className="text-cf-primary hover:underline">https://flowvium.vercel.app</a></p>
             </div>
           </div>
         </section>

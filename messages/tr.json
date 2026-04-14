@@ -19,7 +19,7 @@
   "hero": {
     "title": "Gizli Tedarik Zinciri Risklerini Keşfedin",
     "subtitle": "Manşetlere Çıkmadan Önce",
-    "description": "ChainFlow, şirketler, tedarikçiler ve küresel olaylar arasındaki görünmez bağlantıları haritalandırır — aksaklıklar yayılmadan önce öngörmenizi sağlar.",
+    "description": "Flowvium, şirketler, tedarikçiler ve küresel olaylar arasındaki görünmez bağlantıları haritalandırır — aksaklıklar yayılmadan önce öngörmenizi sağlar.",
     "cta": "Keşfetmeye Başla",
     "ctaSecondary": "Demoyu İzle",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Önemli kurumsal aktivite gösteren son 13F başvuruları.",
     "viewAllSignals": "Tüm Sinyalleri Gör",
     "fourLenses": "Tedarik Zinciri Alfası için Dört Bakış Açısı",
-    "fourLensesDesc": "ChainFlow zincir haritalama, kurumsal sinyal tespiti, kaskad analizi ve haber boşluğu puanlamasını birleştirir.",
+    "fourLensesDesc": "Flowvium zincir haritalama, kurumsal sinyal tespiti, kaskad analizi ve haber boşluğu puanlamasını birleştirir.",
     "featureCards": {
       "supplyChainMaps": "Tedarik Zinciri Haritaları",
       "institutionalFlowSignals": "Kurumsal Akış Sinyalleri",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Lider hisse hareket ettiğinde, kaskad takipçisini kullanarak hangi alt hisselerin ne zaman takip edeceğini belirleyin."
     },
     "startExploringNow": "Şimdi Keşfetmeye Başla",
-    "disclaimer": "ChainFlow tedarik zinciri verilerini yalnızca bilgi amaçlı sunar. Yatırım tavsiyesi değildir."
+    "disclaimer": "Flowvium tedarik zinciri verilerini yalnızca bilgi amaçlı sunar. Yatırım tavsiyesi değildir."
   },
   "feedback": {
     "title": "Geri Bildirim Gönder",
-    "subtitle": "ChainFlow'u geliştirmemize yardım edin",
+    "subtitle": "Flowvium'u geliştirmemize yardım edin",
     "nameLabel": "Ad",
     "namePlaceholder": "Adınız",
     "emailLabel": "E-posta",
@@ -342,7 +342,7 @@
     "success": "Geri bildiriminiz için teşekkürler!",
     "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
     "sendFeedback": "Geri Bildirim Gönder",
-    "helpImprove": "ChainFlow'u iyileştirmemize yardım edin",
+    "helpImprove": "Flowvium'u iyileştirmemize yardım edin",
     "feedbackType": "Geri Bildirim Türü",
     "bugReport": "Hata Raporu",
     "featureRequest": "Özellik Talebi",
@@ -380,7 +380,7 @@
     "viewAll": "Tümünü Gör",
     "noData": "Veri mevcut değil",
     "lastUpdated": "Son güncelleme {time}",
-    "poweredBy": "ChainFlow tarafından desteklenmektedir",
+    "poweredBy": "Flowvium tarafından desteklenmektedir",
     "beta": "Beta",
     "new": "Yeni",
     "comingSoon": "Yakında",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Dünyanın tedarik zincirlerini bağlantı bağlantı haritalandırıyoruz.",
     "builtBy": "THE ELIOT K FINANCIAL tarafından özenle geliştirilmiştir",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Tüm hakları saklıdır.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Tüm hakları saklıdır.",
     "terms": "Kullanım Koşulları",
     "privacy": "Gizlilik Politikası",
     "contact": "İletişim",
     "status": "Sistem Durumu",
     "documentation": "Dokümantasyon",
     "api": "API Erişimi",
-    "disclaimer": "ChainFlow, tedarik zinciri verilerini yalnızca bilgilendirme amacıyla sunar. Bu bir yatırım tavsiyesi değildir. Yatırım kararı almadan önce mutlaka kendi araştırmanızı yapın.",
+    "disclaimer": "Flowvium, tedarik zinciri verilerini yalnızca bilgilendirme amacıyla sunar. Bu bir yatırım tavsiyesi değildir. Yatırım kararı almadan önce mutlaka kendi araştırmanızı yapın.",
     "product": "Ürün",
     "resources": "Kaynaklar",
     "legal": "Yasal",
@@ -426,21 +426,21 @@
     "invalidEmail": "Geçerli bir e-posta adresi girin."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Tedarik Zinciri İstihbarat Platformu",
+    "homeTitle": "Flowvium — Tedarik Zinciri İstihbarat Platformu",
     "homeDescription": "Gizli tedarik zinciri risklerini manşetlere çıkmadan önce keşfedin. Gerçek zamanlı izleme, kaskad analizi ve kurumsal sinyal tespiti.",
-    "exploreTitle": "Tedarik Zinciri Gezgini — ChainFlow",
+    "exploreTitle": "Tedarik Zinciri Gezgini — Flowvium",
     "exploreDescription": "Küresel sektörlerde tedarikçi ilişkilerini arayın ve haritalandırın. Tedarik zinciri ağlarını görselleştirin ve yoğunlaşma risklerini belirleyin.",
-    "cascadeTitle": "Kaskad Görselleştirici — ChainFlow",
+    "cascadeTitle": "Kaskad Görselleştirici — Flowvium",
     "cascadeDescription": "Birbirine bağlı tedarik zincirlerinde aksaklıkların yayılmasını modelleyin. Senaryolar simüle edin ve toparlanma sürelerini tahmin edin.",
-    "signalsTitle": "Kurumsal Sinyaller — ChainFlow",
+    "signalsTitle": "Kurumsal Sinyaller — Flowvium",
     "signalsDescription": "SEC dosyalamalarından, içeriden öğrenen işlemlerinden ve kazanç görüşmelerinden akıllı para hareketlerini ve erken uyarı göstergelerini takip edin.",
-    "newsGapTitle": "Haber Boşluğu Analiz Aracı — ChainFlow",
+    "newsGapTitle": "Haber Boşluğu Analiz Aracı — Flowvium",
     "newsGapDescription": "Yeterli medya ilgisi görmemiş önemli tedarik zinciri olaylarını keşfedin. Yetersiz haberlerden alfa bulun.",
-    "aboutTitle": "ChainFlow Hakkında — THE ELIOT K FINANCIAL Tedarik Zinciri İstihbaratı",
-    "aboutDescription": "ChainFlow'un tedarik zinciri istihbaratını demokratikleştirme ve küresel ticaret ağlarını şeffaflaştırma misyonunu öğrenin."
+    "aboutTitle": "Flowvium Hakkında — THE ELIOT K FINANCIAL Tedarik Zinciri İstihbaratı",
+    "aboutDescription": "Flowvium'un tedarik zinciri istihbaratını demokratikleştirme ve küresel ticaret ağlarını şeffaflaştırma misyonunu öğrenin."
   },
   "pro": {
-    "upgradeTitle": "ChainFlow Pro'yu Açın",
+    "upgradeTitle": "Flowvium Pro'yu Açın",
     "upgradeSubtitle": "Gelişmiş tedarik zinciri istihbaratına sınırsız erişim",
     "upgradeDescription": "Pro üyeler derinlemesine analiz, gerçek zamanlı uyarılar, API erişimi ve öncelikli destek alır.",
     "upgradeCta": "Pro'ya Yükselt",
@@ -463,11 +463,11 @@
     "limitDescription": "Bu özelliğe sınırsız erişim için Pro'ya yükseltin."
   },
   "about": {
-    "title": "ChainFlow Hakkında",
+    "title": "Flowvium Hakkında",
     "mission": "Misyonumuz",
-    "missionText": "Tedarik zinciri şeffaflığının bir lüks olmaması gerektiğine inanıyoruz. ChainFlow, tedarik zinciri istihbaratına erişimi demokratikleştirir; yatırımcılara, analistlere ve işletmelere bilinçli kararlar alma gücü verir.",
+    "missionText": "Tedarik zinciri şeffaflığının bir lüks olmaması gerektiğine inanıyoruz. Flowvium, tedarik zinciri istihbaratına erişimi demokratikleştirir; yatırımcılara, analistlere ve işletmelere bilinçli kararlar alma gücü verir.",
     "story": "Hikayemiz",
-    "storyText": "Küresel tedarik zincirlerinin ekonominin gizli omurgası olduğu farkındalığıyla doğan ChainFlow, bu görünmez ağları görünür kılmak için inşa edildi. Alternatif verileri, yapay zeka analizini ve sezgisel görselleştirmeyi birleştirerek gerçekten önemli bağlantıları ortaya çıkarıyoruz.",
+    "storyText": "Küresel tedarik zincirlerinin ekonominin gizli omurgası olduğu farkındalığıyla doğan Flowvium, bu görünmez ağları görünür kılmak için inşa edildi. Alternatif verileri, yapay zeka analizini ve sezgisel görselleştirmeyi birleştirerek gerçekten önemli bağlantıları ortaya çıkarıyoruz.",
     "team": "Ekibimiz",
     "teamText": "Küresel ticarete şeffaflık getirme tutkusuyla çalışan mühendisler, veri bilimciler ve tedarik zinciri uzmanlarından oluşan bir ekibiz.",
     "values": "Değerlerimiz",

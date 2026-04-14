@@ -1,5 +1,5 @@
-# ChainFlow — robots.txt
-# https://chainflow-mu.vercel.app
+# Flowvium — robots.txt
+# https://flowvium.vercel.app
 
 User-agent: *
 Allow: /
@@ -35,4 +35,4 @@ Allow: /
 User-agent: YandexBot
 Allow: /
 
-Sitemap: https://chainflow-mu.vercel.app/sitemap.xml
+Sitemap: https://flowvium.vercel.app/sitemap.xml

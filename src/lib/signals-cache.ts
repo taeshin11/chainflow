@@ -9,7 +9,7 @@ export interface TickerNewsCache {
 }
 
 // Redis key for news gap cache
-const KEY = 'chainflow:news-gap:v2';
+const KEY = 'flowvium:news-gap:v2';
 // 26-hour TTL — ensures data refreshes daily even if cron fires slightly late
 const TTL = 26 * 60 * 60;
 

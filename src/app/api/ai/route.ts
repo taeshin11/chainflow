@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const systemPrompt = `You are ChainFlow AI, an expert supply chain investment analyst.
+    const systemPrompt = `You are Flowvium AI, an expert supply chain investment analyst.
 Provide concise, actionable analysis about supply chain relationships, institutional flows,
 and investment implications. Be specific with data and patterns.
 Analysis type: ${type || 'general'}`;

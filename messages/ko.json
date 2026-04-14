@@ -19,7 +19,7 @@
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",
     "subtitle": "뉴스에 나오기 전에",
-    "description": "ChainFlow는 기업, 공급업체, 글로벌 이벤트 사이의 보이지 않는 연결고리를 추적하여 연쇄적 혼란이 발생하기 전에 선제적으로 대응할 수 있도록 합니다.",
+    "description": "Flowvium는 기업, 공급업체, 글로벌 이벤트 사이의 보이지 않는 연결고리를 추적하여 연쇄적 혼란이 발생하기 전에 선제적으로 대응할 수 있도록 합니다.",
     "cta": "탐색 시작하기",
     "ctaSecondary": "데모 보기",
     "features": {
@@ -288,7 +288,7 @@
   },
   "feedback": {
     "title": "피드백 보내기",
-    "subtitle": "ChainFlow 개선에 도움을 주세요",
+    "subtitle": "Flowvium 개선에 도움을 주세요",
     "nameLabel": "이름",
     "namePlaceholder": "이름을 입력하세요",
     "emailLabel": "이메일",
@@ -304,7 +304,7 @@
     "success": "피드백을 보내주셔서 감사합니다!",
     "error": "문제가 발생했습니다. 다시 시도해 주세요.",
     "sendFeedback": "피드백 보내기",
-    "helpImprove": "ChainFlow 개선에 도움을 주세요",
+    "helpImprove": "Flowvium 개선에 도움을 주세요",
     "feedbackType": "피드백 유형",
     "bugReport": "버그 신고",
     "featureRequest": "기능 요청",
@@ -342,7 +342,7 @@
     "viewAll": "전체 보기",
     "noData": "데이터가 없습니다",
     "lastUpdated": "최종 업데이트: {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "베타",
     "new": "신규",
     "comingSoon": "출시 예정",
@@ -355,14 +355,14 @@
   "footer": {
     "tagline": "전 세계 공급망을 하나의 연결 고리씩 매핑합니다.",
     "builtBy": "THE ELIOT K FINANCIAL가 정성껏 만들었습니다",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "이용약관",
     "privacy": "개인정보 처리방침",
     "contact": "문의하기",
     "status": "시스템 상태",
     "documentation": "문서",
     "api": "API 접근",
-    "disclaimer": "ChainFlow는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다.",
+    "disclaimer": "Flowvium는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다.",
     "product": "제품",
     "resources": "리소스",
     "legal": "법적 고지",
@@ -379,21 +379,21 @@
     "about": "소개"
   },
   "seo": {
-    "homeTitle": "ChainFlow — 공급망 인텔리전스 플랫폼",
+    "homeTitle": "Flowvium — 공급망 인텔리전스 플랫폼",
     "homeDescription": "뉴스에 나오기 전에 숨겨진 공급망 리스크를 발견하세요. 실시간 모니터링, 연쇄 영향 분석, 기관 투자자 시그널 감지.",
-    "exploreTitle": "공급망 탐색기 — ChainFlow",
+    "exploreTitle": "공급망 탐색기 — Flowvium",
     "exploreDescription": "글로벌 산업 전반의 공급업체 관계를 검색하고 매핑합니다. 공급망 네트워크를 시각화하고 집중 리스크를 식별합니다.",
-    "cascadeTitle": "연쇄 영향 시각화 — ChainFlow",
+    "cascadeTitle": "연쇄 영향 시각화 — Flowvium",
     "cascadeDescription": "상호 연결된 공급망을 통한 차질 확산 과정을 모델링합니다. 시나리오를 시뮬레이션하고 회복 일정을 추정합니다.",
-    "signalsTitle": "기관 투자자 시그널 — ChainFlow",
+    "signalsTitle": "기관 투자자 시그널 — Flowvium",
     "signalsDescription": "SEC 공시, 내부자 거래, 실적 발표에서 스마트 머니의 움직임과 조기 경보 지표를 추적합니다.",
-    "newsGapTitle": "뉴스 갭 분석기 — ChainFlow",
+    "newsGapTitle": "뉴스 갭 분석기 — Flowvium",
     "newsGapDescription": "충분한 미디어 보도를 받지 못한 중대한 공급망 이벤트를 발견합니다. 과소 보도된 이슈에서 알파를 찾으세요.",
-    "aboutTitle": "소개 — THE ELIOT K FINANCIAL의 공급망 인텔리전스, ChainFlow",
-    "aboutDescription": "공급망 인텔리전스를 민주화하고 글로벌 무역 네트워크를 투명하게 만들기 위한 ChainFlow의 미션을 알아보세요."
+    "aboutTitle": "소개 — THE ELIOT K FINANCIAL의 공급망 인텔리전스, Flowvium",
+    "aboutDescription": "공급망 인텔리전스를 민주화하고 글로벌 무역 네트워크를 투명하게 만들기 위한 Flowvium의 미션을 알아보세요."
   },
   "pro": {
-    "upgradeTitle": "ChainFlow Pro 이용하기",
+    "upgradeTitle": "Flowvium Pro 이용하기",
     "upgradeSubtitle": "고급 공급망 인텔리전스에 무제한으로 접근하세요",
     "upgradeDescription": "Pro 회원은 심층 분석, 실시간 알림, API 접근, 우선 지원을 받을 수 있습니다.",
     "upgradeCta": "Pro로 업그레이드",
@@ -416,11 +416,11 @@
     "limitDescription": "이 기능에 무제한으로 접근하려면 Pro로 업그레이드하세요."
   },
   "about": {
-    "title": "ChainFlow 소개",
+    "title": "Flowvium 소개",
     "mission": "우리의 미션",
-    "missionText": "공급망 투명성은 소수의 특권이 되어서는 안 됩니다. ChainFlow는 공급망 인텔리전스에 대한 접근을 민주화하여 투자자, 분석가, 기업이 올바른 판단을 내릴 수 있도록 지원합니다.",
+    "missionText": "공급망 투명성은 소수의 특권이 되어서는 안 됩니다. Flowvium는 공급망 인텔리전스에 대한 접근을 민주화하여 투자자, 분석가, 기업이 올바른 판단을 내릴 수 있도록 지원합니다.",
     "story": "우리의 이야기",
-    "storyText": "글로벌 공급망이 경제의 보이지 않는 근간이라는 깨달음에서 출발한 ChainFlow는 이 보이지 않는 네트워크를 가시화하기 위해 만들어졌습니다. 대안 데이터, AI 분석, 직관적인 시각화를 결합하여 중요한 연결 관계를 밝혀냅니다.",
+    "storyText": "글로벌 공급망이 경제의 보이지 않는 근간이라는 깨달음에서 출발한 Flowvium는 이 보이지 않는 네트워크를 가시화하기 위해 만들어졌습니다. 대안 데이터, AI 분석, 직관적인 시각화를 결합하여 중요한 연결 관계를 밝혀냅니다.",
     "team": "우리 팀",
     "teamText": "글로벌 무역의 투명성을 높이는 데 열정을 가진 엔지니어, 데이터 과학자, 공급망 전문가로 구성되어 있습니다.",
     "values": "핵심 가치",
@@ -452,7 +452,7 @@
     "latestSignalsDesc": "주요 기관 활동을 보여주는 최근 13F 보고서.",
     "viewAllSignals": "모든 시그널 보기",
     "fourLenses": "공급망 알파의 네 가지 관점",
-    "fourLensesDesc": "ChainFlow는 공급망 매핑, 기관 시그널 감지, 연쇄 분석, 뉴스 갭 점수를 하나의 플랫폼에 통합합니다.",
+    "fourLensesDesc": "Flowvium는 공급망 매핑, 기관 시그널 감지, 연쇄 분석, 뉴스 갭 점수를 하나의 플랫폼에 통합합니다.",
     "featureCards": {
       "supplyChainMaps": "공급망 지도",
       "institutionalFlowSignals": "기관 자금 흐름 시그널",
@@ -469,7 +469,7 @@
       "tradeTheCascadeDesc": "리더 종목이 움직일 때, 연쇄 트래커를 사용하여 어떤 하류 종목이 언제 따라갈지 식별하세요."
     },
     "startExploringNow": "지금 탐색 시작하기",
-    "disclaimer": "ChainFlow는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 과거 기관 활동이 미래 수익을 보장하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다."
+    "disclaimer": "Flowvium는 정보 제공 목적으로만 공급망 데이터를 제공합니다. 투자 조언에 해당하지 않습니다. 과거 기관 활동이 미래 수익을 보장하지 않습니다. 투자 결정 전 반드시 자체적으로 조사하시기 바랍니다."
   },
   "emailCta": {
     "title": "주간 공급망 인사이트 받기",

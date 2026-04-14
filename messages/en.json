@@ -19,7 +19,7 @@
   "hero": {
     "title": "Uncover Hidden Supply Chain Risks",
     "subtitle": "Before They Become Headlines",
-    "description": "ChainFlow maps the invisible connections between companies, suppliers, and global events — giving you the edge to anticipate disruptions before they cascade.",
+    "description": "Flowvium maps the invisible connections between companies, suppliers, and global events — giving you the edge to anticipate disruptions before they cascade.",
     "cta": "Start Exploring",
     "ctaSecondary": "Watch Demo",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Recent 13F filings showing significant institutional activity.",
     "viewAllSignals": "View All Signals",
     "fourLenses": "Four Lenses on Supply Chain Alpha",
-    "fourLensesDesc": "ChainFlow combines supply chain mapping, institutional signal detection, cascade analysis, and news gap scoring into one platform.",
+    "fourLensesDesc": "Flowvium combines supply chain mapping, institutional signal detection, cascade analysis, and news gap scoring into one platform.",
     "featureCards": {
       "supplyChainMaps": "Supply Chain Maps",
       "institutionalFlowSignals": "Institutional Flow Signals",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "When a leader stock moves, use our cascade tracker to identify which downstream stocks will follow and when."
     },
     "startExploringNow": "Start Exploring Now",
-    "disclaimer": "ChainFlow provides supply chain data for informational purposes only. It does not constitute financial advice. Past institutional activity does not guarantee future returns. Always conduct your own research before making investment decisions."
+    "disclaimer": "Flowvium provides supply chain data for informational purposes only. It does not constitute financial advice. Past institutional activity does not guarantee future returns. Always conduct your own research before making investment decisions."
   },
   "feedback": {
     "title": "Send Feedback",
-    "subtitle": "Help us improve ChainFlow",
+    "subtitle": "Help us improve Flowvium",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -342,7 +342,7 @@
     "success": "Thank you for your feedback!",
     "error": "Something went wrong. Please try again.",
     "sendFeedback": "Send Feedback",
-    "helpImprove": "Help us improve ChainFlow",
+    "helpImprove": "Help us improve Flowvium",
     "feedbackType": "Feedback Type",
     "bugReport": "Bug Report",
     "featureRequest": "Feature Request",
@@ -380,7 +380,7 @@
     "viewAll": "View All",
     "noData": "No data available",
     "lastUpdated": "Last updated {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "Beta",
     "new": "New",
     "comingSoon": "Coming Soon",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Mapping the world's supply chains, one connection at a time.",
     "builtBy": "Built with care by THE ELIOT K FINANCIAL",
-    "copyright": "\u00a9 {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "\u00a9 {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "contact": "Contact Us",
     "status": "System Status",
     "documentation": "Documentation",
     "api": "API Access",
-    "disclaimer": "ChainFlow provides supply chain data for informational purposes only. It does not constitute financial advice. Always conduct your own research before making investment decisions.",
+    "disclaimer": "Flowvium provides supply chain data for informational purposes only. It does not constitute financial advice. Always conduct your own research before making investment decisions.",
     "product": "Product",
     "resources": "Resources",
     "legal": "Legal",
@@ -427,21 +427,21 @@
     "invalidEmail": "Please enter a valid email address."
   },
   "seo": {
-    "homeTitle": "ChainFlow \u2014 Supply Chain Intelligence Platform",
+    "homeTitle": "Flowvium \u2014 Supply Chain Intelligence Platform",
     "homeDescription": "Uncover hidden supply chain risks before they become headlines. Real-time monitoring, cascade analysis, and institutional signal detection.",
-    "exploreTitle": "Supply Chain Explorer \u2014 ChainFlow",
+    "exploreTitle": "Supply Chain Explorer \u2014 Flowvium",
     "exploreDescription": "Search and map supplier relationships across global industries. Visualize supply chain networks and identify concentration risks.",
-    "cascadeTitle": "Cascade Visualizer \u2014 ChainFlow",
+    "cascadeTitle": "Cascade Visualizer \u2014 Flowvium",
     "cascadeDescription": "Model how disruptions propagate through interconnected supply chains. Simulate scenarios and estimate recovery timelines.",
-    "signalsTitle": "Institutional Signals \u2014 ChainFlow",
+    "signalsTitle": "Institutional Signals \u2014 Flowvium",
     "signalsDescription": "Track smart money movements and early warning indicators from SEC filings, insider trades, and earnings calls.",
-    "newsGapTitle": "News Gap Analyzer \u2014 ChainFlow",
+    "newsGapTitle": "News Gap Analyzer \u2014 Flowvium",
     "newsGapDescription": "Discover material supply chain events that haven't received adequate media coverage. Find alpha in underreported stories.",
-    "aboutTitle": "About ChainFlow \u2014 Supply Chain Intelligence by THE ELIOT K FINANCIAL",
-    "aboutDescription": "Learn about ChainFlow's mission to democratize supply chain intelligence and make global trade networks transparent."
+    "aboutTitle": "About Flowvium \u2014 Supply Chain Intelligence by THE ELIOT K FINANCIAL",
+    "aboutDescription": "Learn about Flowvium's mission to democratize supply chain intelligence and make global trade networks transparent."
   },
   "pro": {
-    "upgradeTitle": "Unlock ChainFlow Pro",
+    "upgradeTitle": "Unlock Flowvium Pro",
     "upgradeSubtitle": "Get unlimited access to advanced supply chain intelligence",
     "upgradeDescription": "Pro members get deeper analytics, real-time alerts, API access, and priority support.",
     "upgradeCta": "Upgrade to Pro",
@@ -464,11 +464,11 @@
     "limitDescription": "Upgrade to Pro for unlimited access to this feature."
   },
   "about": {
-    "title": "About ChainFlow",
+    "title": "About Flowvium",
     "mission": "Our Mission",
-    "missionText": "We believe supply chain transparency shouldn't be a luxury. ChainFlow democratizes access to supply chain intelligence, empowering investors, analysts, and businesses to make informed decisions.",
+    "missionText": "We believe supply chain transparency shouldn't be a luxury. Flowvium democratizes access to supply chain intelligence, empowering investors, analysts, and businesses to make informed decisions.",
     "story": "Our Story",
-    "storyText": "Born from the realization that global supply chains are the hidden backbone of the economy, ChainFlow was built to make these invisible networks visible. We combine alternative data, AI analysis, and intuitive visualization to reveal the connections that matter.",
+    "storyText": "Born from the realization that global supply chains are the hidden backbone of the economy, Flowvium was built to make these invisible networks visible. We combine alternative data, AI analysis, and intuitive visualization to reveal the connections that matter.",
     "team": "Our Team",
     "teamText": "We're a team of engineers, data scientists, and supply chain experts passionate about bringing transparency to global trade.",
     "values": "Our Values",

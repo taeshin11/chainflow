@@ -37,9 +37,9 @@ export default function PrivacyPolicyPage() {
         {/* Introduction */}
         <section>
           <p className="text-cf-text-secondary leading-relaxed">
-            ChainFlow (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is operated by THE ELIOT K FINANCIAL. This Privacy Policy
+            Flowvium (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is operated by THE ELIOT K FINANCIAL. This Privacy Policy
             explains how we collect, use, disclose, and safeguard your information when you visit our
-            website at https://chainflow-mu.vercel.app (the &quot;Site&quot;) and use our supply chain
+            website at https://flowvium.vercel.app (the &quot;Site&quot;) and use our supply chain
             intelligence platform (the &quot;Service&quot;). Please read this Privacy Policy carefully. By
             accessing or using the Site and Service, you acknowledge that you have read, understood,
             and agree to be bound by the terms of this Privacy Policy. If you do not agree with the
@@ -59,7 +59,7 @@ export default function PrivacyPolicyPage() {
                 When you contact us via email, submit feedback through our feedback widget, or
                 communicate with us in any other manner, you may voluntarily provide us with personal
                 information such as your name, email address, and the content of your message. We only
-                collect personal information that you choose to share with us. Using ChainFlow does not
+                collect personal information that you choose to share with us. Using Flowvium does not
                 require creating an account or providing any personal information. The feedback widget
                 on our Site uses a mailto: link to open your default email client, meaning your
                 feedback is sent directly through your own email service and is not processed through
@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
             <p>
               Cookies are small text files placed on your device by websites you visit. They are widely
               used to make websites work efficiently, provide information to site owners, and enable
-              certain features. ChainFlow uses the following types of cookies:
+              certain features. Flowvium uses the following types of cookies:
             </p>
             <div>
               <h3 className="font-medium text-cf-text-primary mb-2">2.1 Essential Cookies</h3>
@@ -154,7 +154,7 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-4 text-cf-text-secondary leading-relaxed">
             <p>
               Our Site may contain links to third-party websites, services, or content that are not
-              owned or controlled by ChainFlow. We have no control over, and assume no responsibility
+              owned or controlled by Flowvium. We have no control over, and assume no responsibility
               for, the content, privacy policies, or practices of any third-party websites or services.
               We use the following third-party services in connection with the Site:
             </p>
@@ -267,7 +267,7 @@ export default function PrivacyPolicyPage() {
             7. Children&apos;s Privacy
           </h2>
           <p className="text-cf-text-secondary leading-relaxed">
-            ChainFlow is not directed to individuals under the age of 13 (or the applicable age of
+            Flowvium is not directed to individuals under the age of 13 (or the applicable age of
             digital consent in your jurisdiction). We do not knowingly collect personal information
             from children under 13. If we become aware that we have inadvertently collected personal
             information from a child under 13, we will take steps to delete such information as soon
@@ -298,7 +298,7 @@ export default function PrivacyPolicyPage() {
             9. International Data Transfers
           </h2>
           <p className="text-cf-text-secondary leading-relaxed">
-            ChainFlow is operated from the United States and our Site is hosted on servers located
+            Flowvium is operated from the United States and our Site is hosted on servers located
             in various regions. If you are accessing the Site from outside the United States, please
             be aware that your information may be transferred to, stored, and processed in the United
             States or other countries where our service providers maintain facilities. By using the
@@ -334,9 +334,9 @@ export default function PrivacyPolicyPage() {
               data practices, please contact us at:
             </p>
             <div className="bg-cf-background rounded-lg p-4">
-              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — ChainFlow</p>
+              <p className="font-medium text-cf-text-primary">THE ELIOT K FINANCIAL — Flowvium</p>
               <p>Email: <a href="mailto:taeshinkim11@gmail.com" className="text-cf-primary hover:underline">taeshinkim11@gmail.com</a></p>
-              <p>Website: <a href="https://chainflow-mu.vercel.app" className="text-cf-primary hover:underline">https://chainflow-mu.vercel.app</a></p>
+              <p>Website: <a href="https://flowvium.vercel.app" className="text-cf-primary hover:underline">https://flowvium.vercel.app</a></p>
             </div>
           </div>
         </section>

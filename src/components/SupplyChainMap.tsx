@@ -465,7 +465,7 @@ export default function SupplyChainMap({ company }: { company: Company }) {
         className="px-4 py-1 flex items-center justify-between font-mono text-[9px] text-gray-500 border-t"
         style={{ backgroundColor: '#0f0f20', borderColor: '#2a2a4a' }}
       >
-        <span>CHAINFLOW TERMINAL v2.0</span>
+        <span>FLOWVIUM TERMINAL v2.0</span>
         <span>
           {company.name} ({company.ticker}) — {company.relationships.length} RELATIONSHIPS
         </span>

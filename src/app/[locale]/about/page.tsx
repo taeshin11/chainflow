@@ -15,7 +15,7 @@ export async function generateMetadata({
     path: '/about',
     locale: params.locale,
     keywords: [
-      'about ChainFlow',
+      'about Flowvium',
       'THE ELIOT K FINANCIAL',
       'supply chain intelligence',
       'retail investor tools',
@@ -29,32 +29,32 @@ export default function AboutPage() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-4">
-          About ChainFlow
+          About Flowvium
         </h1>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">
           Supply chain intelligence for the modern investor
         </p>
       </div>
 
-      {/* What is ChainFlow */}
+      {/* What is Flowvium */}
       <section className="cf-card p-8 mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          What Is ChainFlow?
+          What Is Flowvium?
         </h2>
         <div className="space-y-4 text-cf-text-secondary leading-relaxed">
           <p>
-            ChainFlow is a free, web-based supply chain intelligence platform that tracks how institutional
+            Flowvium is a free, web-based supply chain intelligence platform that tracks how institutional
             buying flows through supply chain relationships — before the headlines catch up. Built for
             investors, analysts, researchers, and anyone who wants a clearer view of global trade dynamics,
-            ChainFlow transforms complex, fragmented supply chain data into actionable visual insights that
+            Flowvium transforms complex, fragmented supply chain data into actionable visual insights that
             were previously available only to hedge funds and large institutional trading desks.
           </p>
           <p>
-            At its core, ChainFlow solves a fundamental problem in modern investing: the information
+            At its core, Flowvium solves a fundamental problem in modern investing: the information
             asymmetry between institutional investors and everyone else. When a major fund begins
             accumulating positions in a semiconductor supplier, the ripple effects travel through dozens of
             interconnected companies — from raw material providers to logistics firms to end-product
-            manufacturers. Traditional financial tools show you price movements after the fact. ChainFlow
+            manufacturers. Traditional financial tools show you price movements after the fact. Flowvium
             shows you the supply chain connections that explain why those movements happen, often before the
             broader market recognizes the pattern.
           </p>
@@ -62,28 +62,28 @@ export default function AboutPage() {
             The platform aggregates data from SEC filings, earnings call transcripts, trade databases,
             shipping records, and alternative data sources to build a living map of global supply chain
             relationships. By cross-referencing institutional flow data with these supply chain maps,
-            ChainFlow identifies early warning signals — such as unusual accumulation patterns in a
+            Flowvium identifies early warning signals — such as unusual accumulation patterns in a
             cluster of related companies, or divergences between media coverage and actual supply chain
             activity — that may indicate emerging opportunities or risks.
           </p>
           <p>
             Whether you are a retail investor looking for an edge, a supply chain professional monitoring
             disruption risk, a journalist investigating corporate interconnections, or an academic
-            researcher studying global trade networks, ChainFlow provides a powerful, intuitive interface
+            researcher studying global trade networks, Flowvium provides a powerful, intuitive interface
             for exploring the hidden architecture of the global economy. And because we believe supply chain
-            transparency should not be a privilege reserved for the few, ChainFlow is entirely free to use.
+            transparency should not be a privilege reserved for the few, Flowvium is entirely free to use.
           </p>
         </div>
       </section>
 
-      {/* Who Is ChainFlow For */}
+      {/* Who Is Flowvium For */}
       <section className="cf-card p-8 mb-8">
         <h2 className="text-2xl font-heading font-bold text-cf-text-primary mb-4">
-          Who Is ChainFlow For?
+          Who Is Flowvium For?
         </h2>
         <div className="space-y-4 text-cf-text-secondary leading-relaxed">
           <p>
-            ChainFlow is designed for a broad range of users who need visibility into supply chain
+            Flowvium is designed for a broad range of users who need visibility into supply chain
             relationships and institutional capital flows. Our platform serves several key audiences:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -134,7 +134,7 @@ export default function AboutPage() {
         </h2>
         <div className="space-y-4 text-cf-text-secondary leading-relaxed">
           <p>
-            ChainFlow employs a multi-layered approach to supply chain intelligence that combines data
+            Flowvium employs a multi-layered approach to supply chain intelligence that combines data
             aggregation, network analysis, and signal detection into a unified platform. Our methodology
             is built on several key technological pillars:
           </p>
@@ -154,7 +154,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-medium text-cf-text-primary mb-1">Supply Chain Graph Modeling</h3>
-                <p className="text-sm">At the heart of ChainFlow is a dynamic graph database that models companies, suppliers, customers, and intermediaries as nodes in an interconnected network. Edges represent supply relationships, capital flows, shared risk exposures, and competitive dynamics. This graph structure allows us to compute cascade effects, identify concentration risks, and surface non-obvious connections between seemingly unrelated entities.</p>
+                <p className="text-sm">At the heart of Flowvium is a dynamic graph database that models companies, suppliers, customers, and intermediaries as nodes in an interconnected network. Edges represent supply relationships, capital flows, shared risk exposures, and competitive dynamics. This graph structure allows us to compute cascade effects, identify concentration risks, and surface non-obvious connections between seemingly unrelated entities.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -172,7 +172,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-medium text-cf-text-primary mb-1">News Gap Analysis</h3>
-                <p className="text-sm">ChainFlow continuously compares the magnitude of supply chain events (as measured by our data feeds and graph analysis) with the level of media and analyst coverage those events have received. When we detect a significant gap — a material event with minimal coverage — we flag it as a potential alpha-generating opportunity for our users.</p>
+                <p className="text-sm">Flowvium continuously compares the magnitude of supply chain events (as measured by our data feeds and graph analysis) with the level of media and analyst coverage those events have received. When we detect a significant gap — a material event with minimal coverage — we flag it as a potential alpha-generating opportunity for our users.</p>
               </div>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function AboutPage() {
             <h3 className="font-heading font-bold text-cf-text-primary mb-2">
               Accessibility
             </h3>
-            <p className="text-sm text-cf-text-secondary">Powerful analytical tools should be available to everyone, not just institutions with deep pockets. ChainFlow is free because we believe democratizing financial intelligence leads to fairer, more efficient markets.</p>
+            <p className="text-sm text-cf-text-secondary">Powerful analytical tools should be available to everyone, not just institutions with deep pockets. Flowvium is free because we believe democratizing financial intelligence leads to fairer, more efficient markets.</p>
           </div>
         </div>
       </section>
@@ -231,7 +231,7 @@ export default function AboutPage() {
             capabilities that were once the exclusive domain of Wall Street.
           </p>
           <p>
-            ChainFlow is the flagship product of THE ELIOT K FINANCIAL, representing our core belief that the most
+            Flowvium is the flagship product of THE ELIOT K FINANCIAL, representing our core belief that the most
             valuable investment insights often lie not in traditional financial statements, but in the
             complex web of supply chain relationships that underpin the global economy. We are
             committed to continuous improvement of our platform, incorporating user feedback and
@@ -246,10 +246,10 @@ export default function AboutPage() {
           Disclaimer
         </h2>
         <p className="text-cf-text-secondary leading-relaxed text-sm">
-          ChainFlow provides supply chain data and institutional flow analysis for informational
+          Flowvium provides supply chain data and institutional flow analysis for informational
           and educational purposes only. Nothing on this platform constitutes financial advice,
           investment advice, trading advice, or any other sort of advice. You should not treat any
-          of the content as such. ChainFlow does not recommend that any securities, transactions,
+          of the content as such. Flowvium does not recommend that any securities, transactions,
           or investment strategies are suitable for any specific person. The data presented may
           contain inaccuracies or be delayed. Always conduct your own research and consult with a
           licensed financial advisor before making any investment decisions.
@@ -262,7 +262,7 @@ export default function AboutPage() {
           Get in Touch
         </h2>
         <p className="text-cf-text-secondary leading-relaxed mb-6">
-          We value feedback from our users and are always looking for ways to improve ChainFlow.
+          We value feedback from our users and are always looking for ways to improve Flowvium.
           Whether you have a question about the platform, a feature suggestion, a bug report, or a
           business inquiry, we would love to hear from you. Our team reviews every message and
           strives to respond promptly.

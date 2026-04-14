@@ -19,7 +19,7 @@
   "hero": {
     "title": "Descubra Riscos Ocultos na Cadeia de Suprimentos",
     "subtitle": "Antes Que Virem Manchete",
-    "description": "O ChainFlow mapeia as conexões invisíveis entre empresas, fornecedores e eventos globais — oferecendo a vantagem de antecipar interrupções antes que se propaguem.",
+    "description": "O Flowvium mapeia as conexões invisíveis entre empresas, fornecedores e eventos globais — oferecendo a vantagem de antecipar interrupções antes que se propaguem.",
     "cta": "Começar a Explorar",
     "ctaSecondary": "Ver Demonstração",
     "features": {
@@ -305,7 +305,7 @@
     "latestSignalsDesc": "Registros 13F recentes mostrando atividade institucional significativa.",
     "viewAllSignals": "Ver todos os sinais",
     "fourLenses": "Quatro perspectivas sobre alfa da cadeia de suprimentos",
-    "fourLensesDesc": "ChainFlow combina mapeamento de cadeias, detecção de sinais institucionais, análise de cascata e score de lacuna em uma plataforma.",
+    "fourLensesDesc": "Flowvium combina mapeamento de cadeias, detecção de sinais institucionais, análise de cascata e score de lacuna em uma plataforma.",
     "featureCards": {
       "supplyChainMaps": "Mapas de cadeia de suprimentos",
       "institutionalFlowSignals": "Sinais de fluxo institucional",
@@ -322,11 +322,11 @@
       "tradeTheCascadeDesc": "Quando uma ação líder se move, use nosso rastreador de cascata para identificar quais ações seguirão e quando."
     },
     "startExploringNow": "Comece a explorar agora",
-    "disclaimer": "ChainFlow fornece dados de cadeia de suprimentos apenas para fins informativos. Não constitui aconselhamento financeiro. Atividade institucional passada não garante retornos futuros."
+    "disclaimer": "Flowvium fornece dados de cadeia de suprimentos apenas para fins informativos. Não constitui aconselhamento financeiro. Atividade institucional passada não garante retornos futuros."
   },
   "feedback": {
     "title": "Enviar Feedback",
-    "subtitle": "Ajude-nos a melhorar o ChainFlow",
+    "subtitle": "Ajude-nos a melhorar o Flowvium",
     "nameLabel": "Nome",
     "namePlaceholder": "Seu nome",
     "emailLabel": "E-mail",
@@ -342,7 +342,7 @@
     "success": "Obrigado pelo seu feedback!",
     "error": "Algo deu errado. Por favor, tente novamente.",
     "sendFeedback": "Enviar feedback",
-    "helpImprove": "Ajude-nos a melhorar o ChainFlow",
+    "helpImprove": "Ajude-nos a melhorar o Flowvium",
     "feedbackType": "Tipo de feedback",
     "bugReport": "Relato de bug",
     "featureRequest": "Solicitação de recurso",
@@ -380,7 +380,7 @@
     "viewAll": "Ver Tudo",
     "noData": "Nenhum dado disponível",
     "lastUpdated": "Última atualização: {time}",
-    "poweredBy": "Desenvolvido por ChainFlow",
+    "poweredBy": "Desenvolvido por Flowvium",
     "beta": "Beta",
     "new": "Novo",
     "comingSoon": "Em Breve",
@@ -393,14 +393,14 @@
   "footer": {
     "tagline": "Mapeando as cadeias de suprimentos do mundo, uma conexão por vez.",
     "builtBy": "Desenvolvido com dedicação pela THE ELIOT K FINANCIAL",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. Todos os direitos reservados.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Todos os direitos reservados.",
     "terms": "Termos de Serviço",
     "privacy": "Política de Privacidade",
     "contact": "Contato",
     "status": "Status do Sistema",
     "documentation": "Documentação",
     "api": "Acesso à API",
-    "disclaimer": "O ChainFlow fornece dados de cadeia de suprimentos apenas para fins informativos. Não constitui aconselhamento financeiro. Sempre conduza sua própria pesquisa antes de tomar decisões de investimento.",
+    "disclaimer": "O Flowvium fornece dados de cadeia de suprimentos apenas para fins informativos. Não constitui aconselhamento financeiro. Sempre conduza sua própria pesquisa antes de tomar decisões de investimento.",
     "product": "Produto",
     "resources": "Recursos",
     "legal": "Legal",
@@ -426,21 +426,21 @@
     "invalidEmail": "Por favor, insira um e-mail válido."
   },
   "seo": {
-    "homeTitle": "ChainFlow — Plataforma de Inteligência de Cadeia de Suprimentos",
+    "homeTitle": "Flowvium — Plataforma de Inteligência de Cadeia de Suprimentos",
     "homeDescription": "Descubra riscos ocultos na cadeia de suprimentos antes que virem manchete. Monitoramento em tempo real, análise em cascata e detecção de sinais institucionais.",
-    "exploreTitle": "Explorador de Cadeias de Suprimentos — ChainFlow",
+    "exploreTitle": "Explorador de Cadeias de Suprimentos — Flowvium",
     "exploreDescription": "Pesquise e mapeie relações de fornecedores em indústrias globais. Visualize redes de suprimentos e identifique riscos de concentração.",
-    "cascadeTitle": "Visualizador de Cascata — ChainFlow",
+    "cascadeTitle": "Visualizador de Cascata — Flowvium",
     "cascadeDescription": "Modele a propagação de interrupções em cadeias de suprimentos interconectadas. Simule cenários e estime prazos de recuperação.",
-    "signalsTitle": "Sinais Institucionais — ChainFlow",
+    "signalsTitle": "Sinais Institucionais — Flowvium",
     "signalsDescription": "Acompanhe movimentos do dinheiro inteligente e indicadores de alerta antecipado em registros SEC, negociações de insiders e teleconferências de resultados.",
-    "newsGapTitle": "Analisador de Lacunas Informativas — ChainFlow",
+    "newsGapTitle": "Analisador de Lacunas Informativas — Flowvium",
     "newsGapDescription": "Descubra eventos materiais da cadeia de suprimentos com cobertura midiática insuficiente. Encontre alfa em histórias sub-reportadas.",
-    "aboutTitle": "Sobre o ChainFlow — Inteligência de Cadeia de Suprimentos pela THE ELIOT K FINANCIAL",
-    "aboutDescription": "Conheça a missão do ChainFlow de democratizar a inteligência de cadeia de suprimentos e tornar transparentes as redes de comércio global."
+    "aboutTitle": "Sobre o Flowvium — Inteligência de Cadeia de Suprimentos pela THE ELIOT K FINANCIAL",
+    "aboutDescription": "Conheça a missão do Flowvium de democratizar a inteligência de cadeia de suprimentos e tornar transparentes as redes de comércio global."
   },
   "pro": {
-    "upgradeTitle": "Desbloqueie o ChainFlow Pro",
+    "upgradeTitle": "Desbloqueie o Flowvium Pro",
     "upgradeSubtitle": "Acesso ilimitado à inteligência avançada de cadeia de suprimentos",
     "upgradeDescription": "Membros Pro têm acesso a análises mais profundas, alertas em tempo real, acesso à API e suporte prioritário.",
     "upgradeCta": "Fazer Upgrade para Pro",
@@ -463,11 +463,11 @@
     "limitDescription": "Faça upgrade para Pro para acesso ilimitado a este recurso."
   },
   "about": {
-    "title": "Sobre o ChainFlow",
+    "title": "Sobre o Flowvium",
     "mission": "Nossa Missão",
-    "missionText": "Acreditamos que a transparência da cadeia de suprimentos não deveria ser um luxo. O ChainFlow democratiza o acesso à inteligência de cadeia de suprimentos, capacitando investidores, analistas e empresas a tomar decisões informadas.",
+    "missionText": "Acreditamos que a transparência da cadeia de suprimentos não deveria ser um luxo. O Flowvium democratiza o acesso à inteligência de cadeia de suprimentos, capacitando investidores, analistas e empresas a tomar decisões informadas.",
     "story": "Nossa História",
-    "storyText": "Nascido da percepção de que as cadeias de suprimentos globais são a espinha dorsal oculta da economia, o ChainFlow foi criado para tornar essas redes invisíveis visíveis. Combinamos dados alternativos, análise com IA e visualização intuitiva para revelar as conexões que importam.",
+    "storyText": "Nascido da percepção de que as cadeias de suprimentos globais são a espinha dorsal oculta da economia, o Flowvium foi criado para tornar essas redes invisíveis visíveis. Combinamos dados alternativos, análise com IA e visualização intuitiva para revelar as conexões que importam.",
     "team": "Nossa Equipe",
     "teamText": "Somos uma equipe de engenheiros, cientistas de dados e especialistas em cadeia de suprimentos apaixonados por trazer transparência ao comércio global.",
     "values": "Nossos Valores",

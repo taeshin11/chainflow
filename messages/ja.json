@@ -19,7 +19,7 @@
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",
     "subtitle": "ニュースになる前に",
-    "description": "ChainFlowは企業、サプライヤー、グローバルイベント間の見えないつながりを可視化し、混乱が連鎖する前に先手を打つ力を提供します。",
+    "description": "Flowviumは企業、サプライヤー、グローバルイベント間の見えないつながりを可視化し、混乱が連鎖する前に先手を打つ力を提供します。",
     "cta": "探索を始める",
     "ctaSecondary": "デモを見る",
     "features": {
@@ -288,7 +288,7 @@
   },
   "feedback": {
     "title": "フィードバックを送信",
-    "subtitle": "ChainFlowの改善にご協力ください",
+    "subtitle": "Flowviumの改善にご協力ください",
     "nameLabel": "名前",
     "namePlaceholder": "お名前",
     "emailLabel": "メールアドレス",
@@ -304,7 +304,7 @@
     "success": "フィードバックをお寄せいただきありがとうございます！",
     "error": "エラーが発生しました。もう一度お試しください。",
     "sendFeedback": "フィードバックを送信",
-    "helpImprove": "ChainFlowの改善にご協力ください",
+    "helpImprove": "Flowviumの改善にご協力ください",
     "feedbackType": "フィードバックの種類",
     "bugReport": "不具合の報告",
     "featureRequest": "機能リクエスト",
@@ -342,7 +342,7 @@
     "viewAll": "すべて見る",
     "noData": "データがありません",
     "lastUpdated": "最終更新: {time}",
-    "poweredBy": "Powered by ChainFlow",
+    "poweredBy": "Powered by Flowvium",
     "beta": "ベータ",
     "new": "新着",
     "comingSoon": "近日公開",
@@ -355,14 +355,14 @@
   "footer": {
     "tagline": "世界のサプライチェーンを、一つのつながりから紐解きます。",
     "builtBy": "THE ELIOT K FINANCIALが心を込めて開発",
-    "copyright": "© {year} ChainFlow by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "contact": "お問い合わせ",
     "status": "システム状況",
     "documentation": "ドキュメント",
     "api": "APIアクセス",
-    "disclaimer": "ChainFlowは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。投資判断の前に必ずご自身で調査を行ってください。",
+    "disclaimer": "Flowviumは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。投資判断の前に必ずご自身で調査を行ってください。",
     "product": "プロダクト",
     "resources": "リソース",
     "legal": "法的情報",
@@ -379,21 +379,21 @@
     "about": "概要"
   },
   "seo": {
-    "homeTitle": "ChainFlow — サプライチェーン・インテリジェンス・プラットフォーム",
+    "homeTitle": "Flowvium — サプライチェーン・インテリジェンス・プラットフォーム",
     "homeDescription": "ニュースになる前に隠れたサプライチェーンリスクを発見。リアルタイム監視、カスケード分析、機関投資家シグナル検出。",
-    "exploreTitle": "サプライチェーン・エクスプローラー — ChainFlow",
+    "exploreTitle": "サプライチェーン・エクスプローラー — Flowvium",
     "exploreDescription": "グローバル産業全体のサプライヤー関係を検索・マッピング。サプライチェーンネットワークを可視化し、集中リスクを特定。",
-    "cascadeTitle": "カスケード・ビジュアライザー — ChainFlow",
+    "cascadeTitle": "カスケード・ビジュアライザー — Flowvium",
     "cascadeDescription": "相互接続されたサプライチェーンを通じた混乱の波及をモデル化。シナリオをシミュレーションし、回復期間を推定。",
-    "signalsTitle": "機関投資家シグナル — ChainFlow",
+    "signalsTitle": "機関投資家シグナル — Flowvium",
     "signalsDescription": "SEC提出書類、インサイダー取引、決算説明会からスマートマネーの動きと早期警戒指標を追跡。",
-    "newsGapTitle": "ニュースギャップ・アナライザー — ChainFlow",
+    "newsGapTitle": "ニュースギャップ・アナライザー — Flowvium",
     "newsGapDescription": "十分なメディア報道を受けていない重要なサプライチェーンイベントを発見。報道不足の情報からアルファを見つけましょう。",
-    "aboutTitle": "概要 — THE ELIOT K FINANCIALによるサプライチェーン・インテリジェンス、ChainFlow",
-    "aboutDescription": "サプライチェーン・インテリジェンスの民主化とグローバル貿易ネットワークの透明化というChainFlowのミッションについて。"
+    "aboutTitle": "概要 — THE ELIOT K FINANCIALによるサプライチェーン・インテリジェンス、Flowvium",
+    "aboutDescription": "サプライチェーン・インテリジェンスの民主化とグローバル貿易ネットワークの透明化というFlowviumのミッションについて。"
   },
   "pro": {
-    "upgradeTitle": "ChainFlow Proを利用する",
+    "upgradeTitle": "Flowvium Proを利用する",
     "upgradeSubtitle": "高度なサプライチェーン・インテリジェンスに無制限アクセス",
     "upgradeDescription": "Pro会員は深層分析、リアルタイムアラート、APIアクセス、優先サポートを利用できます。",
     "upgradeCta": "Proにアップグレード",
@@ -416,11 +416,11 @@
     "limitDescription": "この機能に無制限でアクセスするにはProにアップグレードしてください。"
   },
   "about": {
-    "title": "ChainFlowについて",
+    "title": "Flowviumについて",
     "mission": "私たちのミッション",
-    "missionText": "サプライチェーンの透明性は特権であるべきではありません。ChainFlowはサプライチェーン・インテリジェンスへのアクセスを民主化し、投資家、アナリスト、企業が情報に基づいた判断を下せるよう支援します。",
+    "missionText": "サプライチェーンの透明性は特権であるべきではありません。Flowviumはサプライチェーン・インテリジェンスへのアクセスを民主化し、投資家、アナリスト、企業が情報に基づいた判断を下せるよう支援します。",
     "story": "私たちのストーリー",
-    "storyText": "グローバルサプライチェーンが経済の隠れた基盤であるという気づきから生まれたChainFlowは、目に見えないネットワークを可視化するために構築されました。オルタナティブデータ、AI分析、直感的な可視化を組み合わせ、重要なつながりを明らかにします。",
+    "storyText": "グローバルサプライチェーンが経済の隠れた基盤であるという気づきから生まれたFlowviumは、目に見えないネットワークを可視化するために構築されました。オルタナティブデータ、AI分析、直感的な可視化を組み合わせ、重要なつながりを明らかにします。",
     "team": "チーム紹介",
     "teamText": "グローバル貿易の透明性向上に情熱を持つエンジニア、データサイエンティスト、サプライチェーン専門家で構成されています。",
     "values": "私たちの価値観",
@@ -452,7 +452,7 @@
     "latestSignalsDesc": "重要な機関活動を示す最新の13F報告書。",
     "viewAllSignals": "すべてのシグナルを見る",
     "fourLenses": "サプライチェーンアルファの4つの視点",
-    "fourLensesDesc": "ChainFlowはサプライチェーンマッピング、機関シグナル検出、カスケード分析、ニュースギャップスコアを一つのプラットフォームに統合。",
+    "fourLensesDesc": "Flowviumはサプライチェーンマッピング、機関シグナル検出、カスケード分析、ニュースギャップスコアを一つのプラットフォームに統合。",
     "featureCards": {
       "supplyChainMaps": "サプライチェーンマップ",
       "institutionalFlowSignals": "機関資金フローシグナル",
@@ -469,7 +469,7 @@
       "tradeTheCascadeDesc": "リーダー株が動いたとき、カスケードトラッカーでどの川下株がいつ追随するかを特定。"
     },
     "startExploringNow": "今すぐ探索を始める",
-    "disclaimer": "ChainFlowは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。過去の機関活動は将来のリターンを保証するものではありません。"
+    "disclaimer": "Flowviumは情報提供のみを目的としてサプライチェーンデータを提供しています。投資助言には該当しません。過去の機関活動は将来のリターンを保証するものではありません。"
   },
   "emailCta": {
     "title": "週間サプライチェーンインサイトを受け取る",

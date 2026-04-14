@@ -182,7 +182,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
         </div>
         <p className="text-cf-text-secondary leading-relaxed mb-4"><T text={company.description} /></p>
         <div className="flex items-center gap-3">
-          <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | ChainFlow`} />
+          <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | Flowvium`} />
           <button
             onClick={() => setTerminalView((v) => !v)}
             className={`inline-flex items-center gap-2 text-xs font-mono font-bold px-3 py-1.5 rounded transition-colors ${

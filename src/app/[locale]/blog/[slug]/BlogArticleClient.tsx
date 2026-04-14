@@ -99,7 +99,7 @@ export default function BlogArticleClient({ post }: { post: BlogPost }) {
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary leading-tight mb-4">
           {post.title}
         </h1>
-        <ShareButtons title={`${post.title} | ChainFlow Blog`} />
+        <ShareButtons title={`${post.title} | Flowvium Blog`} />
       </header>
 
       <div className="prose-cf">{renderContent(post.content)}</div>
