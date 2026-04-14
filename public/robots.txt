@@ -1,4 +1,38 @@
+# ChainFlow — robots.txt
+# https://chainflow-mu.vercel.app
+
 User-agent: *
+Allow: /
+Disallow: /api/
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+# Naver (Korea) — NaverBot / Yeti
+User-agent: NaverBot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+# Baidu (China)
+User-agent: Baiduspider
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Yahoo / Yahoo Japan
+User-agent: Slurp
+Allow: /
+
+User-agent: Y!J-BRW
+Allow: /
+
+# Yandex (Russia)
+User-agent: YandexBot
 Allow: /
 
 Sitemap: https://chainflow-mu.vercel.app/sitemap.xml

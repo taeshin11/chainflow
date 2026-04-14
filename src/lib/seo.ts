@@ -5,6 +5,12 @@ const SITE_NAME = 'ChainFlow';
 const DEFAULT_DESC =
   'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.';
 
+/** All supported locales — must match sitemap.ts and [locale] routing */
+const ALL_LOCALES = [
+  'en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'de', 'fr',
+  'pt', 'hi', 'ar', 'vi', 'th', 'id', 'ru', 'tr',
+] as const;
+
 export function generateSeoMetadata({
   title,
   description = DEFAULT_DESC,
@@ -23,6 +29,12 @@ export function generateSeoMetadata({
   const url = `${BASE_URL}/${locale}${path}`;
   const fullTitle = `${title} | ${SITE_NAME}`;
 
+  // Build hreflang map for all 16 locales + x-default
+  const languages: Record<string, string> = { 'x-default': `${BASE_URL}/en${path}` };
+  for (const loc of ALL_LOCALES) {
+    languages[loc] = `${BASE_URL}/${loc}${path}`;
+  }
+
   return {
     title: fullTitle,
     description,
@@ -39,15 +51,7 @@ export function generateSeoMetadata({
     metadataBase: new URL(BASE_URL),
     alternates: {
       canonical: url,
-      languages: {
-        en: `${BASE_URL}/en${path}`,
-        ko: `${BASE_URL}/ko${path}`,
-        ja: `${BASE_URL}/ja${path}`,
-        'zh-CN': `${BASE_URL}/zh-CN${path}`,
-        es: `${BASE_URL}/es${path}`,
-        de: `${BASE_URL}/de${path}`,
-        fr: `${BASE_URL}/fr${path}`,
-      },
+      languages,
     },
     openGraph: {
       title: fullTitle,
@@ -63,7 +67,7 @@ export function generateSeoMetadata({
       title: fullTitle,
       description,
       images: [image],
-      creator: '@spinai',
+      creator: '@chainflow_app',
     },
     robots: {
       index: true,
@@ -78,6 +82,16 @@ export function generateSeoMetadata({
     },
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+      // Bing Webmaster (also covers Yahoo Japan, DuckDuckGo)
+      other: {
+        'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || '',
+        // Naver Search Advisor (Korea)
+        'naver-site-verification': process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION || '',
+        // Baidu Webmaster (China)
+        'baidu-site-verification': process.env.NEXT_PUBLIC_BAIDU_SITE_VERIFICATION || '',
+        // Yandex Webmaster (Russia)
+        'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || '',
+      },
     },
   };
 }

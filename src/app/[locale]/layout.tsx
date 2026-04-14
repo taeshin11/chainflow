@@ -26,29 +26,36 @@ export async function generateMetadata({
   });
 }
 
+const BASE_URL = 'https://chainflow-mu.vercel.app';
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'Organization',
-      '@id': 'https://chainflow-mu.vercel.app/#organization',
+      '@id': `${BASE_URL}/#organization`,
       name: 'THE ELIOT K FINANCIAL',
-      url: 'https://chainflow-mu.vercel.app',
+      url: BASE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://chainflow-mu.vercel.app/og-default.png',
+        url: `${BASE_URL}/og-default.png`,
+        width: 1200,
+        height: 630,
       },
-      sameAs: [],
+      sameAs: [
+        'https://twitter.com/chainflow_app',
+      ],
     },
     {
       '@type': 'WebApplication',
-      '@id': 'https://chainflow-mu.vercel.app/#webapp',
+      '@id': `${BASE_URL}/#webapp`,
       name: 'ChainFlow',
-      url: 'https://chainflow-mu.vercel.app',
+      url: BASE_URL,
       description:
         'Track where smart money flows through the supply chain. Free institutional flow tracker, supply chain maps, and leader-to-midcap cascade analysis.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Web',
+      inLanguage: ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'de', 'fr', 'pt', 'hi', 'ar', 'vi', 'th', 'id', 'ru', 'tr'],
       offers: {
         '@type': 'Offer',
         price: '0',
@@ -61,18 +68,18 @@ const jsonLd = {
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://chainflow-mu.vercel.app/#website',
-      url: 'https://chainflow-mu.vercel.app',
+      '@id': `${BASE_URL}/#website`,
+      url: BASE_URL,
       name: 'ChainFlow',
+      inLanguage: 'en',
       publisher: {
-        '@id': 'https://chainflow-mu.vercel.app/#organization',
+        '@id': `${BASE_URL}/#organization`,
       },
       potentialAction: {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate:
-            'https://chainflow-mu.vercel.app/en/explore?q={search_term_string}',
+          urlTemplate: `${BASE_URL}/en/explore?q={search_term_string}`,
         },
         'query-input': 'required name=search_term_string',
       },
