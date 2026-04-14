@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { type NewsGapEntry } from '@/data/news-gap';
+import { type NewsGapEntry, edgarTicker } from '@/data/news-gap';
 import {
   ScatterChart,
   Scatter,
@@ -156,40 +156,95 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
           {/* 미디어 보도 전체 */}
           <div>
             <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Newspaper className="w-3.5 h-3.5" /> 미디어 보도 전체
+              <Newspaper className="w-3.5 h-3.5" /> 미디어 보도
             </h4>
             {entry.recentArticles.length === 0 ? (
               <p className="text-xs text-cf-text-secondary italic">최근 30일 보도 없음 — 강한 침묵 신호</p>
             ) : (
-              <div className="space-y-3">
-                {entry.recentArticles.map((article, i) => (
-                  <div key={i} className="bg-white rounded-lg p-3 border border-cf-border/50">
-                    {article.url ? (
-                      <a href={article.url} target="_blank" rel="noopener noreferrer"
-                        className="text-xs font-medium text-cf-text-primary hover:text-cf-primary flex items-start gap-1 leading-relaxed">
+              <div className="space-y-2">
+                {entry.recentArticles.map((article, i) => {
+                  const href = article.url || `https://news.google.com/search?q=${encodeURIComponent(article.title + ' ' + entry.ticker)}`;
+                  return (
+                    <div key={i} className="bg-white rounded-lg p-3 border border-cf-border/50">
+                      <a href={href} target="_blank" rel="noopener noreferrer"
+                        className="text-xs font-medium text-cf-text-primary hover:text-cf-primary flex items-start gap-1 leading-relaxed group">
                         &quot;{article.title}&quot;
-                        <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                        <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5 opacity-40 group-hover:opacity-100" />
                       </a>
-                    ) : (
-                      <p className="text-xs font-medium text-cf-text-primary leading-relaxed">&quot;{article.title}&quot;</p>
-                    )}
-                    <div className="flex items-center gap-1.5 mt-1.5 text-cf-text-muted text-xs">
-                      <Calendar className="w-3 h-3" />
-                      <span>{article.date}</span>
-                      {article.source && <><span className="text-gray-300">·</span><span>{article.source}</span></>}
+                      <div className="flex items-center gap-1.5 mt-1.5 text-cf-text-muted text-xs">
+                        <Calendar className="w-3 h-3" />
+                        <span>{article.date}</span>
+                        {article.source && <><span className="text-gray-300">·</span><span className="font-medium">{article.source}</span></>}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+                <a href={`https://news.google.com/search?q=${encodeURIComponent(entry.companyName + ' ' + entry.ticker)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-cf-primary hover:underline mt-1">
+                  Google News에서 더 보기 <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             )}
           </div>
 
-          {/* 기관 행동 전체 */}
+          {/* 기관 보유 현황 (13F) */}
           <div>
             <h4 className="text-xs font-bold text-cf-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5" /> 기관 행동 전체
+              <Building2 className="w-3.5 h-3.5" /> 기관 보유 현황 (13F)
             </h4>
-            <div className="space-y-2">
+            <div className="bg-white rounded-lg border border-cf-border/50 overflow-hidden">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-cf-border/50">
+                    <th className="text-left py-2 px-3 text-cf-text-secondary font-medium">기관</th>
+                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">포지션</th>
+                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">지분율</th>
+                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">동향</th>
+                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">13F</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entry.ownershipData.map((o, i) => (
+                    <tr key={i} className="border-b border-cf-border/30 last:border-0">
+                      <td className="py-2 px-3 font-medium text-cf-text-primary">{o.institution}</td>
+                      <td className="py-2 px-3 text-right font-mono text-cf-text-secondary">
+                        ${o.valueM >= 1000 ? `${(o.valueM / 1000).toFixed(1)}B` : `${o.valueM}M`}
+                      </td>
+                      <td className="py-2 px-3 text-right font-bold text-cf-primary">{o.pctOfShares.toFixed(2)}%</td>
+                      <td className="py-2 px-3 text-center">
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${
+                          o.action === 'new' ? 'bg-blue-50 text-blue-700' :
+                          o.action === 'increased' ? 'bg-green-50 text-green-700' :
+                          o.action === 'reduced' ? 'bg-red-50 text-red-700' :
+                          'bg-gray-50 text-gray-600'
+                        }`}>
+                          {o.action === 'new' ? '신규' : o.action === 'increased' ? '증가' : o.action === 'reduced' ? '감소' : '유지'}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3 text-center">
+                        <a href={o.secUrl} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-0.5 text-cf-primary hover:underline">
+                          SEC <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <a href={edgarTicker(entry.ticker)} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-cf-text-secondary hover:text-cf-primary mt-2">
+              EDGAR에서 {entry.ticker} 관련 전체 13F 보기 <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
+          {/* 요약 */}
+          <div>
+            <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" /> 기관 행동 요약
+            </h4>
+            <div className="space-y-2 mb-4">
               {entry.ibActions.map((action, i) => (
                 <div key={i} className="bg-white rounded-lg p-3 border border-cf-border/50 flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-cf-primary/10 text-cf-primary text-xs font-bold flex-shrink-0 flex items-center justify-center mt-0.5">
@@ -199,23 +254,8 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* 주요 기관 & 요약 */}
-          <div>
-            <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5" /> 주요 보유 기관
-            </h4>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {entry.topInstitutions.map((inst) => (
-                <span key={inst} className="text-xs px-2.5 py-1 rounded-full bg-white border border-cf-border text-cf-text-secondary font-medium">
-                  {inst}
-                </span>
-              ))}
-            </div>
-
             <div className="bg-white rounded-lg p-3 border border-cf-border/50">
-              <p className="text-xs font-bold text-cf-text-primary mb-2">왜 주목받는가?</p>
+              <p className="text-xs font-bold text-cf-text-primary mb-2">신호 강도</p>
               <div className="space-y-1.5 text-xs text-cf-text-secondary">
                 <div className="flex justify-between">
                   <span>기관 활동 수준</span>
