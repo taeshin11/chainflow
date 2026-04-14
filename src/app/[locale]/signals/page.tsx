@@ -1,7 +1,12 @@
 import SignalsPage from '@/components/pages/SignalsPage';
 import { generateSeoMetadata } from '@/lib/seo';
+import { getSignals } from '@/lib/signals-service';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
+
+// ISR: revalidate every 12 hours.
+// Vercel cron at 02:00 UTC also calls /api/cron/update-signals for proactive refresh.
+export const revalidate = 43200;
 
 export async function generateMetadata({
   params,
@@ -24,6 +29,15 @@ export async function generateMetadata({
   });
 }
 
-export default function Page() {
-  return <SignalsPage />;
+export default async function Page() {
+  const { signals, lastUpdated, updatedTickers, source } = await getSignals();
+
+  return (
+    <SignalsPage
+      initialSignals={signals}
+      lastUpdated={lastUpdated}
+      updatedTickers={updatedTickers}
+      source={source}
+    />
+  );
 }

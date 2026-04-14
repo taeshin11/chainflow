@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { institutionalSignals, type InstitutionalSignal } from '@/data/institutional-signals';
+import { type InstitutionalSignal } from '@/data/institutional-signals';
 import { sectors } from '@/data/sectors';
 import {
   BarChart,
@@ -24,6 +24,8 @@ import {
   ArrowUpDown,
   Activity,
   AlertTriangle,
+  Zap,
+  Database,
 } from 'lucide-react';
 
 const actionColors: Record<string, { text: string; bg: string; key: string }> = {
@@ -50,14 +52,26 @@ const sectorColors: Record<string, string> = {
 
 type SortKey = 'date' | 'value' | 'gap';
 
-export default function SignalsPage() {
+interface SignalsPageProps {
+  initialSignals: InstitutionalSignal[];
+  lastUpdated: string;
+  updatedTickers: number;
+  source: 'live' | 'cached' | 'static';
+}
+
+export default function SignalsPage({
+  initialSignals,
+  lastUpdated,
+  updatedTickers,
+  source,
+}: SignalsPageProps) {
   const t = useTranslations('signals');
   const [sectorFilter, setSectorFilter] = useState<string>('all');
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortKey>('date');
 
   const filtered = useMemo(() => {
-    let result = [...institutionalSignals];
+    let result = [...initialSignals];
     if (sectorFilter !== 'all') {
       result = result.filter((s) => s.sector === sectorFilter);
     }
@@ -82,7 +96,7 @@ export default function SignalsPage() {
   // Sector breakdown for bar chart
   const sectorBreakdown = useMemo(() => {
     const map: Record<string, { accumulating: number; reducing: number }> = {};
-    for (const s of institutionalSignals) {
+    for (const s of initialSignals) {
       if (!map[s.sector]) map[s.sector] = { accumulating: 0, reducing: 0 };
       if (s.action === 'accumulating' || s.action === 'new_position') {
         map[s.sector].accumulating += 1;
@@ -101,7 +115,7 @@ export default function SignalsPage() {
   // Top institutions
   const topInstitutions = useMemo(() => {
     const map: Record<string, number> = {};
-    for (const s of institutionalSignals) {
+    for (const s of initialSignals) {
       map[s.institution] = (map[s.institution] || 0) + 1;
     }
     return Object.entries(map)
@@ -113,9 +127,32 @@ export default function SignalsPage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cf-secondary/10 text-cf-secondary text-sm font-medium mb-4">
-          <Activity className="w-4 h-4" />
-          {t('title')}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cf-secondary/10 text-cf-secondary text-sm font-medium">
+            <Activity className="w-4 h-4" />
+            {t('title')}
+          </div>
+          {source === 'live' ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
+              <Zap className="w-3.5 h-3.5" />
+              Live — {updatedTickers} tickers refreshed
+            </div>
+          ) : source === 'cached' ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-200">
+              <Database className="w-3.5 h-3.5" />
+              {updatedTickers} tickers cached
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
+              <Database className="w-3.5 h-3.5" />
+              Static data
+            </div>
+          )}
+          <span className="text-xs text-cf-text-muted ml-auto">
+            Updated {new Date(lastUpdated).toLocaleString('en-US', {
+              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+            })}
+          </span>
         </div>
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary mb-2">
           {t('title')}
