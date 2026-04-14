@@ -33,7 +33,7 @@ export const sectorContextMap: Record<string, SectorContext> = {
       'TSMC 애리조나/일본 fab 확장으로 장비 수요 증가',
       'CoWoS 패키징 병목 → AMAT·LRCX·KLAC 수혜',
     ],
-    googleNewsUrl: 'https://news.google.com/search?q=semiconductor+equipment+HBM+AI+chip',
+    googleNewsUrl: 'https://www.google.com/search?q=semiconductor+equipment+HBM+AI+chip&tbm=nws',
     etfs: ['SOXX', 'SMH', 'XSD'],
     nextCatalysts: [
       'TSMC Q2 실적 (2026.04.17)',
@@ -59,7 +59,7 @@ export const sectorContextMap: Record<string, SectorContext> = {
       'Sovereign AI — 각국 자국 클라우드 구축 수요',
       'Power & Cooling — AI 데이터센터 전력 수요 3배 증가',
     ],
-    googleNewsUrl: 'https://news.google.com/search?q=AI+cloud+hyperscaler+capex+investment',
+    googleNewsUrl: 'https://www.google.com/search?q=AI+cloud+hyperscaler+capex+investment&tbm=nws',
     etfs: ['AIQ', 'BOTZ', 'CLOU', 'QQQ'],
     nextCatalysts: [
       'Meta/GOOGL/MSFT/AMZN Q1 실적 (2026.04~05)',
@@ -85,7 +85,7 @@ export const sectorContextMap: Record<string, SectorContext> = {
       'IRA 세액 공제로 미국 내 배터리 공장 건설 가속',
       'LFP vs NMC 기술 경쟁 — 에너지밀도 vs 원가',
     ],
-    googleNewsUrl: 'https://news.google.com/search?q=lithium+EV+battery+market+2026',
+    googleNewsUrl: 'https://www.google.com/search?q=lithium+EV+battery+market+2026&tbm=nws',
     etfs: ['LIT', 'BATT', 'DRIV'],
     nextCatalysts: [
       'ALB Q1 실적 및 리튬 생산 가이던스 (2026.05)',
@@ -111,7 +111,7 @@ export const sectorContextMap: Record<string, SectorContext> = {
       '우주/사이버 방어 예산 별도 확대',
       '방산 주문 리드타임 2~3년 → 수주잔고 = 미래 매출 가시성',
     ],
-    googleNewsUrl: 'https://news.google.com/search?q=defense+spending+NATO+drone+military+budget',
+    googleNewsUrl: 'https://www.google.com/search?q=defense+spending+NATO+drone+military+budget&tbm=nws',
     etfs: ['ITA', 'XAR', 'DFEN'],
     nextCatalysts: [
       'NOC/LMT/LHX/RTX Q1 실적 (2026.04)',
@@ -137,7 +137,7 @@ export const sectorContextMap: Record<string, SectorContext> = {
       'PFE/MRNA 52주 저점 → 역발상 기관 매집 (Baillie Gifford, Fidelity)',
       'FDA 가속 심사 트랙으로 신약 허가 기간 단축',
     ],
-    googleNewsUrl: 'https://news.google.com/search?q=GLP-1+obesity+drug+pharma+biotech+2026',
+    googleNewsUrl: 'https://www.google.com/search?q=GLP-1+obesity+drug+pharma+biotech+2026&tbm=nws',
     etfs: ['XBI', 'IBB', 'PJP'],
     nextCatalysts: [
       'LLY Orforglipron(경구용 GLP-1) 3상 결과 (2026.Q2)',
