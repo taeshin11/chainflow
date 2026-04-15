@@ -1,0 +1,54 @@
+Flowvium (ChainFlow) Progress Log
+===================================
+Last updated: 2026-04-16
+
+## Current Status
+- Phase: Post-MVP — Dynamic Data Pipeline complete, continuing improvements
+- Production URL: https://flowvium.vercel.app  (alias: https://chainflow-mu.vercel.app)
+- Vercel project name: flowvium
+- GitHub: https://github.com/taeshin11/chainflow (if exists)
+
+## Completed Features (All PRD F001–F014 done)
+- F001: Project Scaffolding & Deployment ✅
+- F002: Supply Chain Interactive Map ✅ (/explore, /explore/[sector])
+- F003: Company Profile Cards ✅ (/company/[ticker])
+- F004: Institutional Flow Signal Tracker ✅ (/signals, now LIVE via Alpha Vantage + Redis)
+- F005: Leader-to-Midcap Cascade Visualizer ✅ (/cascade, /cascade/[sector])
+- F006: News Gap Analyzer ✅ (/news-gap, now LIVE via Alpha Vantage + Redis cache)
+- F007: AI Insight Engine (Gemini API) ✅ (/api/ai, GEMINI_API_KEY set)
+- F008: Silent Data Collection ✅ (utils/collect.ts → Google Sheets webhook)
+- F009: Feedback Widget ✅ (FeedbackWidget.tsx, floating bottom-right)
+- F010: Auto-Locale Detection & i18n ✅ (next-intl, 8 languages)
+- F011: SEO & Traffic Maximization ✅ (sitemap, meta, JSON-LD, blog pages)
+- F012: SPINAI Branding ✅ (footer)
+- F013: Responsive Design & Modern UI ✅ (Tailwind, glassmorphism)
+- F014: Pro Tier Paywall Scaffolding ✅ (ProGate.tsx)
+
+## Dynamic Data Pipeline (completed 2026-04-15)
+- Milestone 1: Alpha Vantage signals → Redis (Upstash) → ISR pages (12h revalidate)
+- Milestone 2: All 25 AV calls focused on news-gap scores (mid/small caps first)
+- Milestone 3: /news-gap reads same Redis cache (zero extra AV calls)
+- Vercel Cron: daily 02:00 UTC → /api/cron/update-signals
+- Live badges: "Live" (green ⚡) / "Cached" (gray) / "Static" on both pages
+
+## Environment Variables (all set in Vercel Production)
+- ALPHA_VANTAGE_KEY ✅
+- UPSTASH_REDIS_REST_URL ✅
+- UPSTASH_REDIS_REST_TOKEN ✅
+- CRON_SECRET ✅
+- GEMINI_API_KEY ✅
+
+## Next Session Goals (Builder Agent picks one)
+Priority order:
+1. Audit live site — check for broken pages, missing translations, error states
+2. Expand i18n to full 16 languages (PRD lists hi, ar, vi, th, id, ru, tr — currently only 8)
+3. Add blog/SEO content pages: programmatic pages per sector (PRD 7.3)
+4. Improve company pages: add more companies (batch expansion)
+5. Add /cascade/[sector] dynamic pages if missing
+6. Add /explore/[sector] dynamic pages if missing
+7. Fix any UI issues found during audit
+
+## Session Log
+- 2026-03-31: MVP built (all 14 features), deployed to Vercel
+- 2026-04-15: Dynamic signals + news-gap pipeline (3 milestones)
+- 2026-04-16: Progress log restored, remote trigger re-created
