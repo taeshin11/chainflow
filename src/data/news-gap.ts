@@ -4,6 +4,8 @@ export interface OwnershipRecord {
   institution: string;
   valueM: number;        // 포지션 가치 ($M)
   pctOfShares: number;   // 발행주식 대비 지분율 (%)
+  /** 직전 분기 지분율 (변화 방향 표시용) */
+  prevPct?: number;
   sharesM?: number;      // 보유 주식수 (백만 주)
   quarter: string;       // "Q4 2025"
   action: 'new' | 'increased' | 'maintained' | 'reduced';

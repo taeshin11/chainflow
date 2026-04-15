@@ -7,6 +7,8 @@ import { allCompanies, type Company } from '@/data/companies';
 import { institutionalSignals } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { cascadePatterns } from '@/data/cascades';
+import { sectorContextMap } from '@/data/sector-context';
+import { companySupplyChainUpdates, typeLabels, type SupplyChainUpdate } from '@/data/company-supply-chain-updates';
 import {
   PieChart,
   Pie,
@@ -34,6 +36,11 @@ import {
   Sparkles,
   Gauge,
   Loader2,
+  AlertTriangle,
+  Zap,
+  Minus,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -66,6 +73,30 @@ const actionColors: Record<string, string> = {
   reducing: 'text-red-600 bg-red-50',
   new_position: 'text-blue-600 bg-blue-50',
   exit: 'text-orange-600 bg-orange-50',
+};
+
+function quarterToFilingDate(quarter: string): string {
+  const parts = quarter.split(' ');
+  const q = parts[0];
+  const year = parseInt(parts[1] || '2025');
+  if (q === 'Q4') return `${year + 1}.02.14`;
+  if (q === 'Q3') return `${year}.11.14`;
+  if (q === 'Q2') return `${year}.08.14`;
+  return `${year}.05.15`;
+}
+
+const impactColors: Record<string, string> = {
+  high: 'border-l-red-400 bg-red-50/30',
+  medium: 'border-l-amber-400 bg-amber-50/30',
+  low: 'border-l-blue-400 bg-blue-50/30',
+};
+
+const updateTypeColors: Record<string, string> = {
+  disruption: 'text-red-600 bg-red-50',
+  expansion: 'text-green-700 bg-green-50',
+  partnership: 'text-blue-700 bg-blue-50',
+  risk: 'text-amber-700 bg-amber-50',
+  opportunity: 'text-purple-700 bg-purple-50',
 };
 
 export default function CompanyPage({ ticker }: { ticker: string }) {
@@ -369,6 +400,36 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             ))}
           </div>
 
+          {/* 공급망 이슈 */}
+          {(() => {
+            const updates = companySupplyChainUpdates[company.ticker];
+            if (!updates || updates.length === 0) return null;
+            return (
+              <div className="cf-card p-6">
+                <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-5 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-cf-accent" />
+                  공급망 이슈
+                </h2>
+                <div className="space-y-3">
+                  {updates.map((upd: SupplyChainUpdate, i: number) => (
+                    <div key={i} className={`border-l-4 rounded-r-lg p-4 ${impactColors[upd.impact]}`}>
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${updateTypeColors[upd.type]}`}>
+                            {typeLabels[upd.type]}
+                          </span>
+                          <span className="text-xs font-bold text-cf-text-primary">{upd.title}</span>
+                        </div>
+                        <span className="text-xs text-cf-text-secondary whitespace-nowrap flex-shrink-0">{upd.date}</span>
+                      </div>
+                      <p className="text-sm text-cf-text-secondary leading-relaxed">{upd.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Institutional Signals */}
           {signals.length > 0 && (
             <div className="cf-card p-6">
@@ -386,13 +447,13 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                         {t('action')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        {t('share')}
-                      </th>
-                      <th className="text-right py-2 text-cf-text-secondary font-medium">
                         {t('value')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        {t('date')}
+                        분기
+                      </th>
+                      <th className="text-right py-2 text-cf-text-secondary font-medium">
+                        공시일
                       </th>
                     </tr>
                   </thead>
@@ -410,14 +471,20 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                             {sig.action.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="text-right py-2.5 text-cf-text-secondary font-mono text-xs">
-                          {sig.sharesChanged.toLocaleString()}
-                        </td>
                         <td className="text-right py-2.5 text-cf-text-primary font-medium">
                           {sig.estimatedValue}
                         </td>
                         <td className="text-right py-2.5 text-cf-text-secondary text-xs">
+                          {sig.quarterEnd.slice(0, 7).replace('-', '.').replace('-', '.')}
+                        </td>
+                        <td className="text-right py-2.5 text-cf-text-secondary text-xs whitespace-nowrap">
                           {sig.filingDate}
+                          {(sig.action === 'accumulating' || sig.action === 'new_position') && (
+                            <span className="ml-1 text-green-600 font-bold">↑</span>
+                          )}
+                          {(sig.action === 'reducing' || sig.action === 'exit') && (
+                            <span className="ml-1 text-red-500 font-bold">↓</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -603,6 +670,64 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </div>
             </div>
           )}
+
+          {/* 섹터 현황 */}
+          {(() => {
+            const sc = sectorContextMap[company.sector];
+            if (!sc) return null;
+            return (
+              <div className="cf-card p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-heading font-bold text-cf-text-primary flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-cf-primary" />
+                    섹터 현황 — {sc.name}
+                  </h3>
+                  <a href={sc.googleNewsUrl} target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-cf-primary hover:underline flex items-center gap-1">
+                    섹터 뉴스 <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <div className="bg-cf-primary/5 rounded-lg px-3 py-2 mb-3">
+                  <p className="text-xs text-cf-primary font-medium leading-relaxed">{sc.phase}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {sc.keyData.map((kd) => (
+                    <div key={kd.label} className="bg-gray-50 rounded-lg p-2">
+                      <p className="text-[10px] text-cf-text-secondary mb-0.5">{kd.label}</p>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-bold text-cf-text-primary">{kd.value}</span>
+                        {kd.trend === 'up' && <TrendingUp className="w-3 h-3 text-green-500" />}
+                        {kd.trend === 'down' && <TrendingDown className="w-3 h-3 text-red-500" />}
+                        {kd.trend === 'neutral' && <Minus className="w-3 h-3 text-gray-400" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">핵심 테마</p>
+                  <ul className="space-y-1">
+                    {sc.themes.slice(0, 3).map((theme, i) => (
+                      <li key={i} className="text-[11px] text-cf-text-secondary flex items-start gap-1.5">
+                        <span className="text-cf-primary mt-0.5">•</span>
+                        {theme}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">다음 주요 이벤트</p>
+                  <ul className="space-y-1">
+                    {sc.nextCatalysts.slice(0, 2).map((cat, i) => (
+                      <li key={i} className="text-[11px] text-cf-text-secondary flex items-start gap-1.5">
+                        <span className="text-amber-500 mt-0.5">◆</span>
+                        {cat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
       )}

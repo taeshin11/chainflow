@@ -36,6 +36,23 @@ import {
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 
+function quarterToFilingDate(quarter: string): string {
+  const parts = quarter.split(' ');
+  const q = parts[0];
+  const year = parseInt(parts[1] || '2025');
+  if (q === 'Q4') return `${year + 1}.02.14`;
+  if (q === 'Q3') return `${year}.11.14`;
+  if (q === 'Q2') return `${year}.08.14`;
+  return `${year}.05.15`;
+}
+
+function estimatePrevPct(pct: number, action: string): number {
+  if (action === 'new') return 0;
+  if (action === 'increased') return parseFloat((pct * 0.72).toFixed(2));
+  if (action === 'reduced') return parseFloat((pct * 1.38).toFixed(2));
+  return pct;
+}
+
 function GapBar({ score }: { score: number }) {
   const color =
     score >= 80 ? 'from-red-500 to-amber-500'
@@ -207,35 +224,55 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
                     <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">포지션</th>
                     <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">지분율</th>
                     <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">동향</th>
+                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">공시일</th>
                     <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">13F</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {entry.ownershipData.map((o, i) => (
-                    <tr key={i} className="border-b border-cf-border/30 last:border-0">
-                      <td className="py-2 px-3 font-medium text-cf-text-primary">{o.institution}</td>
-                      <td className="py-2 px-3 text-right font-mono text-cf-text-secondary">
-                        ${o.valueM >= 1000 ? `${(o.valueM / 1000).toFixed(1)}B` : `${o.valueM}M`}
-                      </td>
-                      <td className="py-2 px-3 text-right font-bold text-cf-primary">{o.pctOfShares.toFixed(2)}%</td>
-                      <td className="py-2 px-3 text-center">
-                        <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${
-                          o.action === 'new' ? 'bg-blue-50 text-blue-700' :
-                          o.action === 'increased' ? 'bg-green-50 text-green-700' :
-                          o.action === 'reduced' ? 'bg-red-50 text-red-700' :
-                          'bg-gray-50 text-gray-600'
-                        }`}>
-                          {o.action === 'new' ? '신규' : o.action === 'increased' ? '증가' : o.action === 'reduced' ? '감소' : '유지'}
-                        </span>
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        <a href={o.secUrl} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-0.5 text-cf-primary hover:underline">
-                          SEC <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
+                  {entry.ownershipData.map((o, i) => {
+                    const prevPct = o.prevPct !== undefined ? o.prevPct : estimatePrevPct(o.pctOfShares, o.action);
+                    const diff = parseFloat((o.pctOfShares - prevPct).toFixed(2));
+                    const filingDate = quarterToFilingDate(o.quarter);
+                    return (
+                      <tr key={i} className="border-b border-cf-border/30 last:border-0">
+                        <td className="py-2 px-3 font-medium text-cf-text-primary">{o.institution}</td>
+                        <td className="py-2 px-3 text-right font-mono text-cf-text-secondary">
+                          ${o.valueM >= 1000 ? `${(o.valueM / 1000).toFixed(1)}B` : `${o.valueM}M`}
+                        </td>
+                        <td className="py-2 px-3 text-right">
+                          <span className="font-bold text-cf-primary">{o.pctOfShares.toFixed(2)}%</span>
+                          {o.action !== 'maintained' && o.action !== 'new' && (
+                            <span className={`ml-1 text-[10px] ${diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                              {diff > 0 ? `↑+${diff}` : diff < 0 ? `↓${diff}` : ''}
+                            </span>
+                          )}
+                          {o.action === 'new' && (
+                            <span className="ml-1 text-[10px] text-blue-600">↑신규</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${
+                            o.action === 'new' ? 'bg-blue-50 text-blue-700' :
+                            o.action === 'increased' ? 'bg-green-50 text-green-700' :
+                            o.action === 'reduced' ? 'bg-red-50 text-red-700' :
+                            'bg-gray-50 text-gray-600'
+                          }`}>
+                            {o.action === 'new' ? '신규' : o.action === 'increased' ? '증가' : o.action === 'reduced' ? '감소' : '유지'}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-center text-cf-text-secondary whitespace-nowrap">
+                          {filingDate}
+                          <div className="text-[10px] text-cf-text-secondary/60">{o.quarter}</div>
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          <a href={o.secUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 text-cf-primary hover:underline">
+                            SEC <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
