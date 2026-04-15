@@ -54,7 +54,7 @@ export default function Navbar() {
                 <LinkIcon className="w-4 h-4 text-cf-primary" />
               </div>
               <span className="text-xl font-heading font-bold text-cf-text-primary tracking-tight">
-                Chain<span className="text-cf-primary">Flow</span>
+                Flow<span className="text-cf-primary">vium</span>
               </span>
             </Link>
 
@@ -112,7 +112,7 @@ export default function Navbar() {
       >
         <div className="flex items-center justify-between p-4 border-b border-cf-border">
           <span className="text-lg font-heading font-bold text-cf-text-primary">
-            Chain<span className="text-cf-primary">Flow</span>
+            Flow<span className="text-cf-primary">vium</span>
           </span>
           <button
             onClick={() => setIsOpen(false)}

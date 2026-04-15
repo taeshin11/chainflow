@@ -19,7 +19,7 @@ export default function Footer() {
                 <LinkIcon className="w-4 h-4 text-cf-primary" />
               </div>
               <span className="text-xl font-heading font-bold text-cf-text-primary tracking-tight">
-                Chain<span className="text-cf-primary">Flow</span>
+                Flow<span className="text-cf-primary">vium</span>
               </span>
             </div>
             <p className="text-sm text-cf-text-secondary leading-relaxed max-w-xs">

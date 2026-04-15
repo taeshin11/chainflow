@@ -1,7 +1,7 @@
-# PRD.md — ChainFlow: Supply Chain Institutional Flow Tracker
+# PRD.md — Flowvium: Supply Chain Institutional Flow Tracker
 
 > **Brand:** SPINAI  
-> **App Name:** ChainFlow  
+> **App Name:** Flowvium  
 > **Tagline:** "Track where smart money flows through the supply chain — before the headlines catch up."  
 > **Version:** MVP 1.0  
 > **Contact:** taeshinkim11@gmail.com (user feedback), spinaiceo@gmail.com (business)  
@@ -11,13 +11,13 @@
 
 ## 1. Product Overview
 
-### 1.1 What Is ChainFlow?
+### 1.1 What Is Flowvium?
 
-ChainFlow is a free, responsive web application that visualizes **how institutional (IB) buying flows through supply chain relationships** — from sector leaders to mid-cap intermediaries. It helps retail investors:
+Flowvium is a free, responsive web application that visualizes **how institutional (IB) buying flows through supply chain relationships** — from sector leaders to mid-cap intermediaries. It helps retail investors:
 
 1. **Map supply chains by sector** — Click any company (e.g., NVIDIA) and instantly see every supplier, partner, and downstream company it interacts with, organized by sector.
 2. **Track institutional accumulation signals** — Identify when investment banks are quietly accumulating positions in leader stocks, BEFORE mainstream media covers it.
-3. **Spot the leader-to-midcap cascade** — When a sector leader (e.g., NVIDIA) rises on institutional buying, related mid-cap/intermediary stocks (e.g., Micron, Samsung) follow. ChainFlow visualizes this flow pattern.
+3. **Spot the leader-to-midcap cascade** — When a sector leader (e.g., NVIDIA) rises on institutional buying, related mid-cap/intermediary stocks (e.g., Micron, Samsung) follow. Flowvium visualizes this flow pattern.
 4. **Analyze the news gap** — Show the disconnect between what IBs are buying and what mainstream headlines/general newspapers are reporting. The key insight: when IBs accumulate, Bloomberg, economic weeklies, and general dailies show ZERO coverage — the signal is in the silence.
 5. **Revenue & product breakdown** — Detailed company profiles with products, revenue streams, and cross-company relationships.
 
@@ -48,9 +48,9 @@ ChainFlow is a free, responsive web application that visualizes **how institutio
 | Tradytics | $69/mo | — | AI trade ideas |
 | Market Chameleon | $39/mo | — | Options analytics |
 
-### 2.2 ChainFlow Differentiator
+### 2.2 Flowvium Differentiator
 
-None of the above combine **supply chain mapping + institutional flow tracking + leader-to-midcap cascade analysis + news gap detection** in one tool. ChainFlow occupies a unique niche.
+None of the above combine **supply chain mapping + institutional flow tracking + leader-to-midcap cascade analysis + news gap detection** in one tool. Flowvium occupies a unique niche.
 
 ### 2.3 Pricing Strategy
 
@@ -199,7 +199,7 @@ None of the above combine **supply chain mapping + institutional flow tracking +
 
 #### `claude-progress.txt`
 ```
-# ChainFlow Progress Log
+# Flowvium Progress Log
 # Updated after each feature completion
 
 ## Current Status
@@ -218,7 +218,7 @@ None of the above combine **supply chain mapping + institutional flow tracking +
 #### `init.sh`
 ```bash
 #!/bin/bash
-# ChainFlow Initialization Script
+# Flowvium Initialization Script
 # Run once at project start
 
 # Install dependencies
@@ -575,7 +575,7 @@ Auto-generate SEO-optimized pages for maximum organic traffic:
 
 ```bash
 # Create repo using gh CLI (REQUIRED)
-gh repo create chainflow --public --description "Supply Chain Institutional Flow Tracker by SPINAI"
+gh repo create flowvium --public --description "Supply Chain Institutional Flow Tracker by SPINAI"
 git init
 git add .
 git commit -m "feat: initial project scaffolding"
@@ -623,7 +623,7 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:g
 # - Sufficient for MVP with ~1,000 AI queries/day
 ```
 
-> **IMPORTANT:** The live URL will be on Vercel's domain (e.g., `chainflow.vercel.app`) — this does NOT expose any GitHub username. Users access the app via the Vercel URL only.
+> **IMPORTANT:** The live URL will be on Vercel's domain (e.g., `flowvium.vercel.app`) — this does NOT expose any GitHub username. Users access the app via the Vercel URL only.
 
 ### 9.5 Git Push Strategy (Milestone-Based)
 
@@ -660,7 +660,7 @@ git commit -m "chore(F008): silent data collection webhook"
 
 ```bash
 # Create GitHub repo
-gh repo create chainflow --public
+gh repo create flowvium --public
 
 # Deploy to Vercel
 vercel --prod --yes
@@ -672,7 +672,7 @@ curl -X POST $WEBHOOK_URL -H "Content-Type: application/json" -d '{"event":"test
 npx next-sitemap
 
 # Check Lighthouse scores
-npx lighthouse https://chainflow.vercel.app --output json
+npx lighthouse https://flowvium.vercel.app --output json
 
 # Google Cloud auth (if needed for Sheets API)
 gcloud auth application-default login
@@ -736,7 +736,7 @@ Before each milestone push, verify:
 
 ## 13. Disclaimer
 
-ChainFlow provides informational data and visualizations for educational purposes only. It does NOT constitute investment advice. Users should conduct their own due diligence before making any investment decisions. Past institutional buying patterns do not guarantee future performance.
+Flowvium provides informational data and visualizations for educational purposes only. It does NOT constitute investment advice. Users should conduct their own due diligence before making any investment decisions. Past institutional buying patterns do not guarantee future performance.
 
 ---
 
