@@ -15,10 +15,11 @@ Last updated: 2026-04-16
 
 ## Content State (as of 2026-04-16)
 - Blog posts: 17 articles
-- Companies: ~137 (116 original + 21 in batch6)
-- Cascade patterns: 11 (7 original + 4 new: energy-fslr, ai-msft-azure, fintech-visa, materials-alb)
+- Companies: ~430 (batch1-7; added AMD, INTC, F, GM, TGT, UBER, PYPL, CVS, HUM, CARR, OTIS, AA in batch7)
+- Cascade patterns: 11
 - Institutional signals: 47 entries (Q1 2026 filing dates, sig-001~sig-047)
-- Sectors covered: semiconductors, ai-cloud, ev-battery, defense, pharma-biotech, energy, financials, materials
+- Sectors covered: semiconductors, ai-cloud, ev-battery, defense, pharma-biotech, energy, financials, materials, industrials, consumer, healthcare
+- i18n: 280+ tickers with Korean/Japanese/Chinese multilingual search
 
 ## Environment Variables (all set in Vercel Production)
 - ALPHA_VANTAGE_KEY ✅
@@ -41,3 +42,4 @@ Priority order:
 - 2026-04-16: Remote trigger restored. Added 5 blog posts, 9 signals (Q1 2026), 2 cascades, 21 companies. Deployed.
 - 2026-04-16: Redis .trim() fix. Added 2 blog posts (fintech, materials), 2 cascades (fintech/materials), 9 signals (sig-039~047). Deployed.
 - 2026-04-16: Compare page (/compare/[slug]), cascade hero animation, sectorIcons 16개, stats update, news-gap +4 tickers. Deployed.
+- 2026-04-16: Product descriptions in CompanyPage, expandable segment rows with topCustomers breakdown, R&D pipeline section. TDG + NVDA fully annotated. Batch7 (+12 S&P 500 companies). i18n 280+ tickers, fixed all duplicate keys. Deployed.

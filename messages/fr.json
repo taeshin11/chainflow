@@ -140,7 +140,27 @@
     "cascadePosition": "Position dans la cascade",
     "roleInCascade": "Rôle dans la cascade",
     "typicalDelay": "Délai typique",
-    "viewFullCascade": "Voir la cascade complète"
+    "viewFullCascade": "Voir la cascade complète",
+    "segmentCompositionAndCustomers": "Composition des segments et principaux clients",
+    "topCustomers": "Principaux clients",
+    "productDetails": "Détails du produit",
+    "rdPipeline": "Pipeline R&D",
+    "rdStageResearch": "Recherche",
+    "rdStageDevelopment": "Développement",
+    "rdStageValidation": "Validation",
+    "rdStageCommercial": "Commercial",
+    "budget": "Budget",
+    "supplyChainIssues": "Problèmes de chaîne d'approvisionnement",
+    "quarter": "Trimestre",
+    "filingDate": "Date de dépôt",
+    "sectorStatus": "Aperçu du secteur",
+    "sectorNews": "Actualités du secteur",
+    "keyThemes": "Thèmes clés",
+    "nextCatalysts": "Prochains catalyseurs",
+    "macroAndMarketContext": "Contexte macro et de marché",
+    "macroTailwinds": "Vents favorables pour {company}",
+    "macroHeadwinds": "Facteurs de risque pour {company}",
+    "macroSummary": "Résumé macro"
   },
   "cascade": {
     "title": "Visualiseur de cascades",
@@ -396,7 +416,7 @@
     "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. Tous droits réservés.",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
-    "contact": "Nous contacter",
+    "contact": "Contact",
     "status": "État du système",
     "documentation": "Documentation",
     "api": "Accès API",
@@ -414,8 +434,7 @@
     "faq": "FAQ",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
-    "about": "À propos",
-    "contact": "Contact"
+    "about": "À propos"
   },
   "emailCta": {
     "title": "Recevez des insights hebdomadaires sur la chaîne d'approvisionnement",

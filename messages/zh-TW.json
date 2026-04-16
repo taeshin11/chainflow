@@ -140,7 +140,27 @@
     "cascadePosition": "連鎖位置",
     "roleInCascade": "連鎖中的角色",
     "typicalDelay": "典型延遲",
-    "viewFullCascade": "檢視完整連鎖分析"
+    "viewFullCascade": "檢視完整連鎖分析",
+    "segmentCompositionAndCustomers": "業務部門構成與主要客戶",
+    "topCustomers": "主要客戶",
+    "productDetails": "產品詳情",
+    "rdPipeline": "研發管線",
+    "rdStageResearch": "研究",
+    "rdStageDevelopment": "開發",
+    "rdStageValidation": "驗證",
+    "rdStageCommercial": "商業化",
+    "budget": "預算",
+    "supplyChainIssues": "供應鏈問題",
+    "quarter": "季度",
+    "filingDate": "申報日期",
+    "sectorStatus": "行業概況",
+    "sectorNews": "行業新聞",
+    "keyThemes": "核心主題",
+    "nextCatalysts": "近期催化劑",
+    "macroAndMarketContext": "宏觀與市場背景",
+    "macroTailwinds": "{company}的利多因素",
+    "macroHeadwinds": "{company}的風險因素",
+    "macroSummary": "宏觀摘要"
   },
   "cascade": {
     "title": "連鎖影響視覺化",
@@ -414,8 +434,7 @@
     "faq": "常見問題",
     "privacyPolicy": "隱私權政策",
     "termsOfService": "服務條款",
-    "about": "關於",
-    "contact": "聯絡我們"
+    "about": "關於"
   },
   "emailCta": {
     "title": "取得每週供應鏈洞察",

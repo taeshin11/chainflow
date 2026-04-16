@@ -2165,6 +2165,23 @@ export const companiesBatch1: Company[] = [
       { targetId: "lmt", type: "customer", products: ["F-35 and military aircraft components"], revenueImpact: "~$300M+ defense parts" },
       { targetId: "ph", type: "competitor", products: ["Aerospace fluid and motion control components"], revenueImpact: "Overlaps in hydraulic/pneumatic components" },
     ],
+    macroImpact: {
+      summary: "TransDigm benefits from the post-COVID commercial aviation recovery, defense budget expansion, and its structural pricing power on sole-source components. The macro environment is broadly favorable, with headwinds from higher interest rates (elevated M&A financing costs) and potential defense budget sequestration.",
+      tailwinds: [
+        "Commercial aviation traffic at 108% of 2019 levels — driving MRO demand for TDG's high-margin aftermarket parts",
+        "Boeing 737 MAX and Airbus A320neo production ramp-up expanding OEM parts content per plane",
+        "US defense budget at $886B (FY2025) — Non-aviation segment benefits from F-35, hypersonics, and satellite programs",
+        "Airline profitability improving → less pricing pushback on sole-source MRO parts → TDG's 3-4x OEM pricing power intact",
+        "Aging global fleet (average aircraft age ~14 years) requires more frequent part replacement — structural MRO tailwind",
+      ],
+      headwinds: [
+        "Boeing 737 MAX production issues reduce near-term OEM parts volume (Power & Control segment)",
+        "High leverage (net debt ~$23B, 7-8x EBITDA) — rate hikes increase refinancing costs",
+        "Private equity ownership history drives congressional scrutiny over government contract pricing",
+        "China aviation recovery lags — Airbus/Boeing deliveries to Chinese carriers delayed by geopolitical tensions",
+        "Potential defense budget sequestration or continuing resolutions could delay DoD procurement timing",
+      ],
+    },
     description: "TransDigm is a highly profitable aerospace components manufacturer focused on proprietary, sole-source products with significant aftermarket content. Its pricing power and acquisition strategy drive industry-leading EBITDA margins (~50%). ~75% of revenue comes from sole-source products. ~55% of revenue is aftermarket (MRO), which commands 3–4x OEM pricing.",
     headquarters: "Cleveland, Ohio, USA",
     founded: 1993,

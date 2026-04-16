@@ -140,7 +140,27 @@
     "cascadePosition": "Kaskadenposition",
     "roleInCascade": "Rolle in der Kaskade",
     "typicalDelay": "Typische Verzögerung",
-    "viewFullCascade": "Vollständige Kaskade anzeigen"
+    "viewFullCascade": "Vollständige Kaskade anzeigen",
+    "segmentCompositionAndCustomers": "Segmentzusammensetzung und Hauptkunden",
+    "topCustomers": "Hauptkunden",
+    "productDetails": "Produktdetails",
+    "rdPipeline": "F&E-Pipeline",
+    "rdStageResearch": "Forschung",
+    "rdStageDevelopment": "Entwicklung",
+    "rdStageValidation": "Validierung",
+    "rdStageCommercial": "Kommerziell",
+    "budget": "Budget",
+    "supplyChainIssues": "Lieferketten-Probleme",
+    "quarter": "Quartal",
+    "filingDate": "Einreichungsdatum",
+    "sectorStatus": "Sektorübersicht",
+    "sectorNews": "Sektornachrichten",
+    "keyThemes": "Hauptthemen",
+    "nextCatalysts": "Nächste Katalysatoren",
+    "macroAndMarketContext": "Makro- und Marktkontext",
+    "macroTailwinds": "Rückenwind für {company}",
+    "macroHeadwinds": "Risikofaktoren für {company}",
+    "macroSummary": "Makrozusammenfassung"
   },
   "cascade": {
     "title": "Kaskaden-Visualisierung",
@@ -414,8 +434,7 @@
     "faq": "FAQ",
     "privacyPolicy": "Datenschutzrichtlinie",
     "termsOfService": "Nutzungsbedingungen",
-    "about": "Über uns",
-    "contact": "Kontakt"
+    "about": "Über uns"
   },
   "emailCta": {
     "title": "Wöchentliche Lieferketten-Insights erhalten",

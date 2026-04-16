@@ -140,7 +140,27 @@
     "cascadePosition": "连锁位置",
     "roleInCascade": "连锁中的角色",
     "typicalDelay": "典型延迟",
-    "viewFullCascade": "查看完整连锁分析"
+    "viewFullCascade": "查看完整连锁分析",
+    "segmentCompositionAndCustomers": "业务板块构成与主要客户",
+    "topCustomers": "主要客户",
+    "productDetails": "产品详情",
+    "rdPipeline": "研发管线",
+    "rdStageResearch": "研究",
+    "rdStageDevelopment": "开发",
+    "rdStageValidation": "验证",
+    "rdStageCommercial": "商业化",
+    "budget": "预算",
+    "supplyChainIssues": "供应链问题",
+    "quarter": "季度",
+    "filingDate": "申报日期",
+    "sectorStatus": "行业概况",
+    "sectorNews": "行业新闻",
+    "keyThemes": "核心主题",
+    "nextCatalysts": "近期催化剂",
+    "macroAndMarketContext": "宏观与市场背景",
+    "macroTailwinds": "{company}的利好因素",
+    "macroHeadwinds": "{company}的风险因素",
+    "macroSummary": "宏观摘要"
   },
   "cascade": {
     "title": "连锁影响可视化",
@@ -414,8 +434,7 @@
     "faq": "常见问题",
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
-    "about": "关于",
-    "contact": "联系我们"
+    "about": "关于"
   },
   "emailCta": {
     "title": "获取每周供应链洞察",

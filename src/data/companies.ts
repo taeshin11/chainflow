@@ -33,6 +33,12 @@ export interface RdPipelineItem {
   budget?: string;
 }
 
+export interface MacroImpact {
+  summary: string;
+  tailwinds: string[];
+  headwinds: string[];
+}
+
 export interface Relationship {
   targetId: string;
   type: "supplier" | "customer" | "partner" | "competitor";
@@ -52,6 +58,7 @@ export interface Company {
   revenue: RevenueBreakdown;
   relationships: Relationship[];
   rdPipeline?: RdPipelineItem[];
+  macroImpact?: MacroImpact;
   description: string;
   headquarters: string;
   founded: number;
@@ -172,6 +179,23 @@ export const companies: Company[] = [
       { targetId: "orcl", type: "customer", products: ["Oracle Cloud GPU infrastructure"], revenueImpact: "$4B+ annually" },
       { targetId: "tesla", type: "customer", products: ["Training GPUs for FSD"], revenueImpact: "$2B+ annually" },
     ],
+    macroImpact: {
+      summary: "NVIDIA is the primary beneficiary of the AI infrastructure supercycle. Hyperscaler capex commitments of $320B+ in 2026 drive GPU demand that exceeds supply through at least H1 2026. Interest rate cuts reduce cost of capital for AI infrastructure investment, further accelerating spend.",
+      tailwinds: [
+        "Hyperscaler AI capex at record highs: Microsoft $80B, Meta $65B, Google $75B, Amazon $105B in FY2026",
+        "Inference demand growing faster than training — Blackwell NVL72 rack-scale systems address this directly",
+        "Sovereign AI: governments building national AI infrastructure (UAE, Saudi, Japan, France) — new demand source",
+        "Interest rate cuts reduce cost of capital for long-duration AI infrastructure projects",
+        "Export restrictions on China accelerate US/Europe AI buildout to compensate",
+      ],
+      headwinds: [
+        "US export controls on H20/H100 to China (~$5-8B annual revenue at risk)",
+        "TSMC advanced node capacity constraints limit upside (CoWoS packaging bottleneck)",
+        "Rising competition from custom silicon (Google TPU v5, Amazon Trainium, Microsoft Maia) in hyperscaler inference",
+        "AMD MI300X gaining traction in inference — price competition risk on commoditized inference workloads",
+        "Valuation premium (30x+ forward PE) leaves little room for execution miss",
+      ],
+    },
     description: "NVIDIA is the dominant designer of graphics processing units and AI accelerator chips. Its data-center GPU monopoly powers the generative-AI revolution, with the H100 and successor Blackwell GPUs serving as the de-facto standard for training and running large language models.",
     headquarters: "Santa Clara, California, USA",
     founded: 1993,

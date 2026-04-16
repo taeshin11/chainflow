@@ -79,7 +79,7 @@ const actionColors: Record<string, string> = {
   exit: 'text-orange-600 bg-orange-50',
 };
 
-function SegmentRow({ seg, idx }: { seg: RevenueSegment; idx: number }) {
+function SegmentRow({ seg, idx, topCustomersLabel }: { seg: RevenueSegment; idx: number; topCustomersLabel: string }) {
   const [open, setOpen] = useState(false);
   const hasExtra = !!(seg.topCustomers?.length || seg.description);
   return (
@@ -116,7 +116,7 @@ function SegmentRow({ seg, idx }: { seg: RevenueSegment; idx: number }) {
           )}
           {seg.topCustomers && seg.topCustomers.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-cf-text-secondary mb-1.5">주요 고객사</p>
+              <p className="text-xs font-bold text-cf-text-secondary mb-1.5">{topCustomersLabel}</p>
               <div className="space-y-1">
                 {seg.topCustomers.map((c, i) => (
                   <div key={i} className="flex items-center justify-between text-xs">
@@ -378,16 +378,16 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             <div className="mt-6 space-y-2">
               <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
                 <Users2 className="w-4 h-4 text-cf-primary" />
-                {t('segment')} 구성 및 주요 고객
+                {t('segmentCompositionAndCustomers')}
               </h3>
               {company.revenue.segments.map((s, idx) => (
-                <SegmentRow key={s.name} seg={s} idx={idx} />
+                <SegmentRow key={s.name} seg={s} idx={idx} topCustomersLabel={t('topCustomers')} />
               ))}
             </div>
 
             {/* Product descriptions */}
             <div className="mt-6">
-              <h3 className="text-sm font-bold text-cf-text-primary mb-3">제품 상세 설명</h3>
+              <h3 className="text-sm font-bold text-cf-text-primary mb-3">{t('productDetails')}</h3>
               <div className="space-y-2">
                 {company.products.map((p, i) => (
                   <div key={i} className="rounded-lg bg-gray-50 p-3">
@@ -407,7 +407,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             <div className="cf-card p-6">
               <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6 flex items-center gap-2">
                 <FlaskConical className="w-5 h-5 text-purple-500" />
-                R&D 파이프라인
+                {t('rdPipeline')}
               </h2>
               <div className="space-y-3">
                 {company.rdPipeline.map((item, i) => {
@@ -417,18 +417,14 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                     validation: 'bg-amber-50 border-amber-200 text-amber-700',
                     commercial: 'bg-green-50 border-green-200 text-green-700',
                   };
-                  const stageLabels: Record<string, string> = {
-                    research: '연구',
-                    development: '개발',
-                    validation: '검증',
-                    commercial: '상용화',
-                  };
+                  const stageKey = `rdStage${item.stage.charAt(0).toUpperCase()}${item.stage.slice(1)}` as
+                    'rdStageResearch' | 'rdStageDevelopment' | 'rdStageValidation' | 'rdStageCommercial';
                   return (
                     <div key={i} className="border border-cf-border rounded-lg p-4">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${stageColors[item.stage]}`}>
-                            {stageLabels[item.stage]}
+                            {t(stageKey)}
                           </span>
                           <span className="text-sm font-medium text-cf-text-primary">{item.name}</span>
                         </div>
@@ -438,7 +434,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                       </div>
                       <p className="text-xs text-cf-text-secondary leading-relaxed">{item.description}</p>
                       {item.budget && (
-                        <p className="text-xs mt-1.5 text-cf-primary font-medium">예산: {item.budget}</p>
+                        <p className="text-xs mt-1.5 text-cf-primary font-medium">{t('budget')}: {item.budget}</p>
                       )}
                     </div>
                   );
@@ -503,7 +499,104 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
             ))}
           </div>
 
-          {/* 공급망 이슈 */}
+          {/* Macro & Market Context */}
+          {(() => {
+            const sc = sectorContextMap[company.sector];
+            const mi = company.macroImpact;
+            if (!sc && !mi) return null;
+            return (
+              <div className="cf-card p-6">
+                <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-5 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-cf-primary" />
+                  {t('macroAndMarketContext')}
+                </h2>
+                {/* Sector phase */}
+                {sc && (
+                  <div className="bg-cf-primary/5 rounded-lg px-4 py-3 mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-cf-primary uppercase tracking-wide">{sc.name}</span>
+                      <a href={sc.googleNewsUrl} target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-cf-primary hover:underline flex items-center gap-1">
+                        {t('sectorNews')} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <p className="text-sm text-cf-primary font-medium leading-relaxed">{sc.phase}</p>
+                  </div>
+                )}
+                {/* Key data grid */}
+                {sc && sc.keyData.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                    {sc.keyData.map((kd) => (
+                      <div key={kd.label} className="bg-gray-50 rounded-lg p-2.5">
+                        <p className="text-[10px] text-cf-text-secondary mb-0.5">{kd.label}</p>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-bold text-cf-text-primary">{kd.value}</span>
+                          {kd.trend === 'up' && <TrendingUp className="w-3 h-3 text-green-500" />}
+                          {kd.trend === 'down' && <TrendingDown className="w-3 h-3 text-red-500" />}
+                          {kd.trend === 'neutral' && <Minus className="w-3 h-3 text-gray-400" />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Company-specific macro impact */}
+                {mi && (
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-gray-50 p-3">
+                      <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-1">{t('macroSummary')}</p>
+                      <p className="text-sm text-cf-text-secondary leading-relaxed">{mi.summary}</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-bold text-green-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                          {t('macroTailwinds', { company: company.ticker })}
+                        </p>
+                        <ul className="space-y-1.5">
+                          {mi.tailwinds.map((tw, i) => (
+                            <li key={i} className="text-xs text-cf-text-secondary flex items-start gap-1.5 leading-relaxed">
+                              <span className="text-green-500 mt-0.5 flex-shrink-0">▲</span>
+                              {tw}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                          <ArrowDownRight className="w-3.5 h-3.5" />
+                          {t('macroHeadwinds', { company: company.ticker })}
+                        </p>
+                        <ul className="space-y-1.5">
+                          {mi.headwinds.map((hw, i) => (
+                            <li key={i} className="text-xs text-cf-text-secondary flex items-start gap-1.5 leading-relaxed">
+                              <span className="text-red-400 mt-0.5 flex-shrink-0">▼</span>
+                              {hw}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {/* Next catalysts */}
+                {sc && sc.nextCatalysts.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-cf-border">
+                    <p className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-2">{t('nextCatalysts')}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {sc.nextCatalysts.map((cat, i) => (
+                        <span key={i} className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded-full flex items-center gap-1">
+                          <span className="text-amber-500">◆</span>
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Supply Chain Issues */}
           {(() => {
             const updates = companySupplyChainUpdates[company.ticker];
             if (!updates || updates.length === 0) return null;
@@ -511,7 +604,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               <div className="cf-card p-6">
                 <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-5 flex items-center gap-2">
                   <Zap className="w-5 h-5 text-cf-accent" />
-                  공급망 이슈
+                  {t('supplyChainIssues')}
                 </h2>
                 <div className="space-y-3">
                   {updates.map((upd: SupplyChainUpdate, i: number) => (
@@ -553,10 +646,10 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                         {t('value')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        분기
+                        {t('quarter')}
                       </th>
                       <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        공시일
+                        {t('filingDate')}
                       </th>
                     </tr>
                   </thead>
@@ -783,11 +876,11 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-base font-heading font-bold text-cf-text-primary flex items-center gap-2">
                     <Globe className="w-4 h-4 text-cf-primary" />
-                    섹터 현황 — {sc.name}
+                    {t('sectorStatus')} — {sc.name}
                   </h3>
                   <a href={sc.googleNewsUrl} target="_blank" rel="noopener noreferrer"
                     className="text-xs text-cf-primary hover:underline flex items-center gap-1">
-                    섹터 뉴스 <ExternalLink className="w-3 h-3" />
+                    {t('sectorNews')} <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
                 <div className="bg-cf-primary/5 rounded-lg px-3 py-2 mb-3">
@@ -807,7 +900,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                   ))}
                 </div>
                 <div className="mb-3">
-                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">핵심 테마</p>
+                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">{t('keyThemes')}</p>
                   <ul className="space-y-1">
                     {sc.themes.slice(0, 3).map((theme, i) => (
                       <li key={i} className="text-[11px] text-cf-text-secondary flex items-start gap-1.5">
@@ -818,7 +911,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                   </ul>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">다음 주요 이벤트</p>
+                  <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wider mb-1.5">{t('nextCatalysts')}</p>
                   <ul className="space-y-1">
                     {sc.nextCatalysts.slice(0, 2).map((cat, i) => (
                       <li key={i} className="text-[11px] text-cf-text-secondary flex items-start gap-1.5">
