@@ -438,15 +438,36 @@ function CapitalFlowsTab() {
             <GitMerge className="w-4 h-4 text-cf-primary" />
             현재 자금 로테이션 (4주 기준)
           </h3>
-          <div className="space-y-2">
-            {data.flow.rotations.map((r, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-cf-bg border border-cf-border">
-                <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">{r.from}</span>
-                <ArrowRight className="w-4 h-4 text-cf-primary flex-shrink-0" />
-                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">{r.to}</span>
-                <span className="ml-auto text-xs font-bold text-cf-primary">격차 {r.magnitude > 0 ? '+' : ''}{r.magnitude}%p</span>
-              </div>
-            ))}
+          <div className="space-y-3">
+            {data.flow.rotations.map((r: {from:string;to:string;magnitude:number;weeksAgo?:number;startDate?:string;momentum?:string}, i: number) => {
+              const momentumBadge = r.momentum === 'accelerating'
+                ? { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700' }
+                : r.momentum === 'fading'
+                ? { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500' }
+                : { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600' };
+              return (
+                <div key={i} className="p-3 rounded-lg bg-cf-bg border border-cf-border space-y-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-full">{r.from}</span>
+                    <ArrowRight className="w-4 h-4 text-cf-primary flex-shrink-0" />
+                    <span className="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">{r.to}</span>
+                    <span className="ml-auto text-sm font-extrabold text-cf-primary">+{r.magnitude}%p</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {r.startDate && (
+                      <span className="text-[11px] text-cf-text-secondary flex items-center gap-1">
+                        🕐 {r.weeksAgo === 1 ? '이번 주 시작' : `${r.weeksAgo}주 전 시작`} ({r.startDate})
+                      </span>
+                    )}
+                    {r.momentum && (
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${momentumBadge.cls}`}>
+                        {momentumBadge.label}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
