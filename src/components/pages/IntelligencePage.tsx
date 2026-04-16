@@ -450,6 +450,237 @@ Answer concisely (3–5 paragraphs). Be specific — name tickers, mechanisms, a
   );
 }
 
+// ── Flow Intensity + Cascade Panel ───────────────────────────────────────────
+// Cascade rules: asset/country → what it implies for other assets/sectors
+const CASCADE_RULES: Record<string, { up: string[]; down: string[] }> = {
+  // Country inflows
+  '미국':   { up: ['기술주(QQQ)', 'S&P500(SPY)', '달러(UUP)'], down: ['EM주식', '채권(TLT)'] },
+  '한국':   { up: ['반도체(SOXX)', 'HBM·AI메모리', 'KOSPI'], down: ['엔화(FXY)'] },
+  '중국':   { up: ['원자재(DJP)', '구리', '철광석', 'EM ETF'], down: ['달러(UUP)', '미국 제조주'] },
+  '인도':   { up: ['IT서비스주', 'EM채권', '인프라·시멘트'], down: [] },
+  '대만':   { up: ['반도체(SOXX)', 'TSMC 공급망', 'AI가속기'], down: [] },
+  '유럽':   { up: ['방산(ITA)', '유로화', '명품·소비주'], down: ['에너지주(XLE)'] },
+  '일본':   { up: ['자동차·수출주', '닛케이'], down: ['엔화 캐리청산 리스크'] },
+  '브라질': { up: ['철광석', '대두·농산물(DBA)', '원유'], down: [] },
+  // Asset inflows
+  '금':     { up: ['은(SLV)', '귀금속 채굴주', '인플레 헤지'], down: ['달러(UUP)', '단기채(SHY)'] },
+  '미 장기채': { up: ['부동산(VNQ)', '배당주', '유틸리티'], down: ['달러', '은행주(XLF)'] },
+  '비트코인': { up: ['암호화폐 관련주', '위험선호', '기술주'], down: ['금', '채권'] },
+  '원유':   { up: ['에너지주(XLE)', '산유국 통화', '인플레'], down: ['항공·해운주', '소비재'] },
+  '미국 테크': { up: ['AI 인프라', 'Mag7', '데이터센터REIT'], down: ['전통금융', '에너지'] },
+  '달러':   { up: ['단기채(SHY)', '미국채'], down: ['금', 'EM주식', '원자재'] },
+  '에너지': { up: ['원유', '가스', '배당주'], down: ['항공·물류', '소비재'] },
+};
+
+function FlowIntensityPanel({ data }: { data: FlowData }) {
+  const [activeView, setActiveView] = useState<'compare' | 'cascade'>('compare');
+
+  // Build comparison across all 3 timeframes
+  const allItems = [
+    ...data.assets.map(a => ({ id: a.id, label: a.label, flag: a.flag, type: 'asset' as const, ret1w: a.ret1w, ret4w: a.ret4w, ret13w: a.ret13w })),
+    ...data.countryFlow.countries.map(c => ({ id: c.id, label: c.label, flag: c.flag, type: 'country' as const, ret1w: c.ret1w, ret4w: c.ret4w, ret13w: c.ret13w })),
+  ];
+
+  // Top movers per timeframe
+  const top4 = (key: 'ret1w' | 'ret4w' | 'ret13w', dir: 'up' | 'down') =>
+    [...allItems].sort((a, b) => dir === 'up' ? b[key] - a[key] : a[key] - b[key]).slice(0, 4);
+
+  // Detect "timeframe divergence" — 1w vs 13w trend reversal
+  const divergent = allItems.filter(a => Math.sign(a.ret1w) !== Math.sign(a.ret13w) && Math.abs(a.ret1w) > 1.5 && Math.abs(a.ret13w) > 1.5);
+
+  // Build cascade from top inflows
+  const topInflowItems = [...allItems].sort((a, b) => b.ret4w - a.ret4w).slice(0, 5);
+  const cascadeChains = topInflowItems
+    .filter(item => CASCADE_RULES[item.label])
+    .map(item => {
+      const rule = CASCADE_RULES[item.label]!;
+      return { item, up: rule.up, down: rule.down };
+    });
+
+  const TF_COLS: Array<{ key: 'ret1w' | 'ret4w' | 'ret13w'; label: string; color: string }> = [
+    { key: 'ret1w',  label: '1주',  color: 'bg-blue-400' },
+    { key: 'ret4w',  label: '4주',  color: 'bg-cf-primary' },
+    { key: 'ret13w', label: '13주', color: 'bg-purple-500' },
+  ];
+
+  return (
+    <div className="cf-card overflow-hidden">
+      <div className="p-4 border-b border-cf-border">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-cf-primary" />
+            <span className="text-sm font-bold text-cf-text-primary">수급 강도 & Cascade 영향</span>
+          </div>
+          <div className="flex gap-1 p-0.5 bg-gray-100 rounded-lg">
+            <button onClick={() => setActiveView('compare')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeView === 'compare' ? 'bg-white text-cf-primary shadow-sm' : 'text-cf-text-secondary'}`}>
+              1w·4w·13w 비교
+            </button>
+            <button onClick={() => setActiveView('cascade')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeView === 'cascade' ? 'bg-white text-cf-primary shadow-sm' : 'text-cf-text-secondary'}`}>
+              Cascade 연쇄
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {activeView === 'compare' && (
+        <div className="p-4 space-y-4">
+          {/* Top inflow comparison */}
+          <div>
+            <p className="text-xs font-bold text-green-700 mb-2 flex items-center gap-1.5">
+              <ArrowUpRight className="w-3.5 h-3.5" /> 수급 유입 상위 (기간별)
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-cf-text-secondary">
+                    <th className="text-left pb-1.5 font-medium">자산/국가</th>
+                    {TF_COLS.map(c => <th key={c.key} className="text-right pb-1.5 font-medium w-14">{c.label}</th>)}
+                    <th className="text-right pb-1.5 font-medium w-16">방향성</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {top4('ret4w', 'up').map(item => {
+                    const trend = item.ret1w > item.ret4w ? '가속▲' : item.ret1w < 0 ? '반전⚡' : '유지→';
+                    const trendColor = item.ret1w > item.ret4w ? 'text-green-600' : item.ret1w < 0 ? 'text-amber-600' : 'text-gray-400';
+                    return (
+                      <tr key={item.id} className="border-t border-cf-border/40">
+                        <td className="py-1.5 flex items-center gap-1.5">
+                          <span>{item.flag}</span>
+                          <span className="font-medium text-cf-text-primary">{item.label}</span>
+                        </td>
+                        {TF_COLS.map(c => (
+                          <td key={c.key} className={`text-right py-1.5 font-bold tabular-nums ${item[c.key] >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            {item[c.key] > 0 ? '+' : ''}{item[c.key].toFixed(1)}%
+                          </td>
+                        ))}
+                        <td className={`text-right py-1.5 text-[10px] font-bold ${trendColor}`}>{trend}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Top outflow comparison */}
+          <div>
+            <p className="text-xs font-bold text-red-600 mb-2 flex items-center gap-1.5">
+              <ArrowDownRight className="w-3.5 h-3.5" /> 수급 유출 상위 (기간별)
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-cf-text-secondary">
+                    <th className="text-left pb-1.5 font-medium">자산/국가</th>
+                    {TF_COLS.map(c => <th key={c.key} className="text-right pb-1.5 font-medium w-14">{c.label}</th>)}
+                    <th className="text-right pb-1.5 font-medium w-16">방향성</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {top4('ret4w', 'down').map(item => {
+                    const trend = item.ret1w < item.ret4w ? '가속▼' : item.ret1w > 0 ? '반전⚡' : '유지→';
+                    const trendColor = item.ret1w < item.ret4w ? 'text-red-600' : item.ret1w > 0 ? 'text-amber-600' : 'text-gray-400';
+                    return (
+                      <tr key={item.id} className="border-t border-cf-border/40">
+                        <td className="py-1.5 flex items-center gap-1.5">
+                          <span>{item.flag}</span>
+                          <span className="font-medium text-cf-text-primary">{item.label}</span>
+                        </td>
+                        {TF_COLS.map(c => (
+                          <td key={c.key} className={`text-right py-1.5 font-bold tabular-nums ${item[c.key] >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            {item[c.key] > 0 ? '+' : ''}{item[c.key].toFixed(1)}%
+                          </td>
+                        ))}
+                        <td className={`text-right py-1.5 text-[10px] font-bold ${trendColor}`}>{trend}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Trend reversal alerts */}
+          {divergent.length > 0 && (
+            <div className="rounded-xl bg-amber-50 border border-amber-200 p-3">
+              <p className="text-[10px] font-bold text-amber-700 mb-2 flex items-center gap-1">
+                ⚡ 추세 전환 감지 — 1주 vs 13주 방향 불일치
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {divergent.slice(0, 6).map(item => (
+                  <div key={item.id} className="flex items-center gap-1.5 bg-white border border-amber-200 rounded-lg px-2 py-1">
+                    <span className="text-sm leading-none">{item.flag}</span>
+                    <span className="text-[10px] font-bold text-cf-text-primary">{item.label}</span>
+                    <span className={`text-[10px] font-bold ${item.ret1w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      1w {item.ret1w > 0 ? '+' : ''}{item.ret1w.toFixed(1)}%
+                    </span>
+                    <span className="text-gray-300">vs</span>
+                    <span className={`text-[10px] font-bold ${item.ret13w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      13w {item.ret13w > 0 ? '+' : ''}{item.ret13w.toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeView === 'cascade' && (
+        <div className="p-4 space-y-3">
+          <p className="text-[11px] text-cf-text-secondary">4주 기준 상위 유입 자산/국가의 연쇄 영향</p>
+          {cascadeChains.length > 0 ? cascadeChains.map(({ item, up, down }) => (
+            <div key={item.id} className="rounded-xl border border-cf-border overflow-hidden">
+              {/* Source */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border-b border-green-100">
+                <span className="text-base leading-none">{item.flag}</span>
+                <span className="text-xs font-bold text-green-700">{item.label}</span>
+                <span className="text-xs font-bold text-green-600 ml-auto tabular-nums">
+                  4w {item.ret4w > 0 ? '+' : ''}{item.ret4w.toFixed(1)}%
+                </span>
+                <span className={`text-[10px] tabular-nums ${item.ret1w >= 0 ? 'text-green-500' : 'text-orange-500'}`}>
+                  1w {item.ret1w > 0 ? '+' : ''}{item.ret1w.toFixed(1)}%
+                </span>
+              </div>
+              {/* Cascade */}
+              <div className="px-3 py-2 flex gap-4">
+                {up.length > 0 && (
+                  <div className="flex-1">
+                    <p className="text-[9px] font-bold text-green-600 uppercase tracking-wide mb-1">수혜 ↑</p>
+                    <div className="space-y-0.5">
+                      {up.map((u, i) => (
+                        <div key={i} className="flex items-center gap-1 text-[11px] text-green-700">
+                          <span className="text-green-400 font-bold">+</span>{u}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {down.length > 0 && (
+                  <div className="flex-1">
+                    <p className="text-[9px] font-bold text-red-500 uppercase tracking-wide mb-1">피해 ↓</p>
+                    <div className="space-y-0.5">
+                      {down.map((d, i) => (
+                        <div key={i} className="flex items-center gap-1 text-[11px] text-red-600">
+                          <span className="text-red-400 font-bold">−</span>{d}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )) : (
+            <p className="text-xs text-cf-text-secondary text-center py-4">Cascade 데이터를 구성 중입니다.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Capital Flows Component ──────────────────────────────────────────────────
 interface AssetReturn { id: string; label: string; flag: string; group: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
 interface CountryReturn { id: string; label: string; flag: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
@@ -979,6 +1210,9 @@ function CapitalFlowsTab() {
           </table>
         </div>
       </div>
+
+      {/* 수급 강도 & Cascade */}
+      <FlowIntensityPanel data={data} />
 
       {/* AI 자금흐름 원인 분석 */}
       <FlowAnalysisPanel tf={tf} />
