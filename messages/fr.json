@@ -15,7 +15,8 @@
     "menu": "Menu",
     "close": "Fermer",
     "feedback": "Commentaires",
-    "intelligence": "Intelligence"
+    "intelligence": "Intelligence",
+    "osint": "Pistage"
   },
   "hero": {
     "title": "Révélez les risques cachés de la chaîne d'approvisionnement",

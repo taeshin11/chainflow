@@ -15,7 +15,8 @@
     "menu": "メニュー",
     "close": "閉じる",
     "feedback": "フィードバック",
-    "intelligence": "インテリジェンス"
+    "intelligence": "インテリジェンス",
+    "osint": "資金追跡"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",

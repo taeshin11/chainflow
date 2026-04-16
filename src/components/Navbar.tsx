@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/signals', key: 'signals' },
   { href: '/news-gap', key: 'newsGap' },
   { href: '/intelligence', key: 'intelligence' },
+  { href: '/osint', key: 'osint' },
   { href: '/about', key: 'about' },
 ] as const;
 
