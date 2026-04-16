@@ -69,21 +69,20 @@ function categoryLabel(cat: MacroNarrative['category'], t: ReturnType<typeof use
 
 // ── Fear & Greed Gauge ────────────────────────────────────────────────────────
 function FearGreedGauge({ score }: { score: number }) {
-  const level = getLevel(score);
   const pct = score / 100;
-  // Arc: 0° = left (extreme fear) → 180° = right (extreme greed)
-  const angle = -180 + pct * 180; // degrees from 12-o-clock perspective
-  const rad = (angle * Math.PI) / 180;
+  // Standard math angle: 180° = left (fear=0), 0° = right (greed=100)
+  const angleDeg = 180 - pct * 180;
+  const rad = (angleDeg * Math.PI) / 180;
   const cx = 60, cy = 60, r = 44;
-  const needleX = cx + r * Math.sin(rad);
-  const needleY = cy - r * Math.cos(rad);
+  // cos for x (right is positive), sin for y (up is positive, so subtract in SVG)
+  const needleX = cx + r * Math.cos(rad);
+  const needleY = cy - r * Math.sin(rad);
 
   const gradColors = ['#dc2626', '#f97316', '#eab308', '#22c55e', '#059669'];
   const segCount = gradColors.length;
 
   return (
-    <svg viewBox="0 0 120 82" className="w-full max-w-[110px]">
-      {/* Arc segments */}
+    <svg viewBox="0 0 120 72" className="w-full max-w-[100px]">
       {gradColors.map((color, i) => {
         const startAngle = (i / segCount) * Math.PI;
         const endAngle = ((i + 1) / segCount) * Math.PI;
@@ -103,21 +102,9 @@ function FearGreedGauge({ score }: { score: number }) {
           />
         );
       })}
-      {/* Needle */}
-      <line
-        x1={cx}
-        y1={cy}
-        x2={needleX}
-        y2={needleY}
-        stroke="#1e293b"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <line x1={cx} y1={cy} x2={needleX} y2={needleY}
+        stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" />
       <circle cx={cx} cy={cy} r="3.5" fill="#1e293b" />
-      {/* Score */}
-      <text x={cx} y={cy + 16} textAnchor="middle" fontSize="13" fontWeight="bold" fill="#1e293b">
-        {score}
-      </text>
     </svg>
   );
 }
@@ -138,8 +125,15 @@ function FearGreedCard({ entry }: { entry: FearGreedEntry }) {
           {meta.ko}
         </span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {/* Gauge */}
         <FearGreedGauge score={entry.score} />
+        {/* Score — large, prominent */}
+        <div className="flex flex-col items-center justify-center w-12 flex-shrink-0">
+          <span className={`text-3xl font-extrabold leading-none ${meta.color}`}>{entry.score}</span>
+          <span className="text-[10px] text-cf-text-secondary mt-0.5">/100</span>
+        </div>
+        {/* Delta + driver */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 mb-1">
             {entry.trend === 'up' && <ArrowUpRight className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
