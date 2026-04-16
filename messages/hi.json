@@ -14,7 +14,8 @@
     "language": "भाषा",
     "menu": "मेन्यू",
     "close": "बंद करें",
-    "feedback": "फ़ीडबैक"
+    "feedback": "फ़ीडबैक",
+    "intelligence": "इंटेलिजेंस"
   },
   "hero": {
     "title": "छिपे हुए सप्लाई चेन जोखिम उजागर करें",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "व्यापक एवं बाजार संदर्भ",
     "macroTailwinds": "{company} के लिए अनुकूल कारक",
     "macroHeadwinds": "{company} के लिए जोखिम कारक",
-    "macroSummary": "व्यापक सारांश"
+    "macroSummary": "व्यापक सारांश",
+    "relatedMacroThemes": "संबंधित मैक्रो थीम",
+    "viewAllThemes": "सभी थीम देखें"
   },
   "cascade": {
     "title": "कैस्केड विज़ुअलाइज़र",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "शक्तिशाली उपकरण सभी के लिए उपलब्ध होने चाहिए, न कि केवल बड़े बजट वाले संस्थानों के लिए।",
     "contact": "संपर्क करें",
     "contactText": "कोई सवाल है या हमारे साथ साझेदारी करना चाहते हैं? हमें आपसे सुनकर खुशी होगी।"
+  },
+  "intelligence": {
+    "title": "मैक्रो इंटेलिजेंस",
+    "subtitle": "स्मार्ट मनी को चलाने वाली संरचनात्मक शक्तियां",
+    "description": "बाजारों को आकार देने वाली शक्ति, धन और सूचना के छिपे तंत्र को समझें।",
+    "askQuestion": "Flowvium AI से पूछें...",
+    "askPlaceholder": "उदा. वॉल स्ट्रीट इतना लाभदायक क्यों है?",
+    "analyzing": "विश्लेषण हो रहा है...",
+    "analyze": "पूछें",
+    "relatedThemes": "संबंधित मैक्रो थीम",
+    "readDeepDive": "गहन विश्लेषण पढ़ें",
+    "learnMore": "अधिक जानें",
+    "keyConceptsLabel": "मुख्य अवधारणाएं",
+    "categoryPower": "शक्ति संरचना",
+    "categoryMonetary": "मौद्रिक",
+    "categoryGeopolitical": "भू-राजनीतिक",
+    "categoryInformation": "सूचना असमानता",
+    "categoryRegulatory": "नियामक"
   }
 }

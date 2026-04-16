@@ -14,7 +14,8 @@
     "language": "ภาษา",
     "menu": "เมนู",
     "close": "ปิด",
-    "feedback": "ความคิดเห็น"
+    "feedback": "ความคิดเห็น",
+    "intelligence": "อัจฉริยะ"
   },
   "hero": {
     "title": "ค้นพบความเสี่ยงที่ซ่อนอยู่ในห่วงโซ่อุปทาน",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "บริบทมหภาคและตลาด",
     "macroTailwinds": "ปัจจัยบวกสำหรับ {company}",
     "macroHeadwinds": "ปัจจัยเสี่ยงสำหรับ {company}",
-    "macroSummary": "สรุปมหภาค"
+    "macroSummary": "สรุปมหภาค",
+    "relatedMacroThemes": "หัวข้อมหภาคที่เกี่ยวข้อง",
+    "viewAllThemes": "ดูหัวข้อทั้งหมด"
   },
   "cascade": {
     "title": "เครื่องมือแสดงผลลูกโซ่",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "เครื่องมือที่ทรงพลังควรเข้าถึงได้สำหรับทุกคน ไม่ใช่เฉพาะสถาบันที่มีงบประมาณมาก",
     "contact": "ติดต่อเรา",
     "contactText": "มีคำถามหรืออยากเป็นพันธมิตรกับเรา? เรายินดีรับฟัง"
+  },
+  "intelligence": {
+    "title": "ระบบข่าวกรองมหภาค",
+    "subtitle": "แรงผลักดันเชิงโครงสร้างที่ขับเคลื่อนเงินอัจฉริยะ",
+    "description": "ทำความเข้าใจกลไกที่ซ่อนอยู่ของอำนาจ เงิน และข้อมูลที่กำหนดตลาด",
+    "askQuestion": "ถาม Flowvium AI...",
+    "askPlaceholder": "เช่น ทำไม Wall Street ถึงทำกำไรได้เสมอ?",
+    "analyzing": "กำลังวิเคราะห์...",
+    "analyze": "ถาม",
+    "relatedThemes": "หัวข้อมหภาคที่เกี่ยวข้อง",
+    "readDeepDive": "อ่านการวิเคราะห์เชิงลึก",
+    "learnMore": "เรียนรู้เพิ่มเติม",
+    "keyConceptsLabel": "แนวคิดหลัก",
+    "categoryPower": "โครงสร้างอำนาจ",
+    "categoryMonetary": "การเงิน",
+    "categoryGeopolitical": "ภูมิรัฐศาสตร์",
+    "categoryInformation": "ความไม่สมดุลของข้อมูล",
+    "categoryRegulatory": "กฎระเบียบ"
   }
 }

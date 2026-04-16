@@ -14,7 +14,8 @@
     "language": "اللغة",
     "menu": "القائمة",
     "close": "إغلاق",
-    "feedback": "ملاحظات"
+    "feedback": "ملاحظات",
+    "intelligence": "الذكاء"
   },
   "hero": {
     "title": "اكتشف مخاطر سلسلة التوريد الخفية",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "السياق الكلي والسوقي",
     "macroTailwinds": "العوامل الإيجابية لـ{company}",
     "macroHeadwinds": "عوامل المخاطر لـ{company}",
-    "macroSummary": "الملخص الكلي"
+    "macroSummary": "الملخص الكلي",
+    "relatedMacroThemes": "المواضيع الكلية ذات الصلة",
+    "viewAllThemes": "عرض جميع المواضيع"
   },
   "cascade": {
     "title": "مصوّر التأثير المتسلسل",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "يجب أن تكون الأدوات القوية متاحة للجميع، وليس فقط للمؤسسات ذات الميزانيات الضخمة.",
     "contact": "تواصل معنا",
     "contactText": "لديك أسئلة أو تريد الشراكة معنا؟ يسعدنا سماع رأيك."
+  },
+  "intelligence": {
+    "title": "ذكاء الاقتصاد الكلي",
+    "subtitle": "القوى الهيكلية التي تحرك الأموال الذكية",
+    "description": "افهم الآليات الخفية للسلطة والمال والمعلومات التي تشكل الأسواق.",
+    "askQuestion": "اسأل Flowvium AI...",
+    "askPlaceholder": "مثال: لماذا وول ستريت مربح دائما؟",
+    "analyzing": "جارٍ التحليل...",
+    "analyze": "اسأل",
+    "relatedThemes": "المواضيع الكلية ذات الصلة",
+    "readDeepDive": "قراءة التحليل المعمق",
+    "learnMore": "اعرف أكثر",
+    "keyConceptsLabel": "المفاهيم الرئيسية",
+    "categoryPower": "هيكل السلطة",
+    "categoryMonetary": "النقدي",
+    "categoryGeopolitical": "الجيوسياسي",
+    "categoryInformation": "عدم تماثل المعلومات",
+    "categoryRegulatory": "التنظيمي"
   }
 }

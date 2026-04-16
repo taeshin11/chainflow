@@ -14,7 +14,8 @@
     "language": "Bahasa",
     "menu": "Menu",
     "close": "Tutup",
-    "feedback": "Masukan"
+    "feedback": "Masukan",
+    "intelligence": "Intelijen"
   },
   "hero": {
     "title": "Temukan Risiko Rantai Pasok Tersembunyi",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Konteks makro dan pasar",
     "macroTailwinds": "Angin segar untuk {company}",
     "macroHeadwinds": "Faktor risiko untuk {company}",
-    "macroSummary": "Ringkasan makro"
+    "macroSummary": "Ringkasan makro",
+    "relatedMacroThemes": "Tema Makro Terkait",
+    "viewAllThemes": "Lihat Semua Tema"
   },
   "cascade": {
     "title": "Visualisasi Kaskade",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Alat yang canggih harus tersedia untuk semua orang, bukan hanya institusi dengan anggaran besar.",
     "contact": "Hubungi Kami",
     "contactText": "Punya pertanyaan atau ingin bermitra dengan kami? Kami senang mendengar dari Anda."
+  },
+  "intelligence": {
+    "title": "Intelijen Makro",
+    "subtitle": "Kekuatan struktural yang menggerakkan uang cerdas",
+    "description": "Pahami mekanisme tersembunyi dari kekuatan, uang, dan informasi yang membentuk pasar.",
+    "askQuestion": "Tanya Flowvium AI...",
+    "askPlaceholder": "mis. Mengapa Wall Street begitu menguntungkan?",
+    "analyzing": "Menganalisis...",
+    "analyze": "Tanya",
+    "relatedThemes": "Tema Makro Terkait",
+    "readDeepDive": "Baca Analisis Mendalam",
+    "learnMore": "Pelajari lebih lanjut",
+    "keyConceptsLabel": "Konsep Kunci",
+    "categoryPower": "Struktur Kekuatan",
+    "categoryMonetary": "Moneter",
+    "categoryGeopolitical": "Geopolitik",
+    "categoryInformation": "Asimetri Informasi",
+    "categoryRegulatory": "Regulatori"
   }
 }

@@ -14,7 +14,8 @@
     "language": "Language",
     "menu": "Menu",
     "close": "Close",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "intelligence": "Intelligence"
   },
   "hero": {
     "title": "Uncover Hidden Supply Chain Risks",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Macro & Market Context",
     "macroTailwinds": "Tailwinds for {company}",
     "macroHeadwinds": "Headwinds for {company}",
-    "macroSummary": "Macro Summary"
+    "macroSummary": "Macro Summary",
+    "relatedMacroThemes": "Related Macro Themes",
+    "viewAllThemes": "View All Themes"
   },
   "cascade": {
     "title": "Cascade Visualizer",
@@ -413,10 +416,10 @@
   "footer": {
     "tagline": "Mapping the world's supply chains, one connection at a time.",
     "builtBy": "Built with care by THE ELIOT K FINANCIAL",
-    "copyright": "\u00a9 {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
+    "copyright": "© {year} Flowvium by THE ELIOT K FINANCIAL. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "contact": "Contact Us",
+    "contact": "Contact",
     "status": "System Status",
     "documentation": "Documentation",
     "api": "API Access",
@@ -434,8 +437,7 @@
     "faq": "FAQ",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "about": "About",
-    "contact": "Contact"
+    "about": "About"
   },
   "emailCta": {
     "title": "Get Weekly Supply Chain Insights",
@@ -447,17 +449,17 @@
     "invalidEmail": "Please enter a valid email address."
   },
   "seo": {
-    "homeTitle": "Flowvium \u2014 Supply Chain Intelligence Platform",
+    "homeTitle": "Flowvium — Supply Chain Intelligence Platform",
     "homeDescription": "Uncover hidden supply chain risks before they become headlines. Real-time monitoring, cascade analysis, and institutional signal detection.",
-    "exploreTitle": "Supply Chain Explorer \u2014 Flowvium",
+    "exploreTitle": "Supply Chain Explorer — Flowvium",
     "exploreDescription": "Search and map supplier relationships across global industries. Visualize supply chain networks and identify concentration risks.",
-    "cascadeTitle": "Cascade Visualizer \u2014 Flowvium",
+    "cascadeTitle": "Cascade Visualizer — Flowvium",
     "cascadeDescription": "Model how disruptions propagate through interconnected supply chains. Simulate scenarios and estimate recovery timelines.",
-    "signalsTitle": "Institutional Signals \u2014 Flowvium",
+    "signalsTitle": "Institutional Signals — Flowvium",
     "signalsDescription": "Track smart money movements and early warning indicators from SEC filings, insider trades, and earnings calls.",
-    "newsGapTitle": "News Gap Analyzer \u2014 Flowvium",
+    "newsGapTitle": "News Gap Analyzer — Flowvium",
     "newsGapDescription": "Discover material supply chain events that haven't received adequate media coverage. Find alpha in underreported stories.",
-    "aboutTitle": "About Flowvium \u2014 Supply Chain Intelligence by THE ELIOT K FINANCIAL",
+    "aboutTitle": "About Flowvium — Supply Chain Intelligence by THE ELIOT K FINANCIAL",
     "aboutDescription": "Learn about Flowvium's mission to democratize supply chain intelligence and make global trade networks transparent."
   },
   "pro": {
@@ -500,5 +502,23 @@
     "valuesAccessibilityText": "Powerful tools should be available to everyone, not just institutions with deep pockets.",
     "contact": "Get in Touch",
     "contactText": "Have questions or want to partner with us? We'd love to hear from you."
+  },
+  "intelligence": {
+    "title": "Macro Intelligence",
+    "subtitle": "The structural forces driving smart money",
+    "description": "Understand the hidden mechanisms of power, money, and information that shape markets before they become headlines.",
+    "askQuestion": "Ask Flowvium AI...",
+    "askPlaceholder": "e.g. Why is Wall Street so profitable? Who benefits from QE?",
+    "analyzing": "Analyzing...",
+    "analyze": "Ask",
+    "relatedThemes": "Related Macro Themes",
+    "readDeepDive": "Read Deep Dive",
+    "learnMore": "Learn More",
+    "keyConceptsLabel": "Key Concepts",
+    "categoryPower": "Power Structure",
+    "categoryMonetary": "Monetary",
+    "categoryGeopolitical": "Geopolitical",
+    "categoryInformation": "Information",
+    "categoryRegulatory": "Regulatory"
   }
 }

@@ -14,7 +14,8 @@
     "language": "Dil",
     "menu": "Menü",
     "close": "Kapat",
-    "feedback": "Geri Bildirim"
+    "feedback": "Geri Bildirim",
+    "intelligence": "İstihbarat"
   },
   "hero": {
     "title": "Gizli Tedarik Zinciri Risklerini Keşfedin",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Makro ve piyasa bağlamı",
     "macroTailwinds": "{company} için olumlu faktörler",
     "macroHeadwinds": "{company} için risk faktörleri",
-    "macroSummary": "Makro özet"
+    "macroSummary": "Makro özet",
+    "relatedMacroThemes": "İlgili Makro Temalar",
+    "viewAllThemes": "Tüm Temaları Gör"
   },
   "cascade": {
     "title": "Kaskad Görselleştirici",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Güçlü araçlar sadece büyük bütçeli kurumlar için değil, herkes için erişilebilir olmalıdır.",
     "contact": "İletişim",
     "contactText": "Sorularınız mı var veya bizimle ortaklık kurmak mı istiyorsunuz? Sizden haber almaktan mutluluk duyarız."
+  },
+  "intelligence": {
+    "title": "Makro İstihbarat",
+    "subtitle": "Akıllı parayı yönlendiren yapısal güçler",
+    "description": "Piyasaları şekillendiren güç, para ve bilginin gizli mekanizmalarını anlayın.",
+    "askQuestion": "Flowvium AI'ya sor...",
+    "askPlaceholder": "ör. Neden Wall Street bu kadar karlı?",
+    "analyzing": "Analiz ediliyor...",
+    "analyze": "Sor",
+    "relatedThemes": "İlgili Makro Temalar",
+    "readDeepDive": "Derin Analizi Oku",
+    "learnMore": "Daha fazla öğren",
+    "keyConceptsLabel": "Temel Kavramlar",
+    "categoryPower": "Güç Yapısı",
+    "categoryMonetary": "Parasal",
+    "categoryGeopolitical": "Jeopolitik",
+    "categoryInformation": "Bilgi Asimetrisi",
+    "categoryRegulatory": "Düzenleyici"
   }
 }

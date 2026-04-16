@@ -14,7 +14,8 @@
     "language": "Langue",
     "menu": "Menu",
     "close": "Fermer",
-    "feedback": "Commentaires"
+    "feedback": "Commentaires",
+    "intelligence": "Intelligence"
   },
   "hero": {
     "title": "Révélez les risques cachés de la chaîne d'approvisionnement",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Contexte macro et de marché",
     "macroTailwinds": "Vents favorables pour {company}",
     "macroHeadwinds": "Facteurs de risque pour {company}",
-    "macroSummary": "Résumé macro"
+    "macroSummary": "Résumé macro",
+    "relatedMacroThemes": "Thèmes Macro Connexes",
+    "viewAllThemes": "Voir Tous les Thèmes"
   },
   "cascade": {
     "title": "Visualiseur de cascades",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Les outils puissants doivent être accessibles à tous, pas seulement aux institutions aux moyens importants.",
     "contact": "Nous contacter",
     "contactText": "Des questions ou envie de collaborer avec nous ? Nous serions ravis d'échanger avec vous."
+  },
+  "intelligence": {
+    "title": "Intelligence Macro",
+    "subtitle": "Les forces structurelles qui animent l'argent intelligent",
+    "description": "Comprenez les mécanismes cachés du pouvoir, de l'argent et de l'information qui façonnent les marchés.",
+    "askQuestion": "Demandez à Flowvium AI...",
+    "askPlaceholder": "ex. Pourquoi Wall Street est-il si rentable ?",
+    "analyzing": "Analyse en cours...",
+    "analyze": "Demander",
+    "relatedThemes": "Thèmes Macro Connexes",
+    "readDeepDive": "Lire l'Analyse Approfondie",
+    "learnMore": "En savoir plus",
+    "keyConceptsLabel": "Concepts Clés",
+    "categoryPower": "Structure du Pouvoir",
+    "categoryMonetary": "Monétaire",
+    "categoryGeopolitical": "Géopolitique",
+    "categoryInformation": "Asymétrie d'Information",
+    "categoryRegulatory": "Réglementaire"
   }
 }

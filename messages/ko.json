@@ -14,7 +14,8 @@
     "language": "언어",
     "menu": "메뉴",
     "close": "닫기",
-    "feedback": "피드백"
+    "feedback": "피드백",
+    "intelligence": "인텔리전스"
   },
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "매크로 & 시장 현황",
     "macroTailwinds": "{company} 수혜 요인",
     "macroHeadwinds": "{company} 리스크 요인",
-    "macroSummary": "매크로 요약"
+    "macroSummary": "매크로 요약",
+    "relatedMacroThemes": "연관 매크로 테마",
+    "viewAllThemes": "모든 테마 보기"
   },
   "cascade": {
     "title": "연쇄 영향 시각화",
@@ -499,5 +502,23 @@
     "subscribed": "구독 완료!",
     "subscribedDesc": "주간 공급망 인사이트를 보내드리겠습니다.",
     "invalidEmail": "유효한 이메일 주소를 입력해 주세요."
+  },
+  "intelligence": {
+    "title": "매크로 인텔리전스",
+    "subtitle": "스마트 머니를 움직이는 구조적 힘",
+    "description": "시장을 형성하는 권력, 돈, 정보의 숨견a 메커니즘을 뉴스가 되기 전에 이해하세요.",
+    "askQuestion": "Flowvium AI에 질문하기...",
+    "askPlaceholder": "예: 왜 월가는 항상 돈을 버나? QE로 누가 이득을 보나?",
+    "analyzing": "분석 중...",
+    "analyze": "질문하기",
+    "relatedThemes": "관련 매크로 테마",
+    "readDeepDive": "심층 분석 읽기",
+    "learnMore": "더 알아보기",
+    "keyConceptsLabel": "핵심 개념",
+    "categoryPower": "권력 구조",
+    "categoryMonetary": "통화/금융",
+    "categoryGeopolitical": "지정학",
+    "categoryInformation": "정보 비대칙",
+    "categoryRegulatory": "규제"
   }
 }

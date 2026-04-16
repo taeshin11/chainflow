@@ -14,7 +14,8 @@
     "language": "Ngôn ngữ",
     "menu": "Menu",
     "close": "Đóng",
-    "feedback": "Góp ý"
+    "feedback": "Góp ý",
+    "intelligence": "Thông tin"
   },
   "hero": {
     "title": "Phát hiện rủi ro chuỗi cung ứng tiềm ẩn",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Bối cảnh vĩ mô và thị trường",
     "macroTailwinds": "Thuận lợi cho {company}",
     "macroHeadwinds": "Rủi ro cho {company}",
-    "macroSummary": "Tóm tắt vĩ mô"
+    "macroSummary": "Tóm tắt vĩ mô",
+    "relatedMacroThemes": "Chủ đề Vĩ mô Liên quan",
+    "viewAllThemes": "Xem Tất cả Chủ đề"
   },
   "cascade": {
     "title": "Trực quan hóa lan truyền",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Công cụ mạnh mẽ nên dành cho tất cả mọi người, không chỉ các tổ chức có ngân sách lớn.",
     "contact": "Liên hệ",
     "contactText": "Có câu hỏi hoặc muốn hợp tác? Chúng tôi rất mong được nghe từ bạn."
+  },
+  "intelligence": {
+    "title": "Thông tin Kinh tế Vĩ mô",
+    "subtitle": "Các lực lượng cấu trúc thúc đẩy dòng tiền thông minh",
+    "description": "Hiểu các cơ chế ẩn của quyền lực, tiền bạc và thông tin định hình thị trường.",
+    "askQuestion": "Hỏi Flowvium AI...",
+    "askPlaceholder": "vd. Tại sao Wall Street luôn có lãi?",
+    "analyzing": "Đang phân tích...",
+    "analyze": "Hỏi",
+    "relatedThemes": "Chủ đề Vĩ mô Liên quan",
+    "readDeepDive": "Đọc Phân tích Chuyên sâu",
+    "learnMore": "Tìm hiểu thêm",
+    "keyConceptsLabel": "Khái niệm Chính",
+    "categoryPower": "Cấu trúc Quyền lực",
+    "categoryMonetary": "Tiền tệ",
+    "categoryGeopolitical": "Địa chính trị",
+    "categoryInformation": "Bất cân xứng Thông tin",
+    "categoryRegulatory": "Quy định"
   }
 }

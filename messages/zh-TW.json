@@ -14,7 +14,8 @@
     "language": "語言",
     "menu": "選單",
     "close": "關閉",
-    "feedback": "意見回饋"
+    "feedback": "意見回饋",
+    "intelligence": "智能分析"
   },
   "hero": {
     "title": "發掘隱藏的供應鏈風險",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "宏觀與市場背景",
     "macroTailwinds": "{company}的利多因素",
     "macroHeadwinds": "{company}的風險因素",
-    "macroSummary": "宏觀摘要"
+    "macroSummary": "宏觀摘要",
+    "relatedMacroThemes": "相關宏觀主题",
+    "viewAllThemes": "查看所有主题"
   },
   "cascade": {
     "title": "連鎖影響視覺化",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "強大的工具應該讓每個人都能使用，而不僅僅服務於財力雄厚的機構。",
     "contact": "聯絡我們",
     "contactText": "有疑問或希望與我們合作？歡迎隨時聯繫。"
+  },
+  "intelligence": {
+    "title": "宏觀情報",
+    "subtitle": "驅動聪明資金的結構性力量",
+    "description": "在新聞出現之前，了解塑造市場的權力、資金和信息的隱藏機制。",
+    "askQuestion": "向Flowvium AI提問...",
+    "askPlaceholder": "例如：為什麼華爾街總是獲利？誰從量化寬鬆中獲益？",
+    "analyzing": "分析中...",
+    "analyze": "提問",
+    "relatedThemes": "相關宏觀主題",
+    "readDeepDive": "閱讀深度分析",
+    "learnMore": "了解更多",
+    "keyConceptsLabel": "核心概念",
+    "categoryPower": "權力結構",
+    "categoryMonetary": "貨幣政策",
+    "categoryGeopolitical": "地緣政治",
+    "categoryInformation": "信息不對稱",
+    "categoryRegulatory": "監管"
   }
 }

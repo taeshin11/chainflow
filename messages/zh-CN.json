@@ -14,7 +14,8 @@
     "language": "语言",
     "menu": "菜单",
     "close": "关闭",
-    "feedback": "反馈"
+    "feedback": "反馈",
+    "intelligence": "智能分析"
   },
   "hero": {
     "title": "发现隐藏的供应链风险",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "宏观与市场背景",
     "macroTailwinds": "{company}的利好因素",
     "macroHeadwinds": "{company}的风险因素",
-    "macroSummary": "宏观摘要"
+    "macroSummary": "宏观摘要",
+    "relatedMacroThemes": "相关宏观主题",
+    "viewAllThemes": "查看所有主题"
   },
   "cascade": {
     "title": "连锁影响可视化",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "强大的工具应该让每个人都能使用，而不仅仅服务于财力雄厚的机构。",
     "contact": "联系我们",
     "contactText": "有疑问或希望与我们合作？欢迎随时联系。"
+  },
+  "intelligence": {
+    "title": "宏观情报",
+    "subtitle": "驱动聪明资金的结构性力量",
+    "description": "在新闻出现之前，了解塑造市场的权力、资金和信息的隐藏机制。",
+    "askQuestion": "向Flowvium AI提问...",
+    "askPlaceholder": "例如：为什么华尔街总是盈利？谁从量化宽松中获益？",
+    "analyzing": "分析中...",
+    "analyze": "提问",
+    "relatedThemes": "相关宏观主题",
+    "readDeepDive": "阅读深度分析",
+    "learnMore": "了解更多",
+    "keyConceptsLabel": "核心概念",
+    "categoryPower": "权力结构",
+    "categoryMonetary": "货币政策",
+    "categoryGeopolitical": "地缘政治",
+    "categoryInformation": "信息不对称",
+    "categoryRegulatory": "监管"
   }
 }

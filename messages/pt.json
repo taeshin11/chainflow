@@ -14,7 +14,8 @@
     "language": "Idioma",
     "menu": "Menu",
     "close": "Fechar",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "intelligence": "Inteligência"
   },
   "hero": {
     "title": "Descubra Riscos Ocultos na Cadeia de Suprimentos",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Contexto macro e de mercado",
     "macroTailwinds": "Ventos favoráveis para {company}",
     "macroHeadwinds": "Fatores de risco para {company}",
-    "macroSummary": "Resumo macro"
+    "macroSummary": "Resumo macro",
+    "relatedMacroThemes": "Temas Macro Relacionados",
+    "viewAllThemes": "Ver Todos os Temas"
   },
   "cascade": {
     "title": "Visualizador de Cascata",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Ferramentas poderosas devem estar disponíveis para todos, não apenas para instituições com grandes orçamentos.",
     "contact": "Entre em Contato",
     "contactText": "Tem perguntas ou quer ser nosso parceiro? Adoraríamos ouvir de você."
+  },
+  "intelligence": {
+    "title": "Inteligência Macro",
+    "subtitle": "As forças estruturais que movem o dinheiro inteligente",
+    "description": "Entenda os mecanismos ocultos de poder, dinheiro e informação que moldam os mercados.",
+    "askQuestion": "Pergunte ao Flowvium AI...",
+    "askPlaceholder": "ex. Por que Wall Street é tão lucrativa?",
+    "analyzing": "Analisando...",
+    "analyze": "Perguntar",
+    "relatedThemes": "Temas Macro Relacionados",
+    "readDeepDive": "Ler Análise Profunda",
+    "learnMore": "Saber mais",
+    "keyConceptsLabel": "Conceitos-chave",
+    "categoryPower": "Estrutura de Poder",
+    "categoryMonetary": "Monetário",
+    "categoryGeopolitical": "Geopolítico",
+    "categoryInformation": "Assimetria de Informação",
+    "categoryRegulatory": "Regulatório"
   }
 }

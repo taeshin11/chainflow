@@ -14,7 +14,8 @@
     "language": "Язык",
     "menu": "Меню",
     "close": "Закрыть",
-    "feedback": "Отзыв"
+    "feedback": "Отзыв",
+    "intelligence": "Аналитика"
   },
   "hero": {
     "title": "Обнаружьте скрытые риски цепочки поставок",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Макро- и рыночный контекст",
     "macroTailwinds": "Попутный ветер для {company}",
     "macroHeadwinds": "Факторы риска для {company}",
-    "macroSummary": "Макросводка"
+    "macroSummary": "Макросводка",
+    "relatedMacroThemes": "Связанные макро-темы",
+    "viewAllThemes": "Все темы"
   },
   "cascade": {
     "title": "Визуализатор каскада",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Мощные инструменты должны быть доступны каждому, а не только институтам с большими бюджетами.",
     "contact": "Связаться с нами",
     "contactText": "Есть вопросы или хотите стать партнёром? Мы будем рады услышать вас."
+  },
+  "intelligence": {
+    "title": "Макро-аналитика",
+    "subtitle": "Структурные силы, движущие умными деньгами",
+    "description": "Поймите скрытые механизмы власти, денег и информации, которые формируют рынки.",
+    "askQuestion": "Спросите Flowvium AI...",
+    "askPlaceholder": "напр. Почему Уолл-стрит так прибыльна?",
+    "analyzing": "Анализирую...",
+    "analyze": "Спросить",
+    "relatedThemes": "Связанные макро-темы",
+    "readDeepDive": "Читать глубокий анализ",
+    "learnMore": "Узнать больше",
+    "keyConceptsLabel": "Ключевые понятия",
+    "categoryPower": "Структура власти",
+    "categoryMonetary": "Монетарная",
+    "categoryGeopolitical": "Геополитика",
+    "categoryInformation": "Информационная асимметрия",
+    "categoryRegulatory": "Регуляторная"
   }
 }

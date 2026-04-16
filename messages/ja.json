@@ -14,7 +14,8 @@
     "language": "言語",
     "menu": "メニュー",
     "close": "閉じる",
-    "feedback": "フィードバック"
+    "feedback": "フィードバック",
+    "intelligence": "インテリジェンス"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "マクロ・市場概況",
     "macroTailwinds": "{company}の追い風",
     "macroHeadwinds": "{company}のリスク要因",
-    "macroSummary": "マクロサマリー"
+    "macroSummary": "マクロサマリー",
+    "relatedMacroThemes": "関連マクロテーマ",
+    "viewAllThemes": "全テーマを見る"
   },
   "cascade": {
     "title": "カスケード・ビジュアライザー",
@@ -499,5 +502,23 @@
     "subscribed": "購読完了！",
     "subscribedDesc": "週間サプライチェーンインサイトをお送りします。",
     "invalidEmail": "有効なメールアドレスを入力してください。"
+  },
+  "intelligence": {
+    "title": "マクロインテリジェンス",
+    "subtitle": "スマートマネーを動かす構造的な力",
+    "description": "市場を形成する権力・資金・情報の隐れたメカニズムをニュースになる前に理解する。",
+    "askQuestion": "Flowvium AIに質問...",
+    "askPlaceholder": "例：なぜウォール街は常に利益を上げるのか？",
+    "analyzing": "分析中...",
+    "analyze": "質問する",
+    "relatedThemes": "関連マクロテーマ",
+    "readDeepDive": "詳細分析を読む",
+    "learnMore": "詳細",
+    "keyConceptsLabel": "重要概念",
+    "categoryPower": "権力構造",
+    "categoryMonetary": "金融政策",
+    "categoryGeopolitical": "地政学",
+    "categoryInformation": "情報の非対称性",
+    "categoryRegulatory": "規制"
   }
 }

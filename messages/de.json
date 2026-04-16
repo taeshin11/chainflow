@@ -14,7 +14,8 @@
     "language": "Sprache",
     "menu": "Menü",
     "close": "Schließen",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "intelligence": "Intelligenz"
   },
   "hero": {
     "title": "Verborgene Lieferkettenrisiken aufdecken",
@@ -160,7 +161,9 @@
     "macroAndMarketContext": "Makro- und Marktkontext",
     "macroTailwinds": "Rückenwind für {company}",
     "macroHeadwinds": "Risikofaktoren für {company}",
-    "macroSummary": "Makrozusammenfassung"
+    "macroSummary": "Makrozusammenfassung",
+    "relatedMacroThemes": "Verwandte Makro-Themen",
+    "viewAllThemes": "Alle Themen"
   },
   "cascade": {
     "title": "Kaskaden-Visualisierung",
@@ -499,5 +502,23 @@
     "valuesAccessibilityText": "Leistungsstarke Tools sollten für alle verfügbar sein — nicht nur für Institutionen mit tiefen Taschen.",
     "contact": "Kontakt aufnehmen",
     "contactText": "Haben Sie Fragen oder möchten Sie mit uns zusammenarbeiten? Wir freuen uns, von Ihnen zu hören."
+  },
+  "intelligence": {
+    "title": "Makro-Intelligenz",
+    "subtitle": "Die strukturellen Kräfte, die Smart Money antreiben",
+    "description": "Verstehen Sie die verborgenen Mechanismen von Macht, Geld und Information, die Märkte prägen.",
+    "askQuestion": "Flowvium AI fragen...",
+    "askPlaceholder": "z.B. Warum ist die Wall Street so profitabel?",
+    "analyzing": "Analysiere...",
+    "analyze": "Fragen",
+    "relatedThemes": "Verwandte Makro-Themen",
+    "readDeepDive": "Tiefenanalyse lesen",
+    "learnMore": "Mehr erfahren",
+    "keyConceptsLabel": "Schlüsselkonzepte",
+    "categoryPower": "Machtstruktur",
+    "categoryMonetary": "Geldpolitik",
+    "categoryGeopolitical": "Geopolitik",
+    "categoryInformation": "Informationsasymmetrie",
+    "categoryRegulatory": "Regulierung"
   }
 }

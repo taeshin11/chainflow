@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/cascade', key: 'cascade' },
   { href: '/signals', key: 'signals' },
   { href: '/news-gap', key: 'newsGap' },
+  { href: '/intelligence', key: 'intelligence' },
   { href: '/about', key: 'about' },
 ] as const;
 

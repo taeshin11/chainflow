@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { allCompanies, type Company, type RevenueSegment } from '@/data/companies';
 import { getGeneratedMacroImpact, getGeneratedRdPipeline } from '@/data/company-contexts';
+import { getNarrativesByTicker } from '@/data/macro-narratives';
 import { institutionalSignals } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { cascadePatterns } from '@/data/cascades';
@@ -46,6 +47,7 @@ import {
   ChevronDown,
   ChevronUp,
   Users2,
+  Brain,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -737,6 +739,50 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </p>
             )}
           </div>
+
+          {/* Related Macro Themes */}
+          {(() => {
+            const narratives = getNarrativesByTicker(company.ticker);
+            if (narratives.length === 0) return null;
+            return (
+              <div className="cf-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-heading font-bold text-cf-text-primary flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-cf-primary" />
+                    {t('relatedMacroThemes')}
+                  </h2>
+                  <Link href="/intelligence" className="text-xs text-cf-primary hover:underline flex items-center gap-1">
+                    {t('viewAllThemes')} <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {narratives.map((n) => (
+                    <div key={n.id} className={`rounded-lg border p-4 ${n.color.split(' ').filter(c => c.startsWith('bg') || c.startsWith('border')).join(' ')}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-bold text-cf-text-primary">{n.title}</p>
+                          <p className="text-xs text-cf-text-secondary mt-0.5 leading-relaxed">{n.summary}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {n.keyConceptsEn.slice(0, 3).map((kc) => (
+                              <span key={kc} className="text-[10px] bg-white/80 border border-current/20 text-cf-text-secondary px-1.5 py-0.5 rounded">{kc}</span>
+                            ))}
+                          </div>
+                        </div>
+                        {n.blogSlug && (
+                          <Link
+                            href={`/blog/${n.blogSlug}`}
+                            className="flex-shrink-0 text-xs font-medium text-cf-primary hover:underline whitespace-nowrap flex items-center gap-1 mt-0.5"
+                          >
+                            <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}
