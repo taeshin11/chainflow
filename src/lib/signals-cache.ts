@@ -14,13 +14,12 @@ const KEY = 'flowvium:news-gap:v2';
 const TTL = 26 * 60 * 60;
 
 function createRedis(): Redis | null {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) {
     return null;
   }
-  return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  return new Redis({ url, token });
 }
 
 export async function getNewsGapCache(): Promise<Record<string, TickerNewsCache> | null> {
