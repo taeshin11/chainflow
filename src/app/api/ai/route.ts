@@ -43,23 +43,54 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Gemini API
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({
-        analysis: 'AI analysis is currently unavailable. The Gemini API key has not been configured.',
-      });
+    // 2. Try vLLM (local EXAONE) first, fallback to Gemini
+    const vllmUrl = process.env.VLLM_URL?.trim(); // e.g. http://localhost:8000/v1
+    let analysis = '';
+
+    if (vllmUrl) {
+      try {
+        const systemPrompt = `You are Flowvium AI, an expert macro and supply chain investment analyst.
+You understand hidden structural forces: regulatory capture, Cantillon effect, dark pools, revolving door,
+military-industrial complex, sovereign wealth, crisis-as-wealth-transfer.
+Analysis type: ${type || 'general'}`;
+        const vllmRes = await fetch(`${vllmUrl}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'LGAI-EXAONE/EXAONE-3.5-2.4B-Instruct',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt },
+            ],
+            max_tokens: 1024,
+            temperature: 0.7,
+          }),
+          signal: AbortSignal.timeout(30000),
+        });
+        if (vllmRes.ok) {
+          const vllmData = await vllmRes.json();
+          analysis = vllmData.choices?.[0]?.message?.content ?? '';
+        }
+      } catch { /* fallback to Gemini */ }
     }
 
-    const systemPrompt = `You are Flowvium AI, an expert supply chain investment analyst.
+    if (!analysis) {
+      // Fallback: Gemini API
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({
+          analysis: 'AI analysis is currently unavailable.',
+        });
+      }
+      const systemPrompt = `You are Flowvium AI, an expert supply chain investment analyst.
 Provide concise, actionable analysis about supply chain relationships, institutional flows,
 and investment implications. Be specific with data and patterns.
 Analysis type: ${type || 'general'}`;
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    const result = await model.generateContent(systemPrompt + '\n\n' + prompt);
-    const analysis = result.response.text();
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const result = await model.generateContent(systemPrompt + '\n\n' + prompt);
+      analysis = result.response.text();
+    }
 
     // 3. Store result in Redis (non-fatal if fails)
     if (redis && ticker && type) {

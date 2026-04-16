@@ -714,8 +714,149 @@ function CapitalFlowsTab() {
   );
 }
 
+// ── Macro Indicators Tab ──────────────────────────────────────────────────────
+interface CascadeStep { asset: string; direction: 'up' | 'down' | 'mixed'; reason: string; magnitude: 'strong' | 'moderate' | 'weak'; }
+interface MacroIndicator {
+  id: string; name: string; nameKo: string; category: string;
+  actual: number | null; forecast: number | null; previous: number | null; unit: string;
+  releaseDate: string; nextRelease?: string;
+  surprise: 'beat' | 'miss' | 'inline' | 'pending';
+  rateImpact: 'hawkish' | 'dovish' | 'neutral';
+  rateImpactKo: string; cascade: CascadeStep[]; summary: string;
+}
+
+const SURPRISE_BADGE: Record<string, { label: string; cls: string }> = {
+  beat:    { label: '예상 상회 ▲', cls: 'bg-red-50 text-red-700 border border-red-200' },
+  miss:    { label: '예상 하회 ▼', cls: 'bg-blue-50 text-blue-700 border border-blue-200' },
+  inline:  { label: '예상 부합 →', cls: 'bg-gray-50 text-gray-600 border border-gray-200' },
+  pending: { label: '발표 대기', cls: 'bg-amber-50 text-amber-600 border border-amber-200' },
+};
+const RATE_BADGE: Record<string, { label: string; cls: string }> = {
+  hawkish: { label: '🦅 매파 (긴축)', cls: 'bg-red-100 text-red-700' },
+  dovish:  { label: '🕊️ 비둘기파 (완화)', cls: 'bg-blue-100 text-blue-700' },
+  neutral: { label: '⚖️ 중립', cls: 'bg-gray-100 text-gray-600' },
+};
+const CASCADE_COLORS: Record<string, string> = {
+  up: 'text-green-600', down: 'text-red-500', mixed: 'text-amber-600',
+};
+const CASCADE_ICONS: Record<string, string> = { up: '▲', down: '▼', mixed: '↕' };
+const MAG_OPACITY: Record<string, string> = { strong: 'opacity-100', moderate: 'opacity-70', weak: 'opacity-40' };
+const CAT_LABELS: Record<string, string> = { inflation: '물가', employment: '고용', growth: '경기', monetary: '통화정책', trade: '무역' };
+const CAT_COLORS: Record<string, string> = { inflation: 'bg-orange-50 text-orange-700', employment: 'bg-green-50 text-green-700', growth: 'bg-blue-50 text-blue-700', monetary: 'bg-purple-50 text-purple-700', trade: 'bg-teal-50 text-teal-700' };
+
+function MacroIndicatorsTab() {
+  const [indicators, setIndicators] = useState<MacroIndicator[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/macro-indicators')
+      .then(r => r.json())
+      .then(d => setIndicators(d.indicators ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="flex items-center justify-center gap-2 py-16 text-cf-text-secondary">
+      <Loader2 className="w-5 h-5 animate-spin" />
+      <span className="text-sm">경제지표 로딩중...</span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="cf-card p-4">
+        <h3 className="text-sm font-bold text-cf-text-primary mb-1 flex items-center gap-2">
+          <Activity className="w-4 h-4 text-cf-primary" />
+          금리 결정 주요 지표 — Cascade 영향 분석
+        </h3>
+        <p className="text-xs text-cf-text-secondary">각 지표 발표 결과가 자산 시장에 미치는 연쇄 영향 · 카드 클릭시 cascade 상세보기</p>
+      </div>
+
+      <div className="space-y-3">
+        {indicators.map((ind) => {
+          const sb = SURPRISE_BADGE[ind.surprise];
+          const rb = RATE_BADGE[ind.rateImpact];
+          const isOpen = expanded === ind.id;
+          return (
+            <div key={ind.id} className="cf-card overflow-hidden">
+              <button
+                className="w-full text-left p-4 hover:bg-gray-50/50 transition-colors"
+                onClick={() => setExpanded(isOpen ? null : ind.id)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${CAT_COLORS[ind.category] ?? 'bg-gray-50 text-gray-600'}`}>
+                        {CAT_LABELS[ind.category] ?? ind.category}
+                      </span>
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${sb.cls}`}>{sb.label}</span>
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${rb.cls}`}>{rb.label}</span>
+                    </div>
+                    <div className="font-bold text-cf-text-primary text-sm">{ind.nameKo}</div>
+                    <div className="text-xs text-cf-text-secondary">{ind.name}</div>
+                  </div>
+                  {/* Numbers */}
+                  <div className="flex gap-3 flex-shrink-0 text-right">
+                    {ind.actual !== null && (
+                      <div>
+                        <div className={`text-lg font-extrabold ${ind.surprise === 'beat' ? 'text-red-600' : ind.surprise === 'miss' ? 'text-blue-600' : 'text-cf-text-primary'}`}>
+                          {ind.actual.toLocaleString()}
+                        </div>
+                        <div className="text-[10px] text-gray-400">{ind.unit}</div>
+                      </div>
+                    )}
+                    {ind.forecast !== null && (
+                      <div>
+                        <div className="text-sm font-bold text-gray-400">{ind.forecast.toLocaleString()}</div>
+                        <div className="text-[10px] text-gray-400">예상</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-cf-text-secondary mt-2 leading-relaxed">{ind.summary}</p>
+                {ind.nextRelease && (
+                  <div className="text-[11px] text-gray-400 mt-1">다음 발표: {ind.nextRelease}</div>
+                )}
+              </button>
+
+              {/* Cascade detail */}
+              {isOpen && ind.cascade.length > 0 && (
+                <div className="border-t border-cf-border bg-gray-50/50 px-4 py-3">
+                  <div className="text-xs font-bold text-cf-text-secondary mb-2 flex items-center gap-1.5">
+                    <GitMerge className="w-3 h-3" /> Cascade 영향
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    {ind.cascade.map((step, i) => (
+                      <div key={i} className={`flex items-center gap-2 text-xs p-2 rounded-lg bg-white border border-cf-border ${MAG_OPACITY[step.magnitude]}`}>
+                        <span className={`font-extrabold text-base leading-none flex-shrink-0 ${CASCADE_COLORS[step.direction]}`}>
+                          {CASCADE_ICONS[step.direction]}
+                        </span>
+                        <div>
+                          <div className="font-bold text-cf-text-primary">{step.asset}</div>
+                          <div className="text-cf-text-secondary leading-tight">{step.reason}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {isOpen && ind.cascade.length === 0 && (
+                <div className="border-t border-cf-border bg-gray-50/50 px-4 py-3 text-xs text-cf-text-secondary">
+                  예상 부합 — 유의미한 cascade 없음
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const TABS = ['capital', 'flows', 'fear-greed', 'narratives'] as const;
+const TABS = ['capital', 'macro', 'flows', 'fear-greed', 'narratives'] as const;
 type Tab = typeof TABS[number];
 
 interface LiveFGData {
@@ -748,7 +889,8 @@ export default function IntelligencePage() {
 
   const tabConfig: Record<Tab, { label: string; icon: React.ReactNode }> = {
     'capital':     { label: '자금 흐름 지도',  icon: <GitMerge className="w-4 h-4" /> },
-    'flows':       { label: '비밀 머니 흐름', icon: <Activity className="w-4 h-4" /> },
+    'macro':       { label: '매크로 지표',     icon: <TrendingUp className="w-4 h-4" /> },
+    'flows':       { label: '머니 흐름',       icon: <Activity className="w-4 h-4" /> },
     'fear-greed':  { label: 'Fear & Greed',   icon: <BarChart3 className="w-4 h-4" /> },
     'narratives':  { label: '매크로 테마',     icon: <Brain className="w-4 h-4" /> },
   };
@@ -796,6 +938,9 @@ export default function IntelligencePage() {
 
         {/* Tab: 자금 흐름 지도 */}
         {activeTab === 'capital' && <CapitalFlowsTab />}
+
+        {/* Tab: 매크로 지표 */}
+        {activeTab === 'macro' && <MacroIndicatorsTab />}
 
         {/* Tab: 비밀 머니 흐름 */}
         {activeTab === 'flows' && (
