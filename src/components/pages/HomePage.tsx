@@ -395,13 +395,26 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-cf-text-secondary mb-8 max-w-lg">
                 {t('description')}
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 <Link href="/explore" className="cf-btn-primary text-base px-8 py-3.5 gap-2 shadow-lg shadow-cf-primary/25 hover:shadow-xl hover:shadow-cf-primary/30 transition-all">
                   {tHome('exploreSupplyChains')}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/signals" className="cf-btn-secondary text-base px-8 py-3.5">
                   {tHome('viewSignals')}
+                </Link>
+                <Link
+                  href="/intelligence"
+                  className="inline-flex items-center gap-2 text-base px-6 py-3.5 rounded-xl font-semibold
+                             bg-slate-900 text-amber-400 border border-slate-700
+                             hover:bg-slate-800 hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/10
+                             transition-all duration-200"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+                  </span>
+                  비밀 머니 추적
                 </Link>
               </div>
               <HeroSearch />
