@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen": "tsx scripts/generate-contexts.ts",
+    "gen:single": "tsx scripts/generate-contexts.ts",
+    "gen:skip": "SKIP_EXISTING=1 tsx scripts/generate-contexts.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -30,6 +33,7 @@
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { allCompanies, type Company, type RevenueSegment } from '@/data/companies';
+import { getGeneratedMacroImpact, getGeneratedRdPipeline } from '@/data/company-contexts';
 import { institutionalSignals } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { cascadePatterns } from '@/data/cascades';
@@ -175,6 +176,16 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
     [ticker]
   );
 
+  // Use hardcoded data if available, otherwise fall back to generated context
+  const effectiveMacroImpact = useMemo(
+    () => company?.macroImpact ?? getGeneratedMacroImpact(ticker),
+    [company, ticker]
+  );
+  const effectiveRdPipeline = useMemo(
+    () => (company?.rdPipeline?.length ? company.rdPipeline : getGeneratedRdPipeline(ticker)),
+    [company, ticker]
+  );
+
   const signals = useMemo(
     () => institutionalSignals.filter((s) => s.ticker.toUpperCase() === ticker.toUpperCase()),
     [ticker]
@@ -240,6 +251,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
         body: JSON.stringify({
           prompt: `Analyze ${company.name} (${company.ticker}) in the context of its supply chain position. Company sector: ${company.sector}. Key products: ${company.products.map((p) => p.name).join(', ')}. Key relationships: ${company.relationships.slice(0, 5).map((r) => `${r.type}: ${r.targetId}`).join(', ')}. Provide a concise investment-relevant analysis.`,
           type: 'company_analysis',
+          ticker: company.ticker,
         }),
       });
       const data = await res.json();
@@ -403,14 +415,14 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           </div>
 
           {/* R&D Pipeline */}
-          {company.rdPipeline && company.rdPipeline.length > 0 && (
+          {effectiveRdPipeline && effectiveRdPipeline.length > 0 && (
             <div className="cf-card p-6">
               <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6 flex items-center gap-2">
                 <FlaskConical className="w-5 h-5 text-purple-500" />
                 {t('rdPipeline')}
               </h2>
               <div className="space-y-3">
-                {company.rdPipeline.map((item, i) => {
+                {effectiveRdPipeline!.map((item, i) => {
                   const stageColors: Record<string, string> = {
                     research: 'bg-purple-50 border-purple-200 text-purple-700',
                     development: 'bg-blue-50 border-blue-200 text-blue-700',
@@ -502,7 +514,7 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           {/* Macro & Market Context */}
           {(() => {
             const sc = sectorContextMap[company.sector];
-            const mi = company.macroImpact;
+            const mi = effectiveMacroImpact;
             if (!sc && !mi) return null;
             return (
               <div className="cf-card p-6">
