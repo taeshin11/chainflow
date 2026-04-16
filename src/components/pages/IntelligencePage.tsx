@@ -389,9 +389,33 @@ Answer concisely (3–5 paragraphs). Be specific — name tickers, mechanisms, a
 const TABS = ['flows', 'fear-greed', 'narratives'] as const;
 type Tab = typeof TABS[number];
 
+interface LiveFGData {
+  byCountry: FearGreedEntry[];
+  byAsset: FearGreedEntry[];
+  updatedAt: string;
+}
+
 export default function IntelligencePage() {
   const t = useTranslations('intelligence');
   const [activeTab, setActiveTab] = useState<Tab>('flows');
+  const [chatOpen, setChatOpen] = useState(false);
+
+  // Live Fear & Greed data from API
+  const [fgData, setFgData] = useState<LiveFGData | null>(null);
+  const [fgLoading, setFgLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== 'fear-greed' || fgData) return;
+    setFgLoading(true);
+    fetch('/api/fear-greed')
+      .then((r) => r.json())
+      .then((d) => setFgData(d))
+      .catch(() => {/* fallback to static */})
+      .finally(() => setFgLoading(false));
+  }, [activeTab, fgData]);
+
+  const liveCountry = fgData?.byCountry ?? fearGreedByCountry;
+  const liveAsset = fgData?.byAsset ?? fearGreedByAsset;
 
   const tabConfig: Record<Tab, { label: string; icon: React.ReactNode }> = {
     'flows':       { label: '비밀 머니 흐름', icon: <Activity className="w-4 h-4" /> },
@@ -444,7 +468,6 @@ export default function IntelligencePage() {
         {activeTab === 'flows' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Inflows */}
               <div>
                 <h2 className="text-base font-heading font-bold text-green-700 mb-3 flex items-center gap-2">
                   <ArrowUpRight className="w-4 h-4" />
@@ -454,7 +477,6 @@ export default function IntelligencePage() {
                   {inflows.map((f) => <MoneyFlowRow key={f.sector} flow={f} />)}
                 </div>
               </div>
-              {/* Outflows */}
               <div>
                 <h2 className="text-base font-heading font-bold text-red-700 mb-3 flex items-center gap-2">
                   <ArrowDownRight className="w-4 h-4" />
@@ -474,32 +496,47 @@ export default function IntelligencePage() {
         {/* Tab: Fear & Greed */}
         {activeTab === 'fear-greed' && (
           <div className="space-y-8">
-            {/* By Country */}
-            <div>
-              <h2 className="text-lg font-heading font-bold text-cf-text-primary mb-1 flex items-center gap-2">
-                <Globe className="w-5 h-5 text-cf-primary" />
-                국가별 Fear & Greed
-              </h2>
-              <p className="text-xs text-cf-text-secondary mb-4">각 국가 주식시장의 현재 심리 지수 (0 = 극단적 공포, 100 = 극단적 탐욕)</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {fearGreedByCountry.map((e) => <FearGreedCard key={e.id} entry={e} />)}
+            {fgLoading && (
+              <div className="flex items-center justify-center gap-2 py-8 text-cf-text-secondary">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-sm">실시간 시장 데이터 로딩중...</span>
               </div>
-            </div>
+            )}
+            {!fgLoading && (
+              <>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-lg font-heading font-bold text-cf-text-primary flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-cf-primary" />
+                      국가별 Fear & Greed
+                    </h2>
+                    {fgData?.updatedAt && (
+                      <span className="text-[11px] text-cf-text-secondary">
+                        {new Date(fgData.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-cf-text-secondary mb-4">
+                    {fgData ? 'CNN F&G 원리 (RSI · 125일 모멘텀 · 변동성) · Yahoo Finance 실시간' : '정적 데이터'}
+                    {' '}· 0 = 극단적 공포, 100 = 극단적 탐욕
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {liveCountry.map((e) => <FearGreedCard key={e.id} entry={e} />)}
+                  </div>
+                </div>
 
-            {/* By Asset */}
-            <div>
-              <h2 className="text-lg font-heading font-bold text-cf-text-primary mb-1 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-cf-primary" />
-                자산별 Fear & Greed
-              </h2>
-              <p className="text-xs text-cf-text-secondary mb-4">섹터 및 자산 클래스별 시장 심리 지수</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {fearGreedByAsset.map((e) => <FearGreedCard key={e.id} entry={e} />)}
-              </div>
-            </div>
-            <p className="text-xs text-cf-text-secondary text-center">
-              자체 산출 지수 (모멘텀 · 변동성 · 기관 포지셔닝 기반) · 매일 새벽 3시 업데이트
-            </p>
+                <div>
+                  <h2 className="text-lg font-heading font-bold text-cf-text-primary mb-1 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-cf-primary" />
+                    자산별 Fear & Greed
+                  </h2>
+                  <p className="text-xs text-cf-text-secondary mb-4">섹터 및 자산 클래스별 시장 심리 지수</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {liveAsset.map((e) => <FearGreedCard key={e.id} entry={e} />)}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -516,9 +553,28 @@ export default function IntelligencePage() {
             </div>
           </div>
         )}
+      </div>
 
-        {/* AI Chat — always visible */}
-        <AiChat t={t} />
+      {/* Floating AI Chat Button */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {chatOpen && (
+          <div className="w-[340px] sm:w-[400px] max-h-[520px] flex flex-col rounded-2xl shadow-2xl border border-cf-border bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-cf-primary text-white">
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4" />
+                <span className="text-sm font-semibold">Flowvium AI</span>
+              </div>
+              <button onClick={() => setChatOpen(false)} className="text-white/70 hover:text-white text-lg leading-none">×</button>
+            </div>
+            <AiChat t={t} />
+          </div>
+        )}
+        <button
+          onClick={() => setChatOpen((o) => !o)}
+          className="w-14 h-14 rounded-full bg-cf-primary text-white shadow-lg hover:bg-cf-primary/90 transition-all flex items-center justify-center"
+        >
+          {chatOpen ? <Minus className="w-6 h-6" /> : <Brain className="w-6 h-6" />}
+        </button>
       </div>
     </div>
   );

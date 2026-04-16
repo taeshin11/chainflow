@@ -64,7 +64,15 @@
       "pharma-biotech": "제약 / 바이오",
       "consumer-defensive": "경기방어주",
       "financials": "금융",
-      "energy": "에너지"
+      "energy": "에너지",
+      "healthcare": "헬스케어",
+      "industrials": "산업재",
+      "communication-services": "통신 서비스",
+      "real-estate": "부동산",
+      "materials": "소재",
+      "utilities": "유틸리티",
+      "consumer-discretionary": "경기소비재",
+      "it-software": "IT / 소프트웨어"
     },
     "relationships": {
       "supplier": "공급업체",
