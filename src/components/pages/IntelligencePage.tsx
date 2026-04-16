@@ -110,43 +110,112 @@ function FearGreedGauge({ score }: { score: number }) {
   );
 }
 
-function FearGreedCard({ entry }: { entry: FearGreedEntry }) {
+interface FearGreedEntryExtended extends FearGreedEntry {
+  factors?: { rsi: number; momentum: number; volatility: number };
+  detail?: { factors: string[]; macro: string; risk: string } | null;
+}
+
+function FactorBar({ label, score, weight }: { label: string; score: number; weight: string }) {
+  const color = score >= 75 ? 'bg-green-500' : score >= 55 ? 'bg-lime-400' : score >= 45 ? 'bg-yellow-400' : score >= 25 ? 'bg-orange-400' : 'bg-red-500';
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] text-cf-text-secondary w-14 flex-shrink-0">{label}</span>
+      <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${score}%` }} />
+      </div>
+      <span className="text-[10px] font-bold w-8 text-right tabular-nums text-cf-text-primary">{score}</span>
+      <span className="text-[9px] text-gray-400 w-8">{weight}</span>
+    </div>
+  );
+}
+
+function FearGreedCard({ entry }: { entry: FearGreedEntryExtended }) {
+  const [expanded, setExpanded] = useState(false);
   const level = getLevel(entry.score);
   const meta = levelLabels[level];
   const delta = entry.prevScore !== undefined ? entry.score - entry.prevScore : 0;
+  const hasDetail = !!(entry.factors || entry.detail);
 
   return (
-    <div className={`cf-card p-4 border ${meta.border} flex flex-col gap-2`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xl leading-none">{entry.flag}</span>
-          <span className="text-sm font-bold text-cf-text-primary leading-tight">{entry.label}</span>
-        </div>
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${meta.bg} ${meta.color} ${meta.border}`}>
-          {meta.ko}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        {/* Gauge */}
-        <FearGreedGauge score={entry.score} />
-        {/* Score — large, prominent */}
-        <div className="flex flex-col items-center justify-center w-12 flex-shrink-0">
-          <span className={`text-3xl font-extrabold leading-none ${meta.color}`}>{entry.score}</span>
-          <span className="text-[10px] text-cf-text-secondary mt-0.5">/100</span>
-        </div>
-        {/* Delta + driver */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1 mb-1">
-            {entry.trend === 'up' && <ArrowUpRight className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
-            {entry.trend === 'down' && <ArrowDownRight className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />}
-            {entry.trend === 'neutral' && <Minus className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
-            <span className={`text-xs font-semibold ${delta > 0 ? 'text-green-600' : delta < 0 ? 'text-red-500' : 'text-gray-400'}`}>
-              {delta > 0 ? `+${delta}` : delta !== 0 ? delta : '±0'} (7d)
-            </span>
+    <div className={`cf-card border ${meta.border} flex flex-col overflow-hidden`}>
+      {/* Main row — clickable */}
+      <button
+        className="p-4 flex flex-col gap-2 text-left w-full"
+        onClick={() => hasDetail && setExpanded(e => !e)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl leading-none">{entry.flag}</span>
+            <span className="text-sm font-bold text-cf-text-primary leading-tight">{entry.label}</span>
           </div>
-          <p className="text-[11px] text-cf-text-secondary leading-relaxed">{entry.driver}</p>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${meta.bg} ${meta.color} ${meta.border}`}>
+              {meta.ko}
+            </span>
+            {hasDetail && (
+              <span className="text-[10px] text-cf-text-secondary">
+                {expanded ? '▲' : '▼'}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+        <div className="flex items-center gap-2">
+          <FearGreedGauge score={entry.score} />
+          <div className="flex flex-col items-center justify-center w-12 flex-shrink-0">
+            <span className={`text-3xl font-extrabold leading-none ${meta.color}`}>{entry.score}</span>
+            <span className="text-[10px] text-cf-text-secondary mt-0.5">/100</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1 mb-1">
+              {entry.trend === 'up' && <ArrowUpRight className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
+              {entry.trend === 'down' && <ArrowDownRight className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />}
+              {entry.trend === 'neutral' && <Minus className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
+              <span className={`text-xs font-semibold ${delta > 0 ? 'text-green-600' : delta < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                {delta > 0 ? `+${delta}` : delta !== 0 ? delta : '±0'} (7d)
+              </span>
+            </div>
+            <p className="text-[11px] text-cf-text-secondary leading-relaxed">{entry.driver}</p>
+          </div>
+        </div>
+      </button>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div className="border-t border-cf-border bg-gray-50/60 px-4 py-3 space-y-3">
+          {/* Factor breakdown */}
+          {entry.factors && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wide mb-1.5">📊 심리 구성 요소</p>
+              <FactorBar label="RSI 모멘텀" score={entry.factors.rsi} weight="40%" />
+              <FactorBar label="추세 강도" score={entry.factors.momentum} weight="35%" />
+              <FactorBar label="변동성" score={entry.factors.volatility} weight="25%" />
+              <p className="text-[9px] text-gray-400 mt-1">0=극단공포 · 50=중립 · 100=극단탐욕</p>
+            </div>
+          )}
+
+          {/* Macro context */}
+          {entry.detail && (
+            <>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wide">🔍 측정 요인</p>
+                {entry.detail.factors.map((f, i) => (
+                  <p key={i} className="text-[11px] text-cf-text-secondary leading-relaxed flex gap-1.5">
+                    <span className="text-gray-400 flex-shrink-0">•</span>{f}
+                  </p>
+                ))}
+              </div>
+              <div className="rounded-lg bg-blue-50 border border-blue-100 p-2.5">
+                <p className="text-[10px] font-bold text-blue-700 mb-1">📈 현재 심리 배경</p>
+                <p className="text-[11px] text-blue-700 leading-relaxed">{entry.detail.macro}</p>
+              </div>
+              <div className="rounded-lg bg-red-50 border border-red-100 p-2.5">
+                <p className="text-[10px] font-bold text-red-600 mb-1">⚠ 주요 리스크</p>
+                <p className="text-[11px] text-red-600 leading-relaxed">{entry.detail.risk}</p>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -1867,8 +1936,8 @@ const TABS = ['capital', 'macro', 'flows', 'fear-greed', 'credit', 'narratives']
 type Tab = typeof TABS[number];
 
 interface LiveFGData {
-  byCountry: FearGreedEntry[];
-  byAsset: FearGreedEntry[];
+  byCountry: FearGreedEntryExtended[];
+  byAsset: FearGreedEntryExtended[];
   updatedAt: string;
 }
 
@@ -1891,8 +1960,8 @@ export default function IntelligencePage() {
       .finally(() => setFgLoading(false));
   }, [activeTab, fgData]);
 
-  const liveCountry = fgData?.byCountry ?? fearGreedByCountry;
-  const liveAsset = fgData?.byAsset ?? fearGreedByAsset;
+  const liveCountry = (fgData?.byCountry ?? fearGreedByCountry) as FearGreedEntryExtended[];
+  const liveAsset = (fgData?.byAsset ?? fearGreedByAsset) as FearGreedEntryExtended[];
 
   const tabConfig: Record<Tab, { label: string; icon: React.ReactNode }> = {
     'capital':     { label: '자금 흐름 지도',  icon: <GitMerge className="w-4 h-4" /> },
