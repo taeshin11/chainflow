@@ -383,7 +383,9 @@ Answer concisely (3–5 paragraphs). Be specific — name tickers, mechanisms, a
 
 // ── Capital Flows Component ──────────────────────────────────────────────────
 interface AssetReturn { id: string; label: string; flag: string; group: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
+interface CountryReturn { id: string; label: string; flag: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
 type RotEntry = { from:string; to:string; magnitude:number; weeksAgo?:number; startDate?:string; momentum?:string };
+type CountryRotEntry = { from:string; fromFlag:string; to:string; toFlag:string; magnitude:number; momentum:'accelerating'|'holding'|'fading' };
 interface FlowData {
   assets: AssetReturn[];
   flow: {
@@ -392,6 +394,10 @@ interface FlowData {
     rotations1w: RotEntry[]; rotations4w: RotEntry[]; rotations13w: RotEntry[];
   };
   goldVsDollar: {goldRet4w:number;dollarRet4w:number;signal:string};
+  countryFlow: {
+    countries: CountryReturn[];
+    rotations1w: CountryRotEntry[]; rotations4w: CountryRotEntry[]; rotations13w: CountryRotEntry[];
+  };
   dataSource?: string;
   updatedAt: string;
 }
@@ -504,6 +510,65 @@ function CapitalFlowsTab() {
         </div>
       )}
 
+      {/* 국가별 시장 자금 흐름 */}
+      {data.countryFlow && (
+        <div className="cf-card p-4">
+          <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+            <Globe className="w-4 h-4 text-cf-primary" />
+            국가별 시장 자금 흐름 ({TF_LABELS[tf]} 기준)
+          </h3>
+
+          {/* Country rotation arrows */}
+          {(() => {
+            const cr = tf === '1w' ? data.countryFlow.rotations1w : tf === '13w' ? data.countryFlow.rotations13w : data.countryFlow.rotations4w;
+            return cr.length > 0 ? (
+              <div className="space-y-2 mb-4">
+                {cr.map((r, i) => {
+                  const mb = r.momentum === 'accelerating'
+                    ? { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700' }
+                    : r.momentum === 'fading'
+                    ? { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500' }
+                    : { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600' };
+                  return (
+                    <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-cf-bg border border-cf-border">
+                      <span className="text-base leading-none flex-shrink-0">{r.fromFlag}</span>
+                      <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">{r.from}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-cf-primary flex-shrink-0" />
+                      <span className="text-base leading-none flex-shrink-0">{r.toFlag}</span>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{r.to}</span>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-1 ${mb.cls}`}>{mb.label}</span>
+                      <span className="ml-auto text-sm font-extrabold text-cf-primary">+{r.magnitude}%p</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null;
+          })()}
+
+          {/* Country returns grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[...data.countryFlow.countries]
+              .sort((a, b) => b[retKey] - a[retKey])
+              .map((c) => {
+                const val = c[retKey];
+                const positive = val >= 0;
+                return (
+                  <div key={c.id} className={`rounded-lg border p-2.5 ${positive ? 'border-green-200 bg-green-50/40' : 'border-red-200 bg-red-50/40'}`}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-base leading-none">{c.flag}</span>
+                      <span className="text-xs font-bold text-cf-text-primary">{c.label}</span>
+                    </div>
+                    <div className={`text-base font-extrabold tabular-nums ${positive ? 'text-green-600' : 'text-red-500'}`}>
+                      {val > 0 ? '+' : ''}{val.toFixed(1)}%
+                    </div>
+                    <div className="text-[10px] text-gray-400 font-mono">{c.ticker}</div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
       {/* 금 vs 달러 */}
       <div className="cf-card p-4">
         <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
@@ -535,53 +600,74 @@ function CapitalFlowsTab() {
       <div className="cf-card p-4">
         <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-cf-primary" />
-          자산군별 4주 수익률 (자금 유입 방향)
+          자산군별 {TF_LABELS[tf]} 수익률 (자금 유입 방향)
         </h3>
-        <div className="space-y-1">
-          {data.flow.groupAvg.map((g) => (
-            <div key={g.group} className="flex items-center gap-3 py-2 border-b border-cf-border last:border-0">
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded border ${GROUP_LIGHT[g.group] ?? 'bg-gray-100 text-gray-600 border-gray-200'} w-20 text-center flex-shrink-0`}>
-                {GROUP_LABELS[g.group] ?? g.group}
-              </span>
-              <ReturnBar val={g.avg4w} max={maxAbs} />
+        {(() => {
+          // Compute group avg from assets for the selected timeframe
+          const groupPerf: Record<string, number[]> = {};
+          for (const a of data.assets) {
+            if (!groupPerf[a.group]) groupPerf[a.group] = [];
+            groupPerf[a.group].push(a[retKey]);
+          }
+          const groupAvgTf = Object.entries(groupPerf)
+            .map(([group, vals]) => ({ group, avg: parseFloat((vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2)) }))
+            .sort((a, b) => b.avg - a.avg);
+          const maxG = Math.max(...groupAvgTf.map(g => Math.abs(g.avg)), 1);
+          return (
+            <div className="space-y-1">
+              {groupAvgTf.map((g) => (
+                <div key={g.group} className="flex items-center gap-3 py-2 border-b border-cf-border last:border-0">
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded border ${GROUP_LIGHT[g.group] ?? 'bg-gray-100 text-gray-600 border-gray-200'} w-20 text-center flex-shrink-0`}>
+                    {GROUP_LABELS[g.group] ?? g.group}
+                  </span>
+                  <ReturnBar val={g.avg} max={maxG} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </div>
 
       {/* 상위 유입/유출 개별 자산 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="cf-card p-4">
-          <h3 className="text-sm font-bold text-green-700 mb-3 flex items-center gap-2">
-            <ArrowUpRight className="w-4 h-4" /> 자금 유입 TOP 5
-          </h3>
-          <div className="space-y-2">
-            {data.flow.topInflows.map((a, i) => (
-              <div key={a.id} className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
-                <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
-                <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
-                <span className="text-xs font-bold text-green-600 flex-shrink-0">+{a.ret4w.toFixed(1)}%</span>
+      {(() => {
+        const sorted = [...data.assets].sort((a, b) => b[retKey] - a[retKey]);
+        const topIn = sorted.slice(0, 5);
+        const topOut = sorted.slice(-5).reverse();
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="cf-card p-4">
+              <h3 className="text-sm font-bold text-green-700 mb-3 flex items-center gap-2">
+                <ArrowUpRight className="w-4 h-4" /> 자금 유입 TOP 5 ({TF_LABELS[tf]})
+              </h3>
+              <div className="space-y-2">
+                {topIn.map((a, i) => (
+                  <div key={a.id} className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
+                    <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
+                    <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
+                    <span className="text-xs font-bold text-green-600 flex-shrink-0">+{a[retKey].toFixed(1)}%</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="cf-card p-4">
-          <h3 className="text-sm font-bold text-red-600 mb-3 flex items-center gap-2">
-            <ArrowDownRight className="w-4 h-4" /> 자금 이탈 TOP 5
-          </h3>
-          <div className="space-y-2">
-            {data.flow.topOutflows.map((a, i) => (
-              <div key={a.id} className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
-                <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
-                <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
-                <span className="text-xs font-bold text-red-500 flex-shrink-0">{a.ret4w.toFixed(1)}%</span>
+            </div>
+            <div className="cf-card p-4">
+              <h3 className="text-sm font-bold text-red-600 mb-3 flex items-center gap-2">
+                <ArrowDownRight className="w-4 h-4" /> 자금 이탈 TOP 5 ({TF_LABELS[tf]})
+              </h3>
+              <div className="space-y-2">
+                {topOut.map((a, i) => (
+                  <div key={a.id} className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
+                    <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
+                    <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
+                    <span className="text-xs font-bold text-red-500 flex-shrink-0">{a[retKey].toFixed(1)}%</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* 전체 테이블 */}
       <div className="cf-card p-4">

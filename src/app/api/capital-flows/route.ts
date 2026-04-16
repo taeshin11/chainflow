@@ -40,6 +40,22 @@ const ASSETS = [
   { id: 'yen',         ticker: 'FXY',   label: '엔화',         group: 'currency',    flag: '💴' },
 ];
 
+// ── Country ETFs ──────────────────────────────────────────────────────────────
+const COUNTRIES = [
+  { id: 'us',        ticker: 'SPY',  label: '미국',       flag: '🇺🇸' },
+  { id: 'korea',     ticker: 'EWY',  label: '한국',       flag: '🇰🇷' },
+  { id: 'japan',     ticker: 'EWJ',  label: '일본',       flag: '🇯🇵' },
+  { id: 'china',     ticker: 'FXI',  label: '중국',       flag: '🇨🇳' },
+  { id: 'europe',    ticker: 'VGK',  label: '유럽',       flag: '🇪🇺' },
+  { id: 'uk',        ticker: 'EWU',  label: '영국',       flag: '🇬🇧' },
+  { id: 'india',     ticker: 'INDA', label: '인도',       flag: '🇮🇳' },
+  { id: 'brazil',    ticker: 'EWZ',  label: '브라질',     flag: '🇧🇷' },
+  { id: 'taiwan',    ticker: 'EWT',  label: '대만',       flag: '🇹🇼' },
+  { id: 'australia', ticker: 'EWA',  label: '호주',       flag: '🇦🇺' },
+  { id: 'germany',   ticker: 'EWG',  label: '독일',       flag: '🇩🇪' },
+  { id: 'mexico',    ticker: 'EWW',  label: '멕시코',     flag: '🇲🇽' },
+];
+
 // ── Data fetchers ─────────────────────────────────────────────────────────────
 
 // ── Source 1: Twelve Data (real-time, 800 calls/day free) ─────────────────────
@@ -239,7 +255,7 @@ export async function GET() {
   const redis = createRedis();
   const twelveKey = process.env.TWELVE_DATA_KEY?.trim() || null;
   const dataSource = twelveKey ? 'Twelve Data (실시간)' : 'Yahoo Finance (15분 지연)';
-  const cacheKey = `flowvium:capital-flows:v3:${twelveKey ? 'twelve' : 'yahoo'}`;
+  const cacheKey = `flowvium:capital-flows:v4:${twelveKey ? 'twelve' : 'yahoo'}`;
 
   if (redis) {
     try {
@@ -248,12 +264,15 @@ export async function GET() {
     } catch { /* non-fatal */ }
   }
 
-  const uniqueTickers = Array.from(new Set(ASSETS.map((a) => a.ticker)));
+  const allTickers = Array.from(new Set([
+    ...ASSETS.map((a) => a.ticker),
+    ...COUNTRIES.map((c) => c.ticker),
+  ]));
   const priceMap: Record<string, number[]> = {};
   const sourceCount: Record<string, number> = {};
 
   await Promise.all(
-    uniqueTickers.map(async (ticker) => {
+    allTickers.map(async (ticker) => {
       const { prices, source } = await fetchPrices(ticker, twelveKey);
       priceMap[ticker] = prices;
       sourceCount[source] = (sourceCount[source] ?? 0) + 1;
@@ -296,7 +315,47 @@ export async function GET() {
       : '혼조',
   };
 
-  const response = { assets: results, flow, goldVsDollar, dataSource: sourceSummary || dataSource, updatedAt: new Date().toISOString() };
+  // ── Country flows ─────────────────────────────────────────────────────────
+  const countryResults = COUNTRIES.map((c) => {
+    const prices = priceMap[c.ticker] ?? [];
+    return {
+      id: c.id, label: c.label, flag: c.flag, ticker: c.ticker,
+      ret1w:  pctReturn(prices, 5),
+      ret4w:  pctReturn(prices, 20),
+      ret13w: pctReturn(prices, 65),
+    };
+  }).filter((r) => r.ret4w !== 0 || r.ret13w !== 0);
+
+  // Build country rotation (top 3 pairs per timeframe)
+  function buildCountryRotations(retKey: 'ret1w' | 'ret4w' | 'ret13w', minSpread: number) {
+    const sorted = [...countryResults].sort((a, b) => b[retKey] - a[retKey]);
+    const pairs: { from: string; fromFlag: string; to: string; toFlag: string; magnitude: number; momentum: 'accelerating' | 'holding' | 'fading' }[] = [];
+    for (let i = 0; i < Math.min(sorted.length, 4); i++) {
+      for (let j = sorted.length - 1; j >= Math.max(0, sorted.length - 4); j--) {
+        if (i >= j) continue;
+        const spread = parseFloat((sorted[i][retKey] - sorted[j][retKey]).toFixed(1));
+        if (spread > minSpread) {
+          // Estimate momentum: compare 1w vs 4w per-week
+          const spread1w = sorted[i].ret1w - sorted[j].ret1w;
+          const spread4wPerWeek = (sorted[i].ret4w - sorted[j].ret4w) / 4;
+          const momentum: 'accelerating' | 'holding' | 'fading' =
+            spread1w > spread4wPerWeek * 1.3 ? 'accelerating' :
+            spread1w < spread4wPerWeek * 0.4 ? 'fading' : 'holding';
+          pairs.push({ from: sorted[j].label, fromFlag: sorted[j].flag, to: sorted[i].label, toFlag: sorted[i].flag, magnitude: spread, momentum });
+        }
+      }
+    }
+    return pairs.sort((a, b) => b.magnitude - a.magnitude).slice(0, 4);
+  }
+
+  const countryFlow = {
+    countries: countryResults,
+    rotations1w:  buildCountryRotations('ret1w',  0.5),
+    rotations4w:  buildCountryRotations('ret4w',  1.5),
+    rotations13w: buildCountryRotations('ret13w', 3.0),
+  };
+
+  const response = { assets: results, flow, goldVsDollar, countryFlow, dataSource: sourceSummary || dataSource, updatedAt: new Date().toISOString() };
 
   if (redis) {
     try { await redis.set(cacheKey, response, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
