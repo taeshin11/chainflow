@@ -191,23 +191,65 @@ function useInView(threshold = 0.15) {
 // Cascade animation: nodes light up in sequence, then ripple outward
 // ── AI Daily Brief ─────────────────────────────────────────────────────────────
 type Timeframe = '1w' | '4w' | '13w';
-
 interface BriefSection { title: string; content: string; bullets: string[]; }
 interface DailyBrief {
   market: BriefSection;
   capital: BriefSection;
   company: BriefSection;
+  signals?: BriefSection;
   outlook: string;
+  riskLevel?: 'low' | 'medium' | 'high';
   generatedAt: string;
   tf: Timeframe;
   cached?: boolean;
 }
 
+const SECTION_META = [
+  {
+    key: 'market' as const,
+    icon: '📊',
+    gradient: 'from-blue-600/20 to-blue-500/5',
+    border: 'border-blue-500/30',
+    accent: 'text-blue-400',
+    dot: 'bg-blue-400',
+  },
+  {
+    key: 'capital' as const,
+    icon: '💰',
+    gradient: 'from-violet-600/20 to-violet-500/5',
+    border: 'border-violet-500/30',
+    accent: 'text-violet-400',
+    dot: 'bg-violet-400',
+  },
+  {
+    key: 'company' as const,
+    icon: '🏢',
+    gradient: 'from-emerald-600/20 to-emerald-500/5',
+    border: 'border-emerald-500/30',
+    accent: 'text-emerald-400',
+    dot: 'bg-emerald-400',
+  },
+  {
+    key: 'signals' as const,
+    icon: '🔍',
+    gradient: 'from-amber-600/20 to-amber-500/5',
+    border: 'border-amber-500/30',
+    accent: 'text-amber-400',
+    dot: 'bg-amber-400',
+  },
+];
+
+const RISK_CONFIG = {
+  low:    { label: '낮음', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  medium: { label: '보통', color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/30' },
+  high:   { label: '높음', color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30' },
+};
+
 function AIDailyBrief() {
   const [tf, setTf] = useState<Timeframe>('4w');
   const [brief, setBrief] = useState<DailyBrief | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -219,49 +261,67 @@ function AIDailyBrief() {
       .finally(() => setLoading(false));
   }, [tf]);
 
-  const tfLabel = { '1w': '1주', '4w': '4주', '13w': '13주' } as const;
-  const tfBtns: Timeframe[] = ['1w', '4w', '13w'];
-
-  const sectionColors = [
-    { bg: 'bg-blue-50', border: 'border-blue-200', dot: 'bg-blue-500', label: 'text-blue-700' },
-    { bg: 'bg-violet-50', border: 'border-violet-200', dot: 'bg-violet-500', label: 'text-violet-700' },
-    { bg: 'bg-emerald-50', border: 'border-emerald-200', dot: 'bg-emerald-500', label: 'text-emerald-700' },
+  const tfBtns: { key: Timeframe; label: string }[] = [
+    { key: '1w', label: '1주' },
+    { key: '4w', label: '4주' },
+    { key: '13w', label: '13주' },
   ];
 
-  const sections: (keyof Pick<DailyBrief, 'market' | 'capital' | 'company'>)[] = ['market', 'capital', 'company'];
+  const riskKey = (brief?.riskLevel ?? 'medium') as 'low' | 'medium' | 'high';
+  const risk = RISK_CONFIG[riskKey];
+
+  const genTime = brief?.generatedAt
+    ? new Date(new Date(brief.generatedAt).getTime() + 9 * 3600000)
+        .toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' }) + ' KST'
+    : null;
 
   return (
-    <div className="border-b border-cf-border bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5">
-        {/* Header row */}
-        <div className="flex items-center justify-between mb-4 gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
+    <div className="relative overflow-hidden border-b border-white/5 bg-[#080c14]">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/4 top-0 h-48 w-48 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
+        <div className="absolute right-1/4 bottom-0 h-48 w-48 translate-y-1/2 rounded-full bg-blue-500/5 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            {/* Live dot + label */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+              <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
               </span>
-              <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">AI Daily Brief</span>
+              <span className="text-amber-400 text-[11px] font-bold tracking-widest uppercase">AI Daily Brief</span>
             </div>
-            {brief?.generatedAt && (
-              <span className="text-slate-500 text-xs hidden sm:inline">
-                {new Date(brief.generatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 생성
+
+            {/* Risk badge */}
+            {brief && (
+              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${risk.bg} ${risk.color}`}>
+                리스크 {risk.label}
               </span>
             )}
+
+            {/* Generation time */}
+            {genTime && (
+              <span className="hidden sm:inline text-[11px] text-slate-500">{genTime} 생성</span>
+            )}
           </div>
+
           {/* Timeframe toggle */}
-          <div className="flex items-center gap-1 bg-slate-800 rounded-lg p-0.5">
-            {tfBtns.map((t) => (
+          <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+            {tfBtns.map(({ key, label }) => (
               <button
-                key={t}
-                onClick={() => setTf(t)}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  tf === t
-                    ? 'bg-amber-400 text-slate-900'
-                    : 'text-slate-400 hover:text-slate-200'
+                key={key}
+                onClick={() => setTf(key)}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                  tf === key
+                    ? 'bg-amber-400 text-slate-900 shadow-lg shadow-amber-400/20'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                {tfLabel[t]}
+                {label}
               </button>
             ))}
           </div>
@@ -269,56 +329,66 @@ function AIDailyBrief() {
 
         {/* Loading skeleton */}
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-xl bg-slate-800/60 animate-pulse h-28" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="rounded-2xl bg-white/5 animate-pulse h-32 border border-white/5" />
             ))}
           </div>
         )}
 
-        {/* Brief cards */}
+        {/* Cards */}
         {!loading && brief && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {sections.map((key, i) => {
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {SECTION_META.map(({ key, icon, gradient, border, accent, dot }) => {
                 const sec = brief[key];
-                const col = sectionColors[i];
+                if (!sec) return null;
+                const isOpen = expandedKey === key;
                 return (
-                  <div key={key} className={`rounded-xl border ${col.border} ${col.bg} p-4`}>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <span className={`w-1.5 h-1.5 rounded-full ${col.dot}`} />
-                      <span className={`text-xs font-bold uppercase tracking-wide ${col.label}`}>
-                        {sec.title}
-                      </span>
+                  <div
+                    key={key}
+                    onClick={() => setExpandedKey(isOpen ? null : key)}
+                    className={`relative overflow-hidden rounded-2xl border ${border} bg-gradient-to-br ${gradient} cursor-pointer
+                               transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20`}
+                  >
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base leading-none">{icon}</span>
+                          <span className={`text-[11px] font-bold uppercase tracking-wide ${accent}`}>
+                            {sec.title}
+                          </span>
+                        </div>
+                        <ArrowRight className={`w-3 h-3 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">{sec.content}</p>
+
+                      {isOpen && (
+                        <ul className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
+                          {sec.bullets.map((b, j) => (
+                            <li key={j} className="flex items-start gap-1.5 text-[11px] text-slate-400">
+                              <span className={`mt-1 w-1 h-1 rounded-full flex-shrink-0 ${dot}`} />
+                              {b}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-700 leading-relaxed mb-2">{sec.content}</p>
-                    {expanded && (
-                      <ul className="space-y-1">
-                        {sec.bullets.map((b, j) => (
-                          <li key={j} className="flex items-start gap-1.5 text-xs text-slate-600">
-                            <span className={`mt-0.5 w-1 h-1 rounded-full flex-shrink-0 ${col.dot}`} />
-                            {b}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
                 );
               })}
             </div>
 
-            {/* Outlook + expand toggle */}
-            <div className="mt-3 flex items-center justify-between gap-4">
-              <p className="text-xs text-amber-300/80 italic">
-                <span className="font-semibold text-amber-300">전망:</span> {brief.outlook}
-              </p>
-              <button
-                onClick={() => setExpanded((p) => !p)}
-                className="flex-shrink-0 text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1"
-              >
-                {expanded ? '접기' : '상세 보기'}
-                <ArrowRight className={`w-3 h-3 transition-transform ${expanded ? 'rotate-90' : ''}`} />
-              </button>
+            {/* Outlook bar */}
+            <div className="mt-4 flex items-start gap-3 px-4 py-3 rounded-xl bg-white/3 border border-white/8">
+              <span className="text-amber-400 text-sm mt-0.5">⚡</span>
+              <div>
+                <span className="text-[11px] font-bold text-amber-400 mr-2">AI 전망</span>
+                <span className="text-[11px] text-slate-400">{brief.outlook}</span>
+              </div>
+              {genTime && (
+                <span className="sm:hidden ml-auto text-[10px] text-slate-600 flex-shrink-0">{genTime}</span>
+              )}
             </div>
           </>
         )}
