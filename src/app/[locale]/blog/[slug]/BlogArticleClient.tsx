@@ -61,7 +61,17 @@ function renderContent(content: string) {
   return elements;
 }
 
-export default function BlogArticleClient({ post }: { post: BlogPost }) {
+export default function BlogArticleClient({
+  post,
+  translatedTitle,
+  translatedContent,
+}: {
+  post: BlogPost;
+  translatedTitle?: string;
+  translatedContent?: string;
+}) {
+  const displayTitle = translatedTitle || post.title;
+  const displayContent = translatedContent || post.content;
   return (
     <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
       <Breadcrumbs overrides={{ [post.slug]: { label: post.title } }} />
@@ -98,12 +108,12 @@ export default function BlogArticleClient({ post }: { post: BlogPost }) {
         </div>
 
         <h1 className="text-4xl font-heading font-bold text-cf-text-primary leading-tight mb-4">
-          {post.title}
+          {displayTitle}
         </h1>
-        <ShareButtons title={`${post.title} | Flowvium Blog`} />
+        <ShareButtons title={`${displayTitle} | Flowvium Blog`} />
       </header>
 
-      <div className="prose-cf">{renderContent(post.content)}</div>
+      <div className="prose-cf">{renderContent(displayContent)}</div>
 
       <EmailCTA />
 

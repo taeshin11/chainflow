@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { generateSeoMetadata } from '@/lib/seo';
 import { getTranslations } from 'next-intl/server';
+import { translateBlogPost } from '@/lib/blog-translate';
 import BlogArticleClient from './BlogArticleClient';
 
 const locales = ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'de', 'fr', 'pt', 'hi', 'ar', 'vi', 'th', 'id', 'ru', 'tr'];
@@ -35,12 +36,27 @@ export async function generateMetadata({
   });
 }
 
-export default function BlogArticlePage({
+export default async function BlogArticlePage({
   params,
 }: {
   params: { locale: string; slug: string };
 }) {
   const post = getBlogPostBySlug(params.slug);
   if (!post) return notFound();
-  return <BlogArticleClient post={post} />;
+
+  const { title: translatedTitle, content: translatedContent } = await translateBlogPost(
+    params.locale,
+    post.slug,
+    post.title,
+    post.metaDescription,
+    post.content,
+  );
+
+  return (
+    <BlogArticleClient
+      post={post}
+      translatedTitle={translatedTitle}
+      translatedContent={translatedContent}
+    />
+  );
 }

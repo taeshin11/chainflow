@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { blogPosts } from '@/data/blog-posts';
+import type { BlogPost } from '@/data/blog-posts';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 
 const sectorColors: Record<string, string> = {
@@ -15,7 +15,7 @@ const sectorColors: Record<string, string> = {
   all: 'bg-gray-100 text-gray-700',
 };
 
-export default function BlogClient() {
+export default function BlogClient({ posts }: { posts: BlogPost[] }) {
   const t = useTranslations('nav');
 
   return (
@@ -31,7 +31,7 @@ export default function BlogClient() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogPosts.map((post) => (
+        {posts.map((post) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
