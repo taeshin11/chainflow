@@ -24,7 +24,7 @@ function createRedis(): Redis | null {
 
 const ASSETS = [
   { id: 'us-stocks',   ticker: 'SPY',   label: '미국 주식',    group: 'equity',      flag: '🇺🇸' },
-  { id: 'em-stocks',   ticker: 'EEM',   label: 'EM 주식',      group: 'equity',      flag: '🌏' },
+  { id: 'em-stocks',   ticker: 'EEM',   label: '이머징마켓 주식', group: 'equity',   flag: '🌏' },
   { id: 'eu-stocks',   ticker: 'VGK',   label: '유럽 주식',    group: 'equity',      flag: '🇪🇺' },
   { id: 'us-tech',     ticker: 'QQQ',   label: '미국 테크',    group: 'equity',      flag: '💻' },
   { id: 'us-bonds-lt', ticker: 'TLT',   label: '미 장기채',    group: 'bonds',       flag: '📊' },
@@ -180,7 +180,7 @@ function estimateRotationStart(
 }
 
 const GROUP_LABELS: Record<string, string> = {
-  equity: '주식', bonds: '채권', alts: '대안자산', commodities: '원자재', currency: '통화',
+  equity: '주식', bonds: '채권', alts: '금·비트코인·실물자산', commodities: '원자재', currency: '통화',
 };
 
 type RotationEntry = {
