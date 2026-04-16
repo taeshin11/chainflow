@@ -393,7 +393,11 @@ interface FlowData {
     groupAvg: {group:string;avg4w:number}[];
     rotations1w: RotEntry[]; rotations4w: RotEntry[]; rotations13w: RotEntry[];
   };
-  goldVsDollar: {goldRet4w:number;dollarRet4w:number;signal:string};
+  goldVsDollar: {
+    goldRet1w:number; dollarRet1w:number; signal1w:string;
+    goldRet4w:number; dollarRet4w:number; signal4w:string;
+    goldRet13w:number; dollarRet13w:number; signal13w:string;
+  };
   countryFlow: {
     countries: CountryReturn[];
     rotations1w: CountryRotEntry[]; rotations4w: CountryRotEntry[]; rotations13w: CountryRotEntry[];
@@ -570,31 +574,39 @@ function CapitalFlowsTab() {
       )}
 
       {/* 금 vs 달러 */}
-      <div className="cf-card p-4">
-        <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
-          <span>⚖️</span> 금 vs 달러 (안전자산 선호 지표)
-        </h3>
-        <div className="flex gap-4 mb-3">
-          <div className="flex-1 text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200">
-            <div className="text-2xl mb-1">🥇</div>
-            <div className={`text-xl font-extrabold ${data.goldVsDollar.goldRet4w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {data.goldVsDollar.goldRet4w > 0 ? '+' : ''}{data.goldVsDollar.goldRet4w.toFixed(1)}%
+      {(() => {
+        const gvd = data.goldVsDollar;
+        const goldRet = tf === '1w' ? gvd.goldRet1w : tf === '13w' ? gvd.goldRet13w : gvd.goldRet4w;
+        const dollarRet = tf === '1w' ? gvd.dollarRet1w : tf === '13w' ? gvd.dollarRet13w : gvd.dollarRet4w;
+        const signal = tf === '1w' ? gvd.signal1w : tf === '13w' ? gvd.signal13w : gvd.signal4w;
+        return (
+          <div className="cf-card p-4">
+            <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+              <span>⚖️</span> 금 vs 달러 ({TF_LABELS[tf]} 기준)
+            </h3>
+            <div className="flex gap-4 mb-3">
+              <div className="flex-1 text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                <div className="text-2xl mb-1">🥇</div>
+                <div className={`text-xl font-extrabold ${goldRet >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {goldRet > 0 ? '+' : ''}{goldRet.toFixed(1)}%
+                </div>
+                <div className="text-[11px] text-gray-500">금 ({TF_LABELS[tf]})</div>
+              </div>
+              <div className="flex items-center text-gray-400 font-bold">vs</div>
+              <div className="flex-1 text-center p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <div className="text-2xl mb-1">💵</div>
+                <div className={`text-xl font-extrabold ${dollarRet >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {dollarRet > 0 ? '+' : ''}{dollarRet.toFixed(1)}%
+                </div>
+                <div className="text-[11px] text-gray-500">달러 ({TF_LABELS[tf]})</div>
+              </div>
             </div>
-            <div className="text-[11px] text-gray-500">금 (4주)</div>
-          </div>
-          <div className="flex items-center text-gray-400 font-bold">vs</div>
-          <div className="flex-1 text-center p-3 rounded-lg bg-blue-50 border border-blue-200">
-            <div className="text-2xl mb-1">💵</div>
-            <div className={`text-xl font-extrabold ${data.goldVsDollar.dollarRet4w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {data.goldVsDollar.dollarRet4w > 0 ? '+' : ''}{data.goldVsDollar.dollarRet4w.toFixed(1)}%
+            <div className="text-center text-xs font-semibold text-cf-primary bg-cf-primary/5 rounded-lg py-2 px-3">
+              📌 {signal}
             </div>
-            <div className="text-[11px] text-gray-500">달러 (4주)</div>
           </div>
-        </div>
-        <div className="text-center text-xs font-semibold text-cf-primary bg-cf-primary/5 rounded-lg py-2 px-3">
-          📌 {data.goldVsDollar.signal}
-        </div>
-      </div>
+        );
+      })()}
 
       {/* 자산군별 성과 */}
       <div className="cf-card p-4">

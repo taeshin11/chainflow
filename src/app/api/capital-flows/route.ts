@@ -303,16 +303,24 @@ export async function GET() {
 
   const gldPrices = priceMap['GLD'] ?? [];
   const uupPrices = priceMap['UUP'] ?? [];
-  const goldRet = pctReturn(gldPrices, 20);
-  const dollarRet = pctReturn(uupPrices, 20);
+
+  function goldSignal(g: number, d: number) {
+    return g > d + 2 ? '금 선호 (달러 약세 헷지)' : d > g + 2 ? '달러 강세 (안전자산 달러로)' : '혼조';
+  }
+
   const goldVsDollar = {
-    goldRet4w: goldRet,
-    dollarRet4w: dollarRet,
-    signal: goldRet > dollarRet + 2
-      ? '금 선호 (달러 약세 헷지)'
-      : dollarRet > goldRet + 2
-      ? '달러 강세 (안전자산 달러로)'
-      : '혼조',
+    // 1w
+    goldRet1w:  pctReturn(gldPrices, 5),
+    dollarRet1w: pctReturn(uupPrices, 5),
+    signal1w: goldSignal(pctReturn(gldPrices, 5), pctReturn(uupPrices, 5)),
+    // 4w
+    goldRet4w:  pctReturn(gldPrices, 20),
+    dollarRet4w: pctReturn(uupPrices, 20),
+    signal4w: goldSignal(pctReturn(gldPrices, 20), pctReturn(uupPrices, 20)),
+    // 13w
+    goldRet13w:  pctReturn(gldPrices, 65),
+    dollarRet13w: pctReturn(uupPrices, 65),
+    signal13w: goldSignal(pctReturn(gldPrices, 65), pctReturn(uupPrices, 65)),
   };
 
   // ── Country flows ─────────────────────────────────────────────────────────
