@@ -329,10 +329,20 @@ function AIDailyBrief() {
 
         {/* Loading skeleton */}
         {loading && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl bg-white/5 animate-pulse h-32 border border-white/5" />
-            ))}
+          <div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="rounded-2xl bg-white/8 animate-pulse border border-white/10" style={{ height: 120 }}>
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-white/10 rounded w-2/3" />
+                    <div className="h-2 bg-white/8 rounded w-full" />
+                    <div className="h-2 bg-white/8 rounded w-4/5" />
+                    <div className="h-2 bg-white/8 rounded w-3/4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="h-8 bg-white/5 rounded-xl animate-pulse" />
           </div>
         )}
 
