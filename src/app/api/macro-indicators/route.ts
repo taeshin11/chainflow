@@ -399,6 +399,7 @@ export async function GET() {
   const [
     fredCPI, fredCoreCPI, fredPCE, fredCorePCE,
     fredNFP, fredGDP, fredPPI, fredRetail, fredUnrate,
+    fredISM, fredFOMCUpper, fredFOMCLower,
     yieldCurve,
   ] = await Promise.allSettled([
     fetchYoY('CPIAUCSL'),
@@ -410,6 +411,9 @@ export async function GET() {
     fetchYoY('PPIACO'),
     fetchMoMPct('RSAFS'),
     fetchLatest('UNRATE'),
+    fetchLatest('NAPM'),             // ISM Manufacturing PMI
+    fetchLatest('DFEDTARU'),         // Fed funds upper bound
+    fetchLatest('DFEDTARL'),         // Fed funds lower bound
     fetchYieldCurve(),
   ]);
 
@@ -489,8 +493,29 @@ export async function GET() {
     });
   }
 
-  // FOMC — static only
-  indicators.push({ ...STATIC.fomc, cascade: buildCascade('fomc', STATIC.fomc.surprise), liveData: false });
+  // FOMC current rate (FRED DFEDTARU/DFEDTARL)
+  const fomcUpper = get(fredFOMCUpper);
+  const fomcLower = get(fredFOMCLower);
+  {
+    const base = STATIC.fomc;
+    const actualUpper = fomcUpper?.value ?? (base.actual ?? 4.5);
+    const actualLower = fomcLower?.value ?? ((base.actual ?? 4.5) - 0.25);
+    const midRate = parseFloat(((actualUpper + actualLower) / 2).toFixed(3));
+    const surprise = classify(midRate, base.forecast ?? 4.5, false);
+    indicators.push({
+      ...base,
+      actual: actualUpper,
+      previous: base.previous,
+      forecast: base.forecast,
+      releaseDate: fomcUpper?.date ?? base.releaseDate,
+      surprise, rateImpact: base.rateImpact, rateImpactKo: base.rateImpactKo,
+      summary: fomcUpper
+        ? `현재 기준금리 ${actualLower}~${actualUpper}% (목표 중간값 ${midRate}%). 다음 FOMC: ${base.nextRelease}.`
+        : base.summary,
+      cascade: buildCascade('fomc', surprise),
+      liveData: !!fomcUpper,
+    });
+  }
 
   // GDP
   const gdpData = get(fredGDP);
@@ -514,8 +539,26 @@ export async function GET() {
     });
   }
 
-  // ISM — static only (not on FRED)
-  indicators.push({ ...STATIC.ism, cascade: buildCascade('ism', STATIC.ism.surprise), liveData: false });
+  // ISM Manufacturing PMI (FRED NAPM series)
+  const ismData = get(fredISM);
+  {
+    const base = STATIC.ism;
+    const actual = ismData ? parseFloat(ismData.value.toFixed(1)) : base.actual;
+    const fc = 49.5; // consensus
+    const surprise = classify(actual, fc, true); // higher PMI = better
+    const ri = rateImpact('ism', surprise);
+    indicators.push({
+      ...base,
+      actual, previous: base.previous, forecast: fc,
+      releaseDate: ismData?.date ?? base.releaseDate,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `ISM PMI ${actual} (예상 ${fc}). ${actual >= 50 ? '제조업 확장 국면.' : '제조업 수축 — 경기 둔화 우려.'}`
+        : base.summary,
+      cascade: buildCascade('ism', surprise),
+      liveData: !!ismData,
+    });
+  }
 
   // Retail Sales
   const retailData = get(fredRetail);
@@ -586,7 +629,7 @@ export async function GET() {
     });
   }
 
-  const yc = get(yieldCurve) ?? { points: [], inverted: false, spread10y2y: null };
+  const yc = get(yieldCurve as PromiseSettledResult<{ points: YieldPoint[]; inverted: boolean; spread10y2y: number | null } | null>) ?? { points: [], inverted: false, spread10y2y: null };
   const response = { indicators, yieldCurve: yc, updatedAt: new Date().toISOString() };
 
   if (redis) {

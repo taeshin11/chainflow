@@ -589,9 +589,6 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* AI Daily Brief */}
-      <AIDailyBrief />
-
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cf-primary/5 via-cf-secondary/5 to-cf-accent/5" />
@@ -648,8 +645,8 @@ export default function HomePage() {
                   <Radar className="w-4 h-4" />
                   뉴스 갭 스캔
                 </Link>
-                <button
-                  onClick={() => document.getElementById('ai-daily-brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                <Link
+                  href="/report"
                   className="inline-flex items-center gap-2 text-base px-6 py-3.5 rounded-xl font-semibold
                              bg-violet-600 text-white border border-violet-500
                              hover:bg-violet-700 hover:shadow-lg hover:shadow-violet-500/20
@@ -660,7 +657,7 @@ export default function HomePage() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
                   </span>
                   AI 리포트
-                </button>
+                </Link>
               </div>
               <HeroSearch />
             </div>

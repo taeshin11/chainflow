@@ -87,14 +87,21 @@ async function getSdnData(redis: Redis | null): Promise<SdnEntry[] | null> {
   }
 }
 
+// Featured programs to show on auto-load (no search query)
+const FEATURED_PROGRAMS = [
+  { key: 'RUSSIA', label: '러시아 제재', color: 'red' },
+  { key: 'IRAN', label: '이란 제재', color: 'orange' },
+  { key: 'DPRK', label: '북한 제재', color: 'yellow' },
+  { key: 'SDGT', label: '테러 지원', color: 'red' },
+  { key: 'CYBER2', label: '사이버 공격', color: 'purple' },
+  { key: 'CHINA', label: '중국 제재', color: 'blue' },
+];
+
 // ── Route handler ──────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get('q')?.trim() ?? '';
-
-  if (!q) {
-    return NextResponse.json({ error: '검색어를 입력하세요' }, { status: 400 });
-  }
+  const featured = searchParams.get('featured') === 'true';
 
   const redis = createRedis();
   const entries = await getSdnData(redis);
@@ -109,10 +116,31 @@ export async function GET(req: NextRequest) {
     });
   }
 
+  // Featured mode: return representative entries per program
+  if (featured || !q) {
+    const grouped: Record<string, { label: string; color: string; entries: object[] }> = {};
+    for (const prog of FEATURED_PROGRAMS) {
+      const matched = entries
+        .filter(e => e.program.toUpperCase().includes(prog.key))
+        .slice(0, 6)
+        .map(e => ({ name: e.name, type: e.type, program: e.program, remarks: e.remarks, entNum: e.entNum }));
+      if (matched.length > 0) {
+        grouped[prog.key] = { label: prog.label, color: prog.color, entries: matched };
+      }
+    }
+    return NextResponse.json({
+      featured: true,
+      groups: grouped,
+      totalEntries: entries.length,
+      source: 'OFAC SDN',
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
   const queryLower = q.toLowerCase();
   const matches = entries
     .filter((e) => e.name.toLowerCase().includes(queryLower))
-    .slice(0, 10)
+    .slice(0, 15)
     .map((e) => ({
       name: e.name,
       type: e.type,

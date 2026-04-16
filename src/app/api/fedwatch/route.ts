@@ -179,17 +179,17 @@ async function fetchCMEImpliedRates(): Promise<Record<string, number> | null> {
   }
 }
 
-// Map CME month code to a meeting, compute probability from implied rate
+// Map CME month code to a meeting, compute probability distribution from implied rate
 function computeMeetingProbs(
   meeting: FomcMeeting,
   impliedRates: Record<string, number>,
   currentMid: number,
 ): Partial<FomcMeeting> {
-  // Month codes: MAY26, JUN26, etc.
   const d = new Date(meeting.date);
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const monthCodes = [
-    `${['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]}${String(d.getFullYear()).slice(2)}`,
-    `${['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]}${d.getFullYear()}`,
+    `${MONTHS[d.getMonth()]}${String(d.getFullYear()).slice(2)}`,
+    `${MONTHS[d.getMonth()]}${d.getFullYear()}`,
   ];
   const implied = monthCodes.reduce((acc: number | null, code) => {
     const r = impliedRates[code];
@@ -198,20 +198,54 @@ function computeMeetingProbs(
 
   if (implied === null) return {};
 
-  const diff = currentMid - implied; // positive = market expects cuts
-  // Each 25bp cut reduces rate by 0.25
-  const rawCuts = diff / 0.25;
-  const probCut25 = Math.min(100, Math.max(0, Math.round(rawCuts * 100)));
-  const probHold = Math.max(0, 100 - probCut25);
+  const diff = currentMid - implied; // positive = market prices in cuts
+  // Expected cumulative cuts in units of 25bp
+  const expectedCuts = diff / 0.25;
+
+  let probHike = 0, probHold = 0, probCut25 = 0, probCut50 = 0, probCut75 = 0;
+
+  if (expectedCuts <= -0.5) {
+    // Hike scenario dominant
+    probHike = Math.min(95, Math.round(-expectedCuts * 80));
+    probHold = 100 - probHike;
+  } else if (expectedCuts < 0.5) {
+    // Hold most likely, small cut/hike tail
+    const tailCut = Math.max(0, Math.round(expectedCuts * 60));
+    const tailHike = expectedCuts < 0 ? Math.min(8, Math.round(-expectedCuts * 40)) : 0;
+    probHold = 100 - tailCut - tailHike;
+    probCut25 = tailCut;
+    probHike = tailHike;
+  } else if (expectedCuts < 1.5) {
+    // 1 cut most likely
+    const p1 = Math.round(Math.max(30, Math.min(85, (1 - Math.abs(expectedCuts - 1)) * 120)));
+    const p0 = Math.round(Math.max(0, (1.5 - expectedCuts) * 60));
+    const p2 = Math.max(0, 100 - p1 - p0);
+    probHold = p0;
+    probCut25 = p1;
+    probCut50 = p2;
+  } else if (expectedCuts < 2.5) {
+    // 2 cuts most likely
+    const p2 = Math.round(Math.max(30, Math.min(80, (1 - Math.abs(expectedCuts - 2)) * 120)));
+    const p1 = Math.round(Math.max(0, (2.5 - expectedCuts) * 50));
+    const p3 = Math.max(0, 100 - p2 - p1);
+    probCut25 = p1;
+    probCut50 = p2;
+    probCut75 = p3;
+  } else {
+    // 3+ cuts
+    probCut75 = Math.min(75, Math.round(expectedCuts * 20));
+    probCut50 = Math.round((100 - probCut75) * 0.55);
+    probCut25 = Math.max(0, 100 - probCut75 - probCut50);
+  }
 
   return {
     impliedRate: parseFloat(implied.toFixed(3)),
+    probHike: parseFloat(probHike.toFixed(1)),
     probHold: parseFloat(probHold.toFixed(1)),
     probCut25: parseFloat(probCut25.toFixed(1)),
-    probCut50: 0,
-    probCut75: 0,
-    probHike: 0,
-    cumulativeCuts: Math.round(Math.max(0, diff) * 4) * 25,
+    probCut50: parseFloat(probCut50.toFixed(1)),
+    probCut75: parseFloat(probCut75.toFixed(1)),
+    cumulativeCuts: parseFloat(Math.max(0, diff * 100).toFixed(0)),
   };
 }
 
@@ -237,8 +271,6 @@ export async function GET() {
       const live = computeMeetingProbs(m, cmeRates, STATIC_DATA.currentRateMid);
       return { ...m, ...live };
     });
-    // Recompute year-end implied
-    const lastMeeting = meetings[meetings.length - 1];
   }
 
   const result: FedWatchData & { cached: boolean; liveData: boolean } = {

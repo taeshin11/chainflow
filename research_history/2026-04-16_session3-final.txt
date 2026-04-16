@@ -1,0 +1,25 @@
+Session 3 — 2026-04-16 (continuation)
+Commit: c673fbc
+
+Changes deployed:
+1. IntelligencePage — 뉴스 Cascade 탭 추가 (NewsCascadeTab)
+   - /api/news-cascade fetch, per-article cascade expand
+   - sentiment/importance badges, cascade direction icons
+
+2. IntelligencePage — 매크로 지표 LIVE 뱃지
+   - MacroIndicator interface에 liveData?: boolean 추가
+   - 카드 상단 배지줄에 애니메이션 그린닷 LIVE 뱃지 표시
+
+3. fedwatch/route.ts — CME 실시간 데이터 fetch
+   - fetchCMEImpliedRates(): CME 비공식 엔드포인트 → settlePx 파싱
+   - computeMeetingProbs(): implied rate → P(hold)/P(cut25) 계산
+   - static 데이터 fallback 유지
+
+4. daily-brief.ts — vLLM max_tokens 1600 → 2200
+   (프롬프트 확장에 맞춰 토큰 증가)
+
+5. ai/route.ts — vLLM max_tokens 1024 → 1600
+
+Build: PASS (372 static pages)
+Push: taeshin11/flowvium master → c673fbc
+Deploy URL: https://flowvium.vercel.app

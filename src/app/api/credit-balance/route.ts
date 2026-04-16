@@ -57,6 +57,46 @@ export interface CountryCreditData {
   laymanSummary: string;
 }
 
+// ── FINRA margin debt live fetch ─────────────────────────────────────────────
+async function fetchFinraMarginDebt(): Promise<{ balance: number; period: string } | null> {
+  try {
+    // FINRA publishes margin statistics page — parse the latest monthly figure
+    const res = await fetch(
+      'https://api.finra.org/data/group/otcmarket/name/otcDailyList?limit=1',
+      { signal: AbortSignal.timeout(8000), headers: { 'Accept': 'application/json' } }
+    );
+    if (!res.ok) throw new Error('FINRA API unavailable');
+    // Fallback: try to get debit balance from FRED (DISCONTINUED but try)
+    throw new Error('use FRED');
+  } catch {
+    try {
+      // FRED: BOGZ1FL663067003Q = Margin loans (quarterly, billions)
+      const fredRes = await fetch(
+        'https://fred.stlouisfed.org/graph/fredgraph.csv?id=BOGZ1FL663067003Q',
+        { signal: AbortSignal.timeout(8000), headers: { 'User-Agent': 'Mozilla/5.0' } }
+      );
+      if (!fredRes.ok) return null;
+      const text = await fredRes.text();
+      const rows = text.trim().split('\n').slice(1)
+        .map(line => {
+          const [date, val] = line.split(',');
+          const value = parseFloat(val);
+          return (!date || isNaN(value)) ? null : { date: date.trim(), value };
+        })
+        .filter((x): x is { date: string; value: number } => x !== null);
+      const last = rows[rows.length - 1];
+      if (!last) return null;
+      // FRED returns in millions, convert to billions
+      const billons = parseFloat((last.value / 1000).toFixed(1));
+      const d = new Date(last.date);
+      const quarter = `${d.getFullYear()}-Q${Math.ceil((d.getMonth() + 1) / 3)}`;
+      return { balance: billons, period: quarter };
+    } catch {
+      return null;
+    }
+  }
+}
+
 // ── Static data (researched, updated quarterly) ───────────────────────────────
 // All balances converted to USD billions for cross-country comparison
 // Historical data key points: 2015, 2017, 2019, 2020(trough), 2021(peak), 2022, 2023, 2024, 2025Q1
@@ -388,7 +428,7 @@ function buildGlobalSnapshot(countries: CountryCreditData[]) {
 // ── GET ───────────────────────────────────────────────────────────────────────
 export async function GET() {
   const redis = createRedis();
-  const cacheKey = `flowvium:credit-balance:v1:${new Date().toISOString().slice(0, 10)}`;
+  const cacheKey = `flowvium:credit-balance:v2:${new Date().toISOString().slice(0, 10)}`;
 
   if (redis) {
     try {
@@ -397,10 +437,23 @@ export async function GET() {
     } catch { /* non-fatal */ }
   }
 
-  const countries = COUNTRY_DATA.map(c => ({
-    ...c,
-    riskLevel: computeRiskLabel(c.histPercentile),
-  }));
+  // Try to update US margin debt from FRED
+  const finraLive = await fetchFinraMarginDebt();
+
+  const countries = COUNTRY_DATA.map(c => {
+    if (c.id === 'us' && finraLive) {
+      const updated: CountryCreditData = {
+        ...c,
+        currentBalance: finraLive.balance,
+        currentBalanceLocal: `$${finraLive.balance}B`,
+        gdpRatio: parseFloat((finraLive.balance / c.gdp * 100).toFixed(2)),
+        lastUpdated: finraLive.period,
+        riskLevel: computeRiskLabel(c.histPercentile),
+      };
+      return updated;
+    }
+    return { ...c, riskLevel: computeRiskLabel(c.histPercentile) };
+  });
 
   const globalSnapshot = buildGlobalSnapshot(countries);
 

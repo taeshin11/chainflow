@@ -1,795 +1,745 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  Search,
-  AlertTriangle,
-  ExternalLink,
-  Shield,
-  Globe,
-  Bitcoin,
-  Building2,
-  BookOpen,
-  Loader2,
-  CheckCircle,
-  XCircle,
-  ArrowUpRight,
-  ArrowDownRight,
+  Search, AlertTriangle, ExternalLink, Shield, Globe, Bitcoin,
+  Building2, BookOpen, Loader2, CheckCircle, XCircle,
+  ArrowUpRight, ArrowDownRight, MessageSquare, Newspaper, RefreshCw,
 } from 'lucide-react';
 
-// ── TypeScript interfaces ──────────────────────────────────────────────────────
+type TabId = 'social' | 'crypto' | 'sanctions' | 'corporate' | 'guide';
 
-interface CryptoTx {
-  hash: string;
-  time: string;
-  value: number;
-  direction: 'in' | 'out';
-}
-
-interface CryptoResult {
-  chain: 'eth' | 'btc';
-  address: string;
-  balance: number;
-  balanceUsd: null;
-  totalReceived: number;
-  totalSent: number;
-  txCount: number;
-  recentTxs: CryptoTx[];
-  riskFlags: string[];
-  error?: string;
-}
-
-interface SanctionMatch {
-  name: string;
-  type: string;
-  program: string;
-  remarks: string;
-  entNum: string;
-}
-
-interface SanctionsResult {
-  matches: SanctionMatch[];
-  total: number;
-  source: string;
-  updatedAt: string;
-  error?: string;
-}
-
-interface CorporateCompany {
-  name: string;
-  number: string;
-  jurisdiction: string;
-  incorporated: string | null;
-  dissolved: string | null;
-  type: string | null;
-  address: string | null;
-  url: string;
-}
-
-interface CorporateResult {
-  companies: CorporateCompany[];
-  total: number;
-  source: string;
-  error?: string;
-}
-
-type TabId = 'crypto' | 'sanctions' | 'corporate' | 'guide';
-
-// ── Jurisdiction flag map ──────────────────────────────────────────────────────
-const jurisdictionFlags: Record<string, string> = {
-  us: '🇺🇸', gb: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', jp: '🇯🇵', cn: '🇨🇳',
-  kr: '🇰🇷', ca: '🇨🇦', au: '🇦🇺', sg: '🇸🇬', hk: '🇭🇰', nl: '🇳🇱',
-  ch: '🇨🇭', se: '🇸🇪', no: '🇳🇴', dk: '🇩🇰', fi: '🇫🇮', ie: '🇮🇪',
-  lu: '🇱🇺', ky: '🇰🇾', bm: '🇧🇲', vg: '🇻🇬', pa: '🇵🇦', li: '🇱🇮',
-  mc: '🇲🇨', je: '🇯🇪', gg: '🇬🇬', im: '🇮🇲', mt: '🇲🇹', cy: '🇨🇾',
-};
-
-function getJurisdictionFlag(code: string): string {
-  const lower = code?.toLowerCase() ?? '';
-  // jurisdiction codes may be like "gb_england_wales" — take first 2 chars
-  const iso2 = lower.slice(0, 2);
-  return jurisdictionFlags[iso2] ?? '🌐';
-}
-
-// ── Helper: truncate hash ──────────────────────────────────────────────────────
-function truncateHash(hash: string, chars = 8): string {
-  if (hash.length <= chars * 2 + 3) return hash;
-  return `${hash.slice(0, chars)}...${hash.slice(-chars)}`;
-}
-
-// ── Explorer URL ───────────────────────────────────────────────────────────────
-function getExplorerTxUrl(chain: 'eth' | 'btc', hash: string): string {
-  if (chain === 'eth') return `https://etherscan.io/tx/${hash}`;
-  return `https://www.blockchain.com/explorer/transactions/btc/${hash}`;
-}
-
-function getExplorerAddressUrl(chain: 'eth' | 'btc', address: string): string {
-  if (chain === 'eth') return `https://etherscan.io/address/${address}`;
-  return `https://www.blockchain.com/explorer/addresses/btc/${address}`;
-}
-
-// ── Number formatting ──────────────────────────────────────────────────────────
-function fmt(n: number, decimals = 6): string {
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function fmt(n: number, d = 6) {
   if (n === 0) return '0';
   if (n < 0.000001) return n.toExponential(3);
-  return n.toLocaleString('en-US', { maximumFractionDigits: decimals });
+  return n.toLocaleString('en-US', { maximumFractionDigits: d });
+}
+function truncateHash(h: string, c = 8) {
+  return h.length <= c * 2 + 3 ? h : `${h.slice(0, c)}...${h.slice(-c)}`;
+}
+function explorerAddr(chain: 'eth' | 'btc', addr: string) {
+  return chain === 'eth'
+    ? `https://etherscan.io/address/${addr}`
+    : `https://www.blockchain.com/explorer/addresses/btc/${addr}`;
+}
+function explorerTx(chain: 'eth' | 'btc', hash: string) {
+  return chain === 'eth'
+    ? `https://etherscan.io/tx/${hash}`
+    : `https://www.blockchain.com/explorer/transactions/btc/${hash}`;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
-
-function ErrorCard({ message }: { message: string }) {
+function LoadingCard({ msg }: { msg: string }) {
   return (
-    <div className="cf-card border-red-200 bg-red-50 flex items-start gap-3 mt-4">
-      <XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-      <p className="text-sm text-red-700">{message}</p>
+    <div className="flex items-center gap-3 py-8 justify-center text-cf-text-secondary">
+      <Loader2 className="w-5 h-5 animate-spin text-cf-primary" />
+      <span className="text-sm">{msg}</span>
+    </div>
+  );
+}
+function ErrorCard({ msg }: { msg: string }) {
+  return (
+    <div className="cf-card border-red-200 bg-red-50 flex items-start gap-3">
+      <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+      <p className="text-sm text-red-700">{msg}</p>
     </div>
   );
 }
 
-function LoadingCard({ message }: { message: string }) {
+// ── SENTIMENT colors ────────────────────────────────────────────────────────────
+const SENTIMENT_STYLE: Record<string, string> = {
+  hawkish: 'bg-red-100 text-red-700',
+  dovish: 'bg-blue-100 text-blue-700',
+  bullish: 'bg-green-100 text-green-700',
+  bearish: 'bg-orange-100 text-orange-700',
+  neutral: 'bg-gray-100 text-gray-600',
+};
+const SENTIMENT_LABEL: Record<string, string> = {
+  hawkish: '매파', dovish: '비둘기파', bullish: '강세', bearish: '약세', neutral: '중립',
+};
+
+// ── Tab: Social (key figures) ─────────────────────────────────────────────────
+interface SocialEntry {
+  person: string; role: string; flag: string; tag: string;
+  title: string; summary: string; source: string; url: string;
+  publishedAt: string; sentiment: string; impact: string;
+}
+function SocialTab() {
+  const [data, setData] = useState<SocialEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>('all');
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const res = await fetch('/api/osint/social');
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setData(json.entries ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '로드 실패');
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const people = ['all', ...Array.from(new Set<string>(data.map(e => e.tag)))];
+  const filtered = filter === 'all' ? data : data.filter(e => e.tag === filter);
+
   return (
-    <div className="cf-card flex items-center gap-3 mt-4">
-      <Loader2 className="w-5 h-5 text-cf-primary animate-spin shrink-0" />
-      <p className="text-sm text-cf-text-secondary">{message}</p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-cf-text-secondary">
+          주요 인물 최신 발언·뉴스 자동 수집 · 30분 캐시
+        </p>
+        <button onClick={load} className="flex items-center gap-1 text-xs text-cf-primary hover:underline">
+          <RefreshCw className="w-3 h-3" /> 새로고침
+        </button>
+      </div>
+
+      {/* Filter chips */}
+      <div className="flex flex-wrap gap-2">
+        {people.map(p => (
+          <button
+            key={p}
+            onClick={() => setFilter(p)}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              filter === p ? 'bg-cf-primary text-white' : 'bg-white border border-cf-border text-cf-text-secondary hover:border-cf-primary/40'
+            }`}
+          >
+            {p === 'all' ? '전체' : p}
+          </button>
+        ))}
+      </div>
+
+      {loading && <LoadingCard msg="주요 인물 발언 수집 중..." />}
+      {error && <ErrorCard msg={error} />}
+
+      {!loading && filtered.length === 0 && !error && (
+        <div className="text-center py-10 text-cf-text-secondary text-sm">현재 관련 뉴스 없음</div>
+      )}
+
+      <div className="grid gap-3">
+        {filtered.map((entry, i) => (
+          <a
+            key={i}
+            href={entry.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cf-card hover:border-cf-primary/30 hover:shadow-md transition-all group block"
+          >
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{entry.flag}</span>
+                <div>
+                  <p className="text-sm font-semibold text-cf-text-primary group-hover:text-cf-primary">
+                    {entry.person}
+                  </p>
+                  <p className="text-xs text-cf-text-secondary">{entry.role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {entry.impact === 'high' && (
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-red-100 text-red-600 font-medium">HIGH</span>
+                )}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${SENTIMENT_STYLE[entry.sentiment] ?? SENTIMENT_STYLE.neutral}`}>
+                  {SENTIMENT_LABEL[entry.sentiment] ?? entry.sentiment}
+                </span>
+              </div>
+            </div>
+            <p className="text-sm font-medium text-cf-text-primary leading-snug mb-1">{entry.title}</p>
+            {entry.summary && (
+              <p className="text-xs text-cf-text-secondary line-clamp-2">{entry.summary}</p>
+            )}
+            <div className="flex items-center gap-2 mt-2 text-xs text-cf-text-secondary">
+              <Newspaper className="w-3 h-3" />
+              <span>{entry.source}</span>
+              <span>·</span>
+              <span>{new Date(entry.publishedAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              <ExternalLink className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
 
-// ── Tab: Crypto ────────────────────────────────────────────────────────────────
+// ── Tab: Crypto (notable wallets + search) ────────────────────────────────────
+const NOTABLE_WALLETS = [
+  { label: 'Satoshi Genesis', address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', chain: 'btc' as const, note: '비트코인 최초 블록 채굴 주소' },
+  { label: 'Binance Cold', address: '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo', chain: 'btc' as const, note: '바이낸스 콜드 월렛' },
+  { label: 'Ethereum Foundation', address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', chain: 'eth' as const, note: '이더리움 재단 공식 주소' },
+  { label: 'Vitalik Buterin', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', chain: 'eth' as const, note: 'Vitalik 개인 지갑' },
+  { label: 'US DOJ Seized BTC', address: '1HQ3Go3ggs8pFnXuHVHRytPCq5fGG8Hbhx', chain: 'btc' as const, note: '미 법무부 압수 비트코인' },
+];
+
+interface CryptoResult {
+  chain: 'eth' | 'btc'; address: string; balance: number;
+  totalReceived: number; totalSent: number; txCount: number;
+  recentTxs: Array<{ hash: string; time: string; value: number; direction: 'in' | 'out' }>;
+  riskFlags: string[]; error?: string;
+}
+
 function CryptoTab() {
+  const [walletData, setWalletData] = useState<Record<string, CryptoResult | 'loading' | 'error'>>({});
   const [address, setAddress] = useState('');
   const [chainParam, setChainParam] = useState<'auto' | 'eth' | 'btc'>('auto');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<CryptoResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [searchResult, setSearchResult] = useState<CryptoResult | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Auto-load notable wallets
+  useEffect(() => {
+    NOTABLE_WALLETS.forEach(async (w) => {
+      setWalletData(prev => ({ ...prev, [w.address]: 'loading' }));
+      try {
+        const res = await fetch(`/api/osint/crypto?address=${encodeURIComponent(w.address)}&chain=${w.chain}`);
+        const data = await res.json();
+        setWalletData(prev => ({ ...prev, [w.address]: data.error ? 'error' : data }));
+      } catch {
+        setWalletData(prev => ({ ...prev, [w.address]: 'error' }));
+      }
+    });
+  }, []);
 
   const search = useCallback(async () => {
     if (!address.trim()) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
+    setSearching(true); setSearchError(null); setSearchResult(null);
     try {
-      const res = await fetch(
-        `/api/osint/crypto?address=${encodeURIComponent(address.trim())}&chain=${chainParam}`
-      );
+      const res = await fetch(`/api/osint/crypto?address=${encodeURIComponent(address.trim())}&chain=${chainParam}`);
       const data = await res.json();
-      if (!res.ok || data.error) {
-        setError(data.error ?? '알 수 없는 오류가 발생했습니다');
-      } else {
-        setResult(data as CryptoResult);
-      }
-    } catch {
-      setError('네트워크 오류: 요청에 실패했습니다');
-    } finally {
-      setLoading(false);
-    }
+      if (data.error) setSearchError(data.error); else setSearchResult(data);
+    } catch { setSearchError('네트워크 오류'); }
+    finally { setSearching(false); }
   }, [address, chainParam]);
-
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') search();
-  };
-
-  const ticker = result?.chain === 'eth' ? 'ETH' : 'BTC';
 
   return (
     <div className="space-y-6">
-      {/* Input */}
-      <div className="cf-card space-y-4">
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            onKeyDown={handleKey}
-            placeholder="지갑 주소 입력 (ETH: 0x... / BTC: 1... 3... bc1...)"
-            className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border"
-          />
-          <button
-            onClick={search}
-            disabled={loading || !address.trim()}
-            className="cf-btn-primary flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            분석
-          </button>
-        </div>
-
-        {/* Chain selector */}
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-cf-text-secondary font-medium">체인 선택:</span>
-          {(['auto', 'eth', 'btc'] as const).map((c) => (
-            <label key={c} className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="radio"
-                name="chain"
-                value={c}
-                checked={chainParam === c}
-                onChange={() => setChainParam(c)}
-                className="accent-cf-primary"
-              />
-              <span className="text-sm text-cf-text-primary">
-                {c === 'auto' ? '자동 감지' : c.toUpperCase()}
-              </span>
-            </label>
-          ))}
+      {/* Notable wallets */}
+      <div>
+        <h3 className="text-sm font-semibold text-cf-text-primary mb-3 flex items-center gap-2">
+          <Bitcoin className="w-4 h-4 text-amber-500" /> 주목할 지갑
+        </h3>
+        <div className="grid gap-3">
+          {NOTABLE_WALLETS.map((w) => {
+            const d = walletData[w.address];
+            const result = typeof d === 'object' && d !== null ? d : null;
+            const ticker = w.chain === 'eth' ? 'ETH' : 'BTC';
+            return (
+              <div key={w.address} className="cf-card">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${w.chain === 'eth' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {ticker}
+                      </span>
+                      <p className="text-sm font-semibold text-cf-text-primary">{w.label}</p>
+                    </div>
+                    <p className="text-xs text-cf-text-secondary mt-0.5">{w.note}</p>
+                  </div>
+                  <a
+                    href={explorerAddr(w.chain, w.address)}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-cf-primary hover:text-cf-primary/70"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+                <p className="font-mono text-xs text-cf-text-secondary bg-gray-50 rounded px-2 py-1 mb-2 truncate">{w.address}</p>
+                {d === 'loading' && (
+                  <div className="flex items-center gap-2 text-xs text-cf-text-secondary">
+                    <Loader2 className="w-3 h-3 animate-spin" /> 잔고 조회 중...
+                  </div>
+                )}
+                {d === 'error' && <p className="text-xs text-red-500">조회 실패</p>}
+                {result && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: '잔고', value: `${fmt(result.balance)} ${ticker}` },
+                      { label: '거래 수', value: result.txCount.toLocaleString() },
+                      { label: '리스크', value: result.riskFlags.length > 0 ? '⚠️ ' + result.riskFlags[0] : '✅ 없음' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="text-center bg-gray-50 rounded p-2">
+                        <p className="text-xs text-cf-text-secondary">{label}</p>
+                        <p className="text-xs font-semibold text-cf-text-primary mt-0.5 break-all">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {loading && <LoadingCard message="블록체인 데이터 조회 중..." />}
-      {error && <ErrorCard message={error} />}
-
-      {result && (
-        <div className="space-y-4">
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: '잔고', value: `${fmt(result.balance)} ${ticker}` },
-              { label: '총 수신', value: `${fmt(result.totalReceived)} ${ticker}` },
-              { label: '총 송신', value: `${fmt(result.totalSent)} ${ticker}` },
-              { label: '거래 수', value: result.txCount.toLocaleString() },
-            ].map(({ label, value }) => (
-              <div key={label} className="cf-card text-center">
-                <p className="text-xs text-cf-text-secondary mb-1">{label}</p>
-                <p className="font-mono text-sm font-semibold text-cf-text-primary break-all">{value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Risk flags */}
-          {result.riskFlags.length > 0 && (
-            <div className="cf-card border-amber-200 bg-amber-50">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                <span className="text-sm font-semibold text-amber-700">위험 신호 감지</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {result.riskFlags.map((flag) => (
-                  <span
-                    key={flag}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200"
-                  >
-                    {flag}
-                  </span>
+      {/* Search */}
+      <div className="cf-card space-y-3">
+        <h3 className="text-sm font-semibold text-cf-text-primary">직접 주소 분석</h3>
+        <div className="flex gap-2">
+          <input
+            type="text" value={address}
+            onChange={e => setAddress(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && search()}
+            placeholder="지갑 주소 (ETH: 0x... / BTC: 1...bc1...)"
+            className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
+          />
+          <button onClick={search} disabled={searching || !address.trim()}
+            className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
+            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            분석
+          </button>
+        </div>
+        <div className="flex gap-3 text-sm">
+          {(['auto', 'eth', 'btc'] as const).map(c => (
+            <label key={c} className="flex items-center gap-1 cursor-pointer">
+              <input type="radio" checked={chainParam === c} onChange={() => setChainParam(c)} className="accent-cf-primary" />
+              {c === 'auto' ? '자동' : c.toUpperCase()}
+            </label>
+          ))}
+        </div>
+        {searching && <LoadingCard msg="블록체인 조회 중..." />}
+        {searchError && <ErrorCard msg={searchError} />}
+        {searchResult && (
+          <div className="space-y-2 pt-2 border-t border-cf-border">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {[
+                { label: '잔고', value: `${fmt(searchResult.balance)} ${searchResult.chain.toUpperCase()}` },
+                { label: '총 수신', value: fmt(searchResult.totalReceived) },
+                { label: '총 송신', value: fmt(searchResult.totalSent) },
+                { label: '거래 수', value: searchResult.txCount.toLocaleString() },
+              ].map(({ label, value }) => (
+                <div key={label} className="text-center bg-gray-50 rounded-lg p-3">
+                  <p className="text-xs text-cf-text-secondary">{label}</p>
+                  <p className="text-sm font-semibold font-mono mt-1">{value}</p>
+                </div>
+              ))}
+            </div>
+            {searchResult.riskFlags.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                {searchResult.riskFlags.map(f => (
+                  <span key={f} className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs">{f}</span>
                 ))}
               </div>
-            </div>
-          )}
-
-          {result.riskFlags.length === 0 && (
-            <div className="cf-card flex items-center gap-2 text-green-700 bg-green-50 border-green-200">
-              <CheckCircle className="w-4 h-4" />
-              <span className="text-sm">위험 신호 없음</span>
-            </div>
-          )}
-
-          {/* Recent transactions */}
-          {result.recentTxs.length > 0 && (
-            <div className="cf-card">
-              <h3 className="text-sm font-semibold text-cf-text-primary mb-3">최근 거래 내역</h3>
+            )}
+            {searchResult.riskFlags.length === 0 && (
+              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg text-green-700 text-sm">
+                <CheckCircle className="w-4 h-4" /> 위험 신호 없음
+              </div>
+            )}
+            {searchResult.recentTxs?.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-cf-text-secondary border-b border-cf-border">
-                      <th className="text-left py-2 pr-4 font-medium">해시</th>
-                      <th className="text-left py-2 pr-4 font-medium">시간</th>
-                      <th className="text-right py-2 pr-4 font-medium">금액</th>
-                      <th className="text-center py-2 font-medium">방향</th>
+                      <th className="text-left py-2 pr-3">해시</th>
+                      <th className="text-left py-2 pr-3">시간</th>
+                      <th className="text-right py-2 pr-3">금액</th>
+                      <th className="text-center py-2">방향</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {result.recentTxs.map((tx) => (
-                      <tr key={tx.hash} className="border-b border-cf-border/50 hover:bg-cf-border/20">
-                        <td className="py-2 pr-4">
-                          <a
-                            href={getExplorerTxUrl(result.chain, tx.hash)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono text-cf-primary hover:underline"
-                          >
-                            {truncateHash(tx.hash)}
-                          </a>
+                    {searchResult.recentTxs.map(tx => (
+                      <tr key={tx.hash} className="border-b border-cf-border/40">
+                        <td className="py-2 pr-3">
+                          <a href={explorerTx(searchResult.chain, tx.hash)} target="_blank" rel="noopener noreferrer"
+                            className="font-mono text-cf-primary hover:underline">{truncateHash(tx.hash)}</a>
                         </td>
-                        <td className="py-2 pr-4 text-cf-text-secondary">
-                          {new Date(tx.time).toLocaleString('ko-KR', {
-                            month: 'short', day: 'numeric',
-                            hour: '2-digit', minute: '2-digit',
-                          })}
-                        </td>
-                        <td className="py-2 pr-4 text-right font-mono">
-                          {fmt(tx.value)} {ticker}
-                        </td>
+                        <td className="py-2 pr-3 text-cf-text-secondary">{new Date(tx.time).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                        <td className="py-2 pr-3 text-right font-mono">{fmt(tx.value)}</td>
                         <td className="py-2 text-center">
-                          {tx.direction === 'in' ? (
-                            <span className="inline-flex items-center gap-0.5 text-green-600">
-                              <ArrowDownRight className="w-3.5 h-3.5" />
-                              수신
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-0.5 text-red-500">
-                              <ArrowUpRight className="w-3.5 h-3.5" />
-                              송신
-                            </span>
-                          )}
+                          {tx.direction === 'in'
+                            ? <span className="text-green-600 flex items-center justify-center gap-0.5"><ArrowDownRight className="w-3 h-3" />수신</span>
+                            : <span className="text-red-500 flex items-center justify-center gap-0.5"><ArrowUpRight className="w-3 h-3" />송신</span>}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-          )}
-
-          {/* External links */}
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={getExplorerAddressUrl(result.chain, result.address)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cf-btn-secondary flex items-center gap-2 px-4 py-2 rounded-lg border border-cf-border text-sm"
-            >
-              <ExternalLink className="w-4 h-4" />
-              {result.chain === 'eth' ? 'Etherscan에서 보기' : 'Blockchain.com에서 보기'}
-            </a>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-// ── Tab: Sanctions ─────────────────────────────────────────────────────────────
+// ── Tab: Sanctions ────────────────────────────────────────────────────────────
+interface SdnEntry { name: string; type: string; program: string; remarks: string; entNum: string }
+interface SanctionsGroup { label: string; color: string; entries: SdnEntry[] }
+
+const PROG_COLOR: Record<string, string> = {
+  RUSSIA: 'red', IRAN: 'orange', DPRK: 'yellow', SDGT: 'red', CYBER2: 'purple', CHINA: 'blue',
+};
+const BADGE_STYLE: Record<string, string> = {
+  red: 'bg-red-100 text-red-700 border-red-200',
+  orange: 'bg-orange-100 text-orange-700 border-orange-200',
+  yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  purple: 'bg-purple-100 text-purple-700 border-purple-200',
+  blue: 'bg-blue-100 text-blue-700 border-blue-200',
+};
+
 function SanctionsTab() {
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SanctionsResult | null>(null);
+  const [groups, setGroups] = useState<Record<string, SanctionsGroup>>({});
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [searchResult, setSearchResult] = useState<SdnEntry[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/osint/sanctions?featured=true')
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) throw new Error(d.error);
+        setGroups(d.groups ?? {});
+        setTotal(d.totalEntries ?? 0);
+        const keys = Object.keys(d.groups ?? {});
+        if (keys.length) setActiveGroup(keys[0]);
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const search = useCallback(async () => {
     if (!query.trim()) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
+    setSearching(true); setSearchResult(null);
     try {
       const res = await fetch(`/api/osint/sanctions?q=${encodeURIComponent(query.trim())}`);
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? '알 수 없는 오류');
-      } else {
-        setResult(data as SanctionsResult);
-        if (data.error) setError(data.error);
-      }
-    } catch {
-      setError('네트워크 오류: 요청에 실패했습니다');
-    } finally {
-      setLoading(false);
-    }
+      const d = await res.json();
+      setSearchResult(d.matches ?? []);
+    } catch { /* silent */ }
+    finally { setSearching(false); }
   }, [query]);
 
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') search();
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="cf-card flex gap-3">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKey}
-          placeholder="인물/기업명 검색 (영문, 예: PUTIN, ROSNEFT)"
-          className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border"
-        />
-        <button
-          onClick={search}
-          disabled={loading || !query.trim()}
-          className="cf-btn-primary flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-          조회
-        </button>
-      </div>
-
-      {loading && <LoadingCard message="OFAC SDN 명단 검색 중 (최초 로딩 시 시간이 걸릴 수 있습니다)..." />}
-      {error && <ErrorCard message={error} />}
-
-      {result && !error && (
-        <div className="space-y-4">
-          {result.matches.length === 0 ? (
-            <div className="cf-card flex items-center gap-3 text-green-700 bg-green-50 border-green-200">
-              <CheckCircle className="w-5 h-5" />
-              <div>
-                <p className="font-medium text-sm">검색 결과 없음 — 제재 명단에 없습니다 ✓</p>
-                <p className="text-xs mt-0.5 text-green-600">
-                  &quot;{query}&quot; 은(는) OFAC SDN 명단에서 발견되지 않았습니다
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-cf-text-secondary">
-                  {result.total}건 검색됨
-                </p>
-                <span className="text-xs text-cf-text-secondary">
-                  기준: {new Date(result.updatedAt).toLocaleString('ko-KR')}
-                </span>
-              </div>
-
-              <div className="cf-card overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-cf-text-secondary border-b border-cf-border text-xs">
-                      <th className="text-left py-2 pr-4 font-medium">이름</th>
-                      <th className="text-left py-2 pr-4 font-medium">유형</th>
-                      <th className="text-left py-2 pr-4 font-medium">제재 프로그램</th>
-                      <th className="text-left py-2 font-medium">비고</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.matches.map((match, idx) => (
-                      <tr key={`${match.entNum}-${idx}`} className="border-b border-cf-border/50 hover:bg-red-50/30">
-                        <td className="py-2.5 pr-4 font-medium text-cf-text-primary">{match.name}</td>
-                        <td className="py-2.5 pr-4">
-                          <span className="px-2 py-0.5 rounded text-xs bg-red-100 text-red-700">
-                            {match.type || '-'}
-                          </span>
-                        </td>
-                        <td className="py-2.5 pr-4 text-cf-text-secondary text-xs">{match.program || '-'}</td>
-                        <td className="py-2.5 text-cf-text-secondary text-xs max-w-xs truncate">
-                          {match.remarks || '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-
-          <div className="flex items-center gap-2 text-xs text-cf-text-secondary">
-            <Shield className="w-3.5 h-3.5" />
-            <span>OFAC SDN 기준 · 미국 재무부 해외자산통제국 (Office of Foreign Assets Control)</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Tab: Corporate ─────────────────────────────────────────────────────────────
-function CorporateTab() {
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<CorporateResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const search = useCallback(async () => {
-    if (!query.trim()) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    try {
-      const res = await fetch(`/api/osint/corporate?q=${encodeURIComponent(query.trim())}`);
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? '알 수 없는 오류');
-      } else {
-        setResult(data as CorporateResult);
-        if (data.error) setError(data.error);
-      }
-    } catch {
-      setError('네트워크 오류: 요청에 실패했습니다');
-    } finally {
-      setLoading(false);
-    }
-  }, [query]);
-
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') search();
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="cf-card space-y-3">
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKey}
-            placeholder="기업명 검색 (예: Gazprom, Alibaba, Samsung)"
-            className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border"
-          />
-          <button
-            onClick={search}
-            disabled={loading || !query.trim()}
-            className="cf-btn-primary flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            검색
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href={`https://offshoreleaks.icij.org/search?q=${encodeURIComponent(query)}&e=&c=&j=`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cf-btn-secondary flex items-center gap-2 px-3 py-1.5 rounded-lg border border-cf-border text-xs"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            ICIJ Offshore Leaks에서 검색
-          </a>
-        </div>
-      </div>
-
-      {loading && <LoadingCard message="OpenCorporates 검색 중..." />}
-      {error && <ErrorCard message={error} />}
-
-      {result && (
-        <div className="space-y-4">
-          {result.companies.length === 0 ? (
-            <div className="cf-card text-center py-8 text-cf-text-secondary">
-              <Building2 className="w-8 h-8 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">검색 결과가 없습니다</p>
-              <p className="text-xs mt-1">다른 키워드나 영문 사명으로 시도해보세요</p>
-            </div>
-          ) : (
-            <>
-              <p className="text-sm text-cf-text-secondary">
-                {result.total.toLocaleString()}건 검색됨 (상위 5건 표시)
-              </p>
-              <div className="grid gap-3">
-                {result.companies.map((company, idx) => (
-                  <div key={`${company.number}-${idx}`} className="cf-card space-y-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h4 className="font-semibold text-cf-text-primary text-sm">{company.name}</h4>
-                        <p className="text-xs text-cf-text-secondary mt-0.5">
-                          {getJurisdictionFlag(company.jurisdiction)}{' '}
-                          <span className="uppercase">{company.jurisdiction}</span>
-                          {company.number && <> · #{company.number}</>}
-                        </p>
-                      </div>
-                      <a
-                        href={company.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="shrink-0 text-cf-primary hover:text-cf-primary/80"
-                        title="OpenCorporates에서 보기"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                      {company.type && (
-                        <div>
-                          <span className="text-cf-text-secondary">유형: </span>
-                          <span className="text-cf-text-primary">{company.type}</span>
-                        </div>
-                      )}
-                      {company.incorporated && (
-                        <div>
-                          <span className="text-cf-text-secondary">설립: </span>
-                          <span className="text-cf-text-primary">{company.incorporated}</span>
-                        </div>
-                      )}
-                      {company.dissolved && (
-                        <div>
-                          <span className="text-cf-text-secondary">해산: </span>
-                          <span className="text-red-600">{company.dissolved}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {company.address && (
-                      <p className="text-xs text-cf-text-secondary truncate">
-                        📍 {company.address}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          <p className="text-xs text-cf-text-secondary flex items-center gap-1">
-            <Globe className="w-3.5 h-3.5" />
-            출처: OpenCorporates · 전 세계 기업 등록 정보
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Tab: Guide ─────────────────────────────────────────────────────────────────
-function GuideTab() {
-  const methods = [
-    {
-      icon: <Building2 className="w-5 h-5 text-blue-500" />,
-      title: '기업 구조 추적',
-      description:
-        '페이퍼 컴퍼니, 쉘 컴퍼니, 신탁 구조를 통해 숨겨진 자산 소유권을 역추적합니다. OpenCorporates와 ICIJ Offshore Leaks 데이터베이스를 활용하면 케이맨 제도, 버진아일랜드 등 조세피난처에 등록된 법인을 조회할 수 있습니다.',
-      links: [
-        { label: 'OpenCorporates', url: 'https://opencorporates.com' },
-        { label: 'ICIJ Offshore Leaks', url: 'https://offshoreleaks.icij.org' },
-      ],
-    },
-    {
-      icon: <Bitcoin className="w-5 h-5 text-amber-500" />,
-      title: '블록체인 분석',
-      description:
-        '암호화폐는 익명성을 표방하지만 블록체인의 모든 거래는 공개 장부에 영구적으로 기록됩니다. 지갑 클러스터링, 거래소 입출금 패턴, 스머핑(소액 분산 송금)을 통해 자금 출처와 목적지를 추적할 수 있습니다.',
-      links: [
-        { label: 'Etherscan', url: 'https://etherscan.io' },
-        { label: 'Blockchain.com Explorer', url: 'https://www.blockchain.com/explorer' },
-      ],
-    },
-    {
-      icon: <Shield className="w-5 h-5 text-red-500" />,
-      title: '제재 명단 조회',
-      description:
-        'OFAC SDN(특별지정국민) 명단은 미국 재무부가 금융 거래를 금지한 개인·기업·선박 목록입니다. 거래 상대방 실사(KYC/AML) 및 규정 준수에 필수적이며, 이름·프로그램·비고 등을 기반으로 검색 가능합니다.',
-      links: [
-        { label: 'OFAC SDN 공식', url: 'https://sanctionssearch.ofac.treas.gov' },
-        { label: 'UN 제재 명단', url: 'https://scsanctions.un.org/consolidated' },
-      ],
-    },
-    {
-      icon: <Globe className="w-5 h-5 text-green-500" />,
-      title: '실물자산 추적',
-      description:
-        '부동산, 요트, 전용기 등 실물자산은 공개 등기 기록이나 항적 데이터로 소유자를 확인할 수 있습니다. 부동산은 각국 등기소, 항공기는 FAA·ICAO, 선박은 IMO·AIS 데이터를 활용합니다.',
-      links: [
-        { label: 'Flightradar24 (항공)', url: 'https://www.flightradar24.com' },
-        { label: 'MarineTraffic (선박)', url: 'https://www.marinetraffic.com' },
-      ],
-    },
-    {
-      icon: <BookOpen className="w-5 h-5 text-purple-500" />,
-      title: '공개 기록 활용',
-      description:
-        '법원 판결문, SEC/금융감독원 공시, 기업 등기 자료, 언론 보도는 모두 OSINT의 핵심 소스입니다. EDGAR(SEC 공시), PACER(미국 연방 법원 기록), 각국 기업 등록소를 통해 법적·재무 관계를 파악할 수 있습니다.',
-      links: [
-        { label: 'SEC EDGAR', url: 'https://www.sec.gov/edgar' },
-        { label: 'OpenSanctions', url: 'https://www.opensanctions.org' },
-      ],
-    },
-  ];
+  const currentGroup = activeGroup ? groups[activeGroup] : null;
 
   return (
     <div className="space-y-4">
-      <div className="cf-card bg-slate-50 border-slate-200">
-        <p className="text-sm text-cf-text-secondary leading-relaxed">
-          OSINT(Open Source Intelligence)는 공개적으로 접근 가능한 정보를 수집·분석하는 정보 수집 방법론입니다.
-          금융 범죄 수사, 기업 실사, 저널리즘, 규정 준수 등 합법적 목적에 활용됩니다.
-        </p>
+      <div className="flex items-center justify-between text-xs text-cf-text-secondary">
+        <div className="flex items-center gap-2">
+          <Shield className="w-3.5 h-3.5" />
+          <span>OFAC SDN 명단 · 총 {total.toLocaleString()}개 제재 대상</span>
+        </div>
+        <span className="text-green-600 font-medium">24시간 자동 갱신</span>
       </div>
 
-      <div className="grid gap-4">
-        {methods.map((method) => (
-          <div key={method.title} className="cf-card space-y-3">
-            <div className="flex items-center gap-3">
-              {method.icon}
-              <h3 className="font-semibold text-cf-text-primary">{method.title}</h3>
-            </div>
-            <p className="text-sm text-cf-text-secondary leading-relaxed">{method.description}</p>
-            <div className="flex flex-wrap gap-2">
-              {method.links.map((link) => (
-                <a
-                  key={link.url}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-cf-primary hover:text-cf-primary/80 border border-cf-primary/30 rounded px-2.5 py-1 hover:bg-cf-primary/5 transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  {link.label}
-                </a>
-              ))}
-            </div>
+      {loading && <LoadingCard msg="OFAC 제재 명단 로딩 중 (최초 로딩은 시간이 걸림)..." />}
+      {error && <ErrorCard msg={error} />}
+
+      {!loading && !error && (
+        <>
+          {/* Group tabs */}
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(groups).map(([key, g]) => (
+              <button key={key} onClick={() => setActiveGroup(key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  activeGroup === key
+                    ? `${BADGE_STYLE[PROG_COLOR[key] ?? 'red']} font-semibold`
+                    : 'bg-white border-cf-border text-cf-text-secondary hover:border-cf-primary/30'
+                }`}>
+                {g.label} ({g.entries.length})
+              </button>
+            ))}
           </div>
+
+          {/* Entries */}
+          {currentGroup && (
+            <div className="cf-card overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-cf-text-secondary border-b border-cf-border">
+                    <th className="text-left py-2 pr-4 font-medium">이름</th>
+                    <th className="text-left py-2 pr-4 font-medium">유형</th>
+                    <th className="text-left py-2 pr-4 font-medium">프로그램</th>
+                    <th className="text-left py-2 font-medium hidden md:table-cell">비고</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentGroup.entries.map((e, i) => (
+                    <tr key={i} className="border-b border-cf-border/40 hover:bg-red-50/20">
+                      <td className="py-2 pr-4 font-medium text-cf-text-primary text-xs">{e.name}</td>
+                      <td className="py-2 pr-4 text-xs">
+                        <span className={`px-1.5 py-0.5 rounded text-xs border ${BADGE_STYLE[PROG_COLOR[activeGroup ?? ''] ?? 'red']}`}>
+                          {e.type || '-'}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-4 text-xs text-cf-text-secondary">{e.program}</td>
+                      <td className="py-2 text-xs text-cf-text-secondary max-w-[200px] truncate hidden md:table-cell">{e.remarks || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Search */}
+          <div className="cf-card space-y-3">
+            <p className="text-sm font-medium text-cf-text-primary">인물/기업 직접 검색</p>
+            <div className="flex gap-2">
+              <input value={query} onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && search()}
+                placeholder="예: PUTIN, ROSNEFT, SAMSUNG"
+                className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
+              />
+              <button onClick={search} disabled={searching || !query.trim()}
+                className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
+                {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                검색
+              </button>
+            </div>
+            {searchResult !== null && (
+              searchResult.length === 0
+                ? <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-3">
+                    <CheckCircle className="w-4 h-4" /> 제재 명단에 없음 ✓
+                  </div>
+                : <div className="space-y-2">
+                    {searchResult.map((e, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                        <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-cf-text-primary">{e.name}</p>
+                          <p className="text-xs text-cf-text-secondary">{e.program} · {e.type}</p>
+                          {e.remarks && <p className="text-xs text-cf-text-secondary mt-0.5">{e.remarks}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Tab: Corporate ────────────────────────────────────────────────────────────
+const FEATURED_QUERIES = [
+  { label: 'Gazprom', desc: '러시아 국영 가스 기업' },
+  { label: 'Wagner Group', desc: '러시아 민간 군사 기업' },
+  { label: 'Alibaba', desc: '중국 기술 대기업' },
+  { label: 'Huawei', desc: '미국 제재 대상 통신 기업' },
+];
+
+interface CorporateCompany {
+  name: string; number: string; jurisdiction: string;
+  incorporated: string | null; dissolved: string | null;
+  type: string | null; address: string | null; url: string;
+}
+interface CorporateResult { companies: CorporateCompany[]; total: number; source: string; error?: string }
+
+const J_FLAGS: Record<string, string> = {
+  us: '🇺🇸', gb: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', jp: '🇯🇵', cn: '🇨🇳',
+  kr: '🇰🇷', sg: '🇸🇬', hk: '🇭🇰', ch: '🇨🇭', ky: '🇰🇾', vg: '🇻🇬',
+  pa: '🇵🇦', bm: '🇧🇲', ie: '🇮🇪', nl: '🇳🇱', lu: '🇱🇺', cy: '🇨🇾',
+};
+function jFlag(code: string) { return J_FLAGS[code?.slice(0, 2).toLowerCase()] ?? '🌐'; }
+
+function CorporateTab() {
+  const [results, setResults] = useState<Record<string, CorporateResult>>({});
+  const [loadingKeys, setLoadingKeys] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState('');
+  const [searchResult, setSearchResult] = useState<CorporateResult | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [active, setActive] = useState<string>(FEATURED_QUERIES[0].label);
+
+  useEffect(() => {
+    FEATURED_QUERIES.forEach(async ({ label }) => {
+      setLoadingKeys(prev => { const s = new Set<string>(Array.from(prev)); s.add(label); return s; });
+      try {
+        const res = await fetch(`/api/osint/corporate?q=${encodeURIComponent(label)}`);
+        const d = await res.json();
+        setResults(prev => ({ ...prev, [label]: d }));
+      } catch { /* silent */ }
+      finally { setLoadingKeys(prev => { const s = new Set<string>(Array.from(prev)); s.delete(label); return s; }); }
+    });
+  }, []);
+
+  const search = useCallback(async () => {
+    if (!query.trim()) return;
+    setSearching(true); setSearchResult(null);
+    try {
+      const res = await fetch(`/api/osint/corporate?q=${encodeURIComponent(query.trim())}`);
+      const d = await res.json();
+      setSearchResult(d);
+      setActive('__search__');
+    } catch { /* silent */ }
+    finally { setSearching(false); }
+  }, [query]);
+
+  const activeResult = active === '__search__' ? searchResult : (results[active] ?? null);
+  const isLoading = active !== '__search__' && loadingKeys.has(active);
+
+  return (
+    <div className="space-y-4">
+      <div className="text-xs text-cf-text-secondary">
+        OpenCorporates · 전 세계 {'>'}200개국 기업 등록 정보
+      </div>
+
+      {/* Featured tabs */}
+      <div className="flex flex-wrap gap-2">
+        {FEATURED_QUERIES.map(({ label, desc }) => (
+          <button key={label} onClick={() => setActive(label)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+              active === label ? 'bg-cf-primary text-white border-cf-primary' : 'bg-white border-cf-border text-cf-text-secondary hover:border-cf-primary/30'
+            }`}>
+            {label}
+            <span className="hidden md:inline text-xs opacity-70"> · {desc}</span>
+          </button>
         ))}
       </div>
 
-      {/* All external links section */}
-      <div className="cf-card">
-        <h3 className="text-sm font-semibold text-cf-text-primary mb-3 flex items-center gap-2">
-          <ExternalLink className="w-4 h-4" />
-          주요 OSINT 리소스 모음
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            { label: 'ICIJ Offshore Leaks', url: 'https://offshoreleaks.icij.org', desc: '조세피난처 기업 DB' },
-            { label: 'OpenCorporates', url: 'https://opencorporates.com', desc: '전 세계 기업 등록' },
-            { label: 'Etherscan', url: 'https://etherscan.io', desc: 'ETH 블록체인' },
-            { label: 'OFAC SDN Search', url: 'https://sanctionssearch.ofac.treas.gov', desc: '미국 제재 명단' },
-            { label: 'Flightradar24', url: 'https://www.flightradar24.com', desc: '실시간 항공 추적' },
-            { label: 'MarineTraffic', url: 'https://www.marinetraffic.com', desc: '실시간 선박 추적' },
-          ].map((res) => (
-            <a
-              key={res.url}
-              href={res.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col gap-0.5 p-3 rounded-lg border border-cf-border hover:border-cf-primary/40 hover:bg-cf-primary/5 transition-colors group"
-            >
-              <span className="text-xs font-medium text-cf-text-primary group-hover:text-cf-primary">
-                {res.label}
-              </span>
-              <span className="text-xs text-cf-text-secondary">{res.desc}</span>
-            </a>
+      {isLoading && <LoadingCard msg="기업 정보 조회 중..." />}
+      {!isLoading && activeResult && (
+        <div className="space-y-3">
+          <p className="text-xs text-cf-text-secondary">{activeResult.total?.toLocaleString()}건 · 상위 5건 표시</p>
+          {activeResult.companies?.length === 0 && (
+            <div className="text-center py-8 text-cf-text-secondary text-sm">검색 결과 없음</div>
+          )}
+          {activeResult.companies?.map((c, i) => (
+            <div key={i} className="cf-card space-y-2">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-cf-text-primary">{c.name}</p>
+                  <p className="text-xs text-cf-text-secondary mt-0.5">
+                    {jFlag(c.jurisdiction)} {c.jurisdiction?.toUpperCase()} {c.number ? `· #${c.number}` : ''}
+                  </p>
+                </div>
+                <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-cf-primary">
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+              <div className="flex flex-wrap gap-3 text-xs text-cf-text-secondary">
+                {c.type && <span>유형: {c.type}</span>}
+                {c.incorporated && <span>설립: {c.incorporated}</span>}
+                {c.dissolved && <span className="text-red-600">해산: {c.dissolved}</span>}
+              </div>
+              {c.address && <p className="text-xs text-cf-text-secondary">📍 {c.address}</p>}
+            </div>
           ))}
         </div>
+      )}
+
+      {/* Search */}
+      <div className="cf-card space-y-3">
+        <p className="text-sm font-medium">기업 직접 검색</p>
+        <div className="flex gap-2">
+          <input value={query} onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && search()}
+            placeholder="기업명 (예: Samsung, Baidu, Rosneft)"
+            className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
+          />
+          <button onClick={search} disabled={searching || !query.trim()}
+            className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
+            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            검색
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <a href={`https://offshoreleaks.icij.org/search?q=${encodeURIComponent(query)}`}
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1 text-xs text-cf-primary border border-cf-primary/30 rounded px-2.5 py-1 hover:bg-cf-primary/5">
+            <ExternalLink className="w-3 h-3" /> ICIJ Offshore Leaks
+          </a>
+          <a href={`https://opencorporates.com/companies?q=${encodeURIComponent(query)}`}
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1 text-xs text-cf-primary border border-cf-primary/30 rounded px-2.5 py-1 hover:bg-cf-primary/5">
+            <Globe className="w-3 h-3" /> OpenCorporates
+          </a>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ── Tab: Guide ────────────────────────────────────────────────────────────────
+function GuideTab() {
+  const methods = [
+    { icon: <MessageSquare className="w-5 h-5 text-sky-500" />, title: '주요 인물 발언 추적', desc: '트럼프·파월·머스크 등 시장 영향력 있는 인물의 최근 발언을 뉴스 피드에서 자동 수집합니다. 발언 성격(매파/비둘기파/강세/약세)을 AI가 자동 분류합니다.', links: [{ label: 'X.com (Twitter)', url: 'https://x.com' }] },
+    { icon: <Bitcoin className="w-5 h-5 text-amber-500" />, title: '블록체인 자금 추적', desc: '주목할 지갑(사토시, 바이낸스, Vitalik 등)의 실시간 잔고와 거래를 자동으로 표시합니다. 특정 지갑 분석도 직접 입력해 추적 가능합니다.', links: [{ label: 'Etherscan', url: 'https://etherscan.io' }, { label: 'Blockchain.com', url: 'https://www.blockchain.com/explorer' }] },
+    { icon: <Shield className="w-5 h-5 text-red-500" />, title: 'OFAC 제재 명단', desc: '미 재무부 OFAC의 SDN(특별지정국민) 명단 전체를 매일 갱신합니다. 러시아·이란·북한·중국·테러 프로그램별로 분류해 자동 표시됩니다.', links: [{ label: 'OFAC 공식', url: 'https://sanctionssearch.ofac.treas.gov' }] },
+    { icon: <Building2 className="w-5 h-5 text-blue-500" />, title: '기업 구조 추적', desc: '주목할 기업(Gazprom, Huawei 등)의 글로벌 법인 등록 현황을 자동으로 표시합니다. 조세피난처 등록 법인, 쉘컴퍼니 구조 파악에 활용합니다.', links: [{ label: 'ICIJ Offshore Leaks', url: 'https://offshoreleaks.icij.org' }, { label: 'OpenCorporates', url: 'https://opencorporates.com' }] },
+    { icon: <Globe className="w-5 h-5 text-green-500" />, title: '실물자산 추적', desc: '부동산·요트·전용기 소유자는 공개 등기/항적 데이터로 확인 가능합니다.', links: [{ label: 'Flightradar24', url: 'https://www.flightradar24.com' }, { label: 'MarineTraffic', url: 'https://www.marinetraffic.com' }] },
+    { icon: <BookOpen className="w-5 h-5 text-purple-500" />, title: '공개 기록 활용', desc: 'SEC EDGAR(미국 공시), PACER(연방법원 기록), 각국 기업등기소를 통해 법적·재무 관계를 파악합니다.', links: [{ label: 'SEC EDGAR', url: 'https://www.sec.gov/edgar' }, { label: 'OpenSanctions', url: 'https://www.opensanctions.org' }] },
+  ];
+  return (
+    <div className="space-y-4">
+      <div className="cf-card bg-slate-50 border-slate-200">
+        <p className="text-sm text-cf-text-secondary leading-relaxed">OSINT(Open Source Intelligence)는 공개 정보 수집·분석 방법론입니다. 금융범죄 수사·기업실사·저널리즘·규정준수에 활용됩니다.</p>
+      </div>
+      {methods.map(m => (
+        <div key={m.title} className="cf-card space-y-3">
+          <div className="flex items-center gap-3">{m.icon}<h3 className="font-semibold text-cf-text-primary">{m.title}</h3></div>
+          <p className="text-sm text-cf-text-secondary leading-relaxed">{m.desc}</p>
+          <div className="flex flex-wrap gap-2">
+            {m.links.map(l => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-cf-primary border border-cf-primary/30 rounded px-2.5 py-1 hover:bg-cf-primary/5 transition-colors">
+                <ExternalLink className="w-3 h-3" />{l.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function OSINTPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('crypto');
+  const [activeTab, setActiveTab] = useState<TabId>('social');
 
-  const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: 'crypto', label: '암호화폐 추적', icon: <Bitcoin className="w-4 h-4" /> },
-    { id: 'sanctions', label: 'OFAC 제재 명단', icon: <Shield className="w-4 h-4" /> },
-    { id: 'corporate', label: '기업 구조 추적', icon: <Building2 className="w-4 h-4" /> },
+  const tabs: { id: TabId; label: string; icon: React.ReactNode; badge?: string }[] = [
+    { id: 'social', label: '인물 발언', icon: <MessageSquare className="w-4 h-4" />, badge: 'LIVE' },
+    { id: 'crypto', label: '암호화폐', icon: <Bitcoin className="w-4 h-4" /> },
+    { id: 'sanctions', label: 'OFAC 제재', icon: <Shield className="w-4 h-4" /> },
+    { id: 'corporate', label: '기업 구조', icon: <Building2 className="w-4 h-4" /> },
     { id: 'guide', label: '조사 가이드', icon: <BookOpen className="w-4 h-4" /> },
   ];
 
   return (
     <main className="min-h-screen bg-cf-background">
-      {/* Hero */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
               <Search className="w-5 h-5 text-white" />
             </div>
-            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">
-              OSINT Intelligence
-            </span>
+            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">OSINT Intelligence</span>
           </div>
-
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">
-            OSINT 자금 추적
-          </h1>
-          <p className="text-slate-300 text-lg mb-6">
-            블록체인·제재·기업 구조 역추적
-          </p>
-
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">OSINT 자금 추적</h1>
+          <p className="text-slate-300 mb-5">인물 발언 · 블록체인 · 제재 · 기업 구조 실시간 추적</p>
           <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/40 rounded-full px-4 py-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="text-amber-300 text-sm font-medium">
-              교육·연구·합법적 조사 목적으로만 사용하세요
-            </span>
+            <span className="text-amber-300 text-sm font-medium">교육·연구·합법적 조사 목적으로만 사용하세요</span>
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Tabs */}
         <div className="flex gap-1 mb-6 bg-white rounded-xl p-1 shadow-sm border border-cf-border overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+          {tabs.map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeTab === tab.id
-                  ? 'bg-cf-primary text-white shadow-sm'
-                  : 'text-cf-text-secondary hover:text-cf-text-primary hover:bg-cf-border/40'
-              }`}
-            >
+                activeTab === tab.id ? 'bg-cf-primary text-white shadow-sm' : 'text-cf-text-secondary hover:text-cf-text-primary hover:bg-cf-border/40'
+              }`}>
               {tab.icon}
               {tab.label}
+              {tab.badge && (
+                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${activeTab === tab.id ? 'bg-white/20' : 'bg-green-100 text-green-700'}`}>
+                  {tab.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* Tab content */}
+        {activeTab === 'social' && <SocialTab />}
         {activeTab === 'crypto' && <CryptoTab />}
         {activeTab === 'sanctions' && <SanctionsTab />}
         {activeTab === 'corporate' && <CorporateTab />}
