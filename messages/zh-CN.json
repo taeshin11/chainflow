@@ -16,7 +16,8 @@
     "close": "关闭",
     "feedback": "反馈",
     "intelligence": "智能分析",
-    "osint": "资金追踪"
+    "osint": "资金追踪",
+    "report": "AI报告"
   },
   "hero": {
     "title": "发现隐藏的供应链风险",

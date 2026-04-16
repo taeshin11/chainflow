@@ -16,7 +16,8 @@
     "close": "閉じる",
     "feedback": "フィードバック",
     "intelligence": "インテリジェンス",
-    "osint": "資金追跡"
+    "osint": "資金追跡",
+    "report": "AIレポート"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",

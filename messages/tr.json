@@ -16,7 +16,8 @@
     "close": "Kapat",
     "feedback": "Geri Bildirim",
     "intelligence": "İstihbarat",
-    "osint": "Para Takibi"
+    "osint": "Para Takibi",
+    "report": "AI Rapor"
   },
   "hero": {
     "title": "Gizli Tedarik Zinciri Risklerini Keşfedin",

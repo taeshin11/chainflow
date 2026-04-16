@@ -16,7 +16,8 @@
     "close": "Đóng",
     "feedback": "Góp ý",
     "intelligence": "Thông tin",
-    "osint": "Theo Dõi Tiền"
+    "osint": "Theo Dõi Tiền",
+    "report": "Báo cáo AI"
   },
   "hero": {
     "title": "Phát hiện rủi ro chuỗi cung ứng tiềm ẩn",

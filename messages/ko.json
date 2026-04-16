@@ -16,7 +16,8 @@
     "close": "닫기",
     "feedback": "피드백",
     "intelligence": "인텔리전스",
-    "osint": "자금 추적"
+    "osint": "자금 추적",
+    "report": "AI 리포트"
   },
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",

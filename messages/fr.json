@@ -16,7 +16,8 @@
     "close": "Fermer",
     "feedback": "Commentaires",
     "intelligence": "Intelligence",
-    "osint": "Pistage"
+    "osint": "Pistage",
+    "report": "Rapport IA"
   },
   "hero": {
     "title": "Révélez les risques cachés de la chaîne d'approvisionnement",

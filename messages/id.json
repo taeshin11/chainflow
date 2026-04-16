@@ -16,7 +16,8 @@
     "close": "Tutup",
     "feedback": "Masukan",
     "intelligence": "Intelijen",
-    "osint": "Lacak Dana"
+    "osint": "Lacak Dana",
+    "report": "Laporan AI"
   },
   "hero": {
     "title": "Temukan Risiko Rantai Pasok Tersembunyi",

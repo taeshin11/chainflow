@@ -16,7 +16,8 @@
     "close": "關閉",
     "feedback": "意見回饋",
     "intelligence": "智能分析",
-    "osint": "資金追蹤"
+    "osint": "資金追蹤",
+    "report": "AI報告"
   },
   "hero": {
     "title": "發掘隱藏的供應鏈風險",

@@ -16,7 +16,8 @@
     "close": "Close",
     "feedback": "Feedback",
     "intelligence": "Intelligence",
-    "osint": "Money Trail"
+    "osint": "Money Trail",
+    "report": "AI Report"
   },
   "hero": {
     "title": "Uncover Hidden Supply Chain Risks",

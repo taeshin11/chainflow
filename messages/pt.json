@@ -16,7 +16,8 @@
     "close": "Fechar",
     "feedback": "Feedback",
     "intelligence": "Inteligência",
-    "osint": "Rastreio"
+    "osint": "Rastreio",
+    "report": "Relatório IA"
   },
   "hero": {
     "title": "Descubra Riscos Ocultos na Cadeia de Suprimentos",

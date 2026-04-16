@@ -16,7 +16,8 @@
     "close": "Schließen",
     "feedback": "Feedback",
     "intelligence": "Intelligenz",
-    "osint": "Geldverfolgung"
+    "osint": "Geldverfolgung",
+    "report": "KI-Bericht"
   },
   "hero": {
     "title": "Verborgene Lieferkettenrisiken aufdecken",
