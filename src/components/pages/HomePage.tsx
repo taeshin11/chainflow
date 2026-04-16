@@ -276,7 +276,7 @@ function AIDailyBrief() {
     : null;
 
   return (
-    <div className="relative overflow-hidden border-b border-white/5 bg-[#080c14]">
+    <div id="ai-daily-brief" className="relative overflow-hidden border-b border-white/5 bg-[#080c14]">
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/4 top-0 h-48 w-48 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
@@ -648,6 +648,19 @@ export default function HomePage() {
                   <Radar className="w-4 h-4" />
                   뉴스 갭 스캔
                 </Link>
+                <button
+                  onClick={() => document.getElementById('ai-daily-brief')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="inline-flex items-center gap-2 text-base px-6 py-3.5 rounded-xl font-semibold
+                             bg-violet-600 text-white border border-violet-500
+                             hover:bg-violet-700 hover:shadow-lg hover:shadow-violet-500/20
+                             transition-all duration-200"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                  </span>
+                  AI 리포트
+                </button>
               </div>
               <HeroSearch />
             </div>
