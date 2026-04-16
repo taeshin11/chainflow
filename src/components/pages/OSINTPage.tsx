@@ -710,10 +710,10 @@ export default function OSINTPage() {
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
               <Search className="w-5 h-5 text-white" />
             </div>
-            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">OSINT Intelligence</span>
+            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">글로벌 정보 추적</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">OSINT 자금 추적</h1>
-          <p className="text-slate-300 mb-5">인물 발언 · 블록체인 · 제재 · 기업 구조 실시간 추적</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">실시간 자금·정보 추적</h1>
+          <p className="text-slate-300 mb-5">주요 인물 발언 · 블록체인 지갑 · 국제 제재 · 기업 연결망 실시간 모니터링</p>
           <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/40 rounded-full px-4 py-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="text-amber-300 text-sm font-medium">교육·연구·합법적 조사 목적으로만 사용하세요</span>

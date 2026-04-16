@@ -658,6 +658,16 @@ export default function HomePage() {
                   </span>
                   AI 리포트
                 </Link>
+                <Link
+                  href="/osint"
+                  className="inline-flex items-center gap-2 text-base px-6 py-3.5 rounded-xl font-semibold
+                             bg-cyan-600 text-white border border-cyan-500
+                             hover:bg-cyan-700 hover:shadow-lg hover:shadow-cyan-500/20
+                             transition-all duration-200"
+                >
+                  <Search className="w-4 h-4" />
+                  자금 추적
+                </Link>
               </div>
               <HeroSearch />
             </div>
