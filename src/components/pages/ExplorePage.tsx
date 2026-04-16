@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useTranslatedText } from '@/hooks/useTranslatedText';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import dynamic from 'next/dynamic';
@@ -55,6 +56,14 @@ const marketCapSizes: Record<string, number> = {
   small: 6,
 };
 
+const marketCapLabels: Record<string, string> = {
+  titan: 'Titan ($1T+)',
+  mega: 'Mega ($200B+)',
+  large: 'Large ($10B+)',
+  mid: 'Mid ($2B–$10B)',
+  small: 'Small (<$2B)',
+};
+
 function getRoleSize(role: string): number {
   if (role === 'leader') return 12;
   if (role === 'intermediary') return 10;
@@ -69,6 +78,7 @@ interface SidePanelProps {
 
 function SidePanel({ company, onClose }: SidePanelProps) {
   const t = useTranslations('explore');
+  const translatedDescription = useTranslatedText(company.description);
   const pieData = company.revenue.segments.map((s) => ({
     name: s.name,
     value: s.percentage,
@@ -120,7 +130,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
           <div className="flex items-center gap-2 text-sm">
             <DollarSign className="w-4 h-4 text-cf-text-secondary" />
             <span className="text-cf-text-secondary">{t('sidePanel.cap')}:</span>
-            <span className="font-medium">{company.marketCap}</span>
+            <span className="font-medium">{marketCapLabels[company.marketCap] ?? company.marketCap}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="w-4 h-4 text-cf-text-secondary" />
@@ -130,7 +140,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
         </div>
 
         <p className="text-sm text-cf-text-secondary leading-relaxed line-clamp-4">
-          {company.description}
+          {translatedDescription}
         </p>
 
         {/* Products */}

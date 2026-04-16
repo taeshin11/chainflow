@@ -9,7 +9,12 @@
     "lint": "next lint",
     "gen": "tsx scripts/generate-contexts.ts",
     "gen:single": "tsx scripts/generate-contexts.ts",
-    "gen:skip": "SKIP_EXISTING=1 tsx scripts/generate-contexts.ts"
+    "gen:skip": "SKIP_EXISTING=1 tsx scripts/generate-contexts.ts",
+    "scrape": "tsx scripts/scrape-daily.ts",
+    "scrape:sec": "tsx scripts/scrapers/sec-13f.ts",
+    "scrape:macro": "tsx scripts/scrapers/fred-macro.ts",
+    "scrape:news": "tsx scripts/scrapers/rss-news.ts",
+    "scrape:gap": "tsx scripts/scrapers/news-gap-calc.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

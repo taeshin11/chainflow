@@ -13,6 +13,7 @@ const sectorColors: Record<string, string> = {
   'ev-battery': 'bg-green-100 text-green-700',
   defense: 'bg-amber-100 text-amber-700',
   'pharma-biotech': 'bg-red-100 text-red-700',
+  macro: 'bg-slate-100 text-slate-700',
   all: 'bg-gray-100 text-gray-700',
 };
 

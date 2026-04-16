@@ -5,8 +5,12 @@ import { generateSeoMetadata } from '@/lib/seo';
 import { getTranslations } from 'next-intl/server';
 import BlogArticleClient from './BlogArticleClient';
 
+const locales = ['en', 'ko', 'ja', 'zh-CN', 'zh-TW', 'es', 'de', 'fr', 'pt', 'hi', 'ar', 'vi', 'th', 'id', 'ru', 'tr'];
+
 export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
+  return locales.flatMap((locale) =>
+    blogPosts.map((post) => ({ locale, slug: post.slug }))
+  );
 }
 
 export async function generateMetadata({

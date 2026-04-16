@@ -34,6 +34,7 @@ import {
   GitCompare,
   Search,
   X,
+  Radar,
 } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import EmailCTA from '@/components/EmailCTA';
@@ -415,6 +416,16 @@ export default function HomePage() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
                   </span>
                   비밀 머니 추적
+                </Link>
+                <Link
+                  href="/news-gap"
+                  className="inline-flex items-center gap-2 text-base px-6 py-3.5 rounded-xl font-semibold
+                             bg-emerald-600 text-white border border-emerald-500
+                             hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/20
+                             transition-all duration-200"
+                >
+                  <Radar className="w-4 h-4" />
+                  뉴스 갭 스캔
                 </Link>
               </div>
               <HeroSearch />
