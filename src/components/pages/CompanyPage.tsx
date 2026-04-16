@@ -650,51 +650,31 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-cf-border">
-                      <th className="text-left py-2 text-cf-text-secondary font-medium">
-                        {t('institution')}
-                      </th>
-                      <th className="text-left py-2 text-cf-text-secondary font-medium">
-                        {t('action')}
-                      </th>
-                      <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        {t('value')}
-                      </th>
-                      <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        {t('quarter')}
-                      </th>
-                      <th className="text-right py-2 text-cf-text-secondary font-medium">
-                        {t('filingDate')}
-                      </th>
+                      <th className="text-left py-2 text-cf-text-secondary font-medium">{t('institution')}</th>
+                      <th className="text-left py-2 text-cf-text-secondary font-medium">{t('action')}</th>
+                      <th className="text-right py-2 text-cf-text-secondary font-medium">{t('value')}</th>
+                      <th className="text-right py-2 text-cf-text-secondary font-medium">{t('quarter')}</th>
+                      <th className="text-right py-2 text-cf-text-secondary font-medium">{t('filingDate')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {signals.map((sig) => (
                       <tr key={sig.id} className="border-b border-cf-border/50">
-                        <td className="py-2.5 text-cf-text-primary font-medium">
-                          {sig.institution}
-                        </td>
+                        <td className="py-2.5 text-cf-text-primary font-medium">{sig.institution}</td>
                         <td className="py-2.5">
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${actionColors[sig.action]}`}
-                          >
+                          <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${actionColors[sig.action]}`}>
                             {actionIcons[sig.action]}
                             {sig.action.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="text-right py-2.5 text-cf-text-primary font-medium">
-                          {sig.estimatedValue}
-                        </td>
+                        <td className="text-right py-2.5 text-cf-text-primary font-medium">{sig.estimatedValue}</td>
                         <td className="text-right py-2.5 text-cf-text-secondary text-xs">
                           {sig.quarterEnd.slice(0, 7).replace('-', '.').replace('-', '.')}
                         </td>
                         <td className="text-right py-2.5 text-cf-text-secondary text-xs whitespace-nowrap">
                           {sig.filingDate}
-                          {(sig.action === 'accumulating' || sig.action === 'new_position') && (
-                            <span className="ml-1 text-green-600 font-bold">↑</span>
-                          )}
-                          {(sig.action === 'reducing' || sig.action === 'exit') && (
-                            <span className="ml-1 text-red-500 font-bold">↓</span>
-                          )}
+                          {(sig.action === 'accumulating' || sig.action === 'new_position') && <span className="ml-1 text-green-600 font-bold">↑</span>}
+                          {(sig.action === 'reducing' || sig.action === 'exit') && <span className="ml-1 text-red-500 font-bold">↓</span>}
                         </td>
                       </tr>
                     ))}
@@ -703,6 +683,106 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </div>
             </div>
           )}
+
+          {/* 지분율 변화 (13F Ownership) */}
+          {(() => {
+            const ownershipEntry = newsGapData.find(n => n.ticker === company.ticker);
+            if (!ownershipEntry?.ownershipData?.length) return null;
+            const owned = ownershipEntry.ownershipData;
+            const actionColor: Record<string, string> = {
+              new: 'bg-blue-50 text-blue-700 border border-blue-200',
+              increased: 'bg-green-50 text-green-700 border border-green-200',
+              maintained: 'bg-gray-50 text-gray-600 border border-gray-200',
+              reduced: 'bg-red-50 text-red-600 border border-red-200',
+            };
+            const actionLabel: Record<string, string> = {
+              new: '신규 매수',
+              increased: '지분 증가',
+              maintained: '유지',
+              reduced: '지분 축소',
+            };
+            return (
+              <div className="cf-card p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <Users2 className="w-5 h-5 text-cf-primary" />
+                  <h2 className="text-xl font-heading font-bold text-cf-text-primary">기관 지분율 현황</h2>
+                  <span className="text-xs text-cf-text-secondary ml-1">13F 기준 · {owned[0]?.quarter}</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-cf-border bg-gray-50">
+                        <th className="text-left py-2 px-3 text-cf-text-secondary font-medium text-xs">기관</th>
+                        <th className="text-center py-2 px-3 text-cf-text-secondary font-medium text-xs">변화</th>
+                        <th className="text-right py-2 px-3 text-cf-text-secondary font-medium text-xs">지분율</th>
+                        <th className="text-right py-2 px-3 text-cf-text-secondary font-medium text-xs">전분기</th>
+                        <th className="text-right py-2 px-3 text-cf-text-secondary font-medium text-xs">보유주식</th>
+                        <th className="text-right py-2 px-3 text-cf-text-secondary font-medium text-xs">평가액</th>
+                        <th className="text-center py-2 px-3 text-cf-text-secondary font-medium text-xs">SEC</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {owned.map((o, i) => {
+                        const diff = o.prevPct !== undefined ? o.pctOfShares - o.prevPct : null;
+                        return (
+                          <tr key={i} className="border-b border-cf-border/50 hover:bg-gray-50 transition-colors">
+                            <td className="py-2.5 px-3 font-medium text-cf-text-primary">{o.institution}</td>
+                            <td className="py-2.5 px-3 text-center">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${actionColor[o.action]}`}>
+                                {actionLabel[o.action]}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-right font-bold tabular-nums">
+                              <span className={o.action === 'increased' || o.action === 'new' ? 'text-green-600' : o.action === 'reduced' ? 'text-red-500' : 'text-cf-text-primary'}>
+                                {o.pctOfShares.toFixed(2)}%
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-right text-xs tabular-nums text-cf-text-secondary">
+                              {o.prevPct !== undefined ? (
+                                <span className="flex items-center justify-end gap-1">
+                                  {o.prevPct.toFixed(2)}%
+                                  {diff !== null && diff !== 0 && (
+                                    <span className={`font-bold ${diff > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                      {diff > 0 ? '+' : ''}{diff.toFixed(2)}%p
+                                    </span>
+                                  )}
+                                </span>
+                              ) : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="py-2.5 px-3 text-right text-xs tabular-nums text-cf-text-secondary">
+                              {o.sharesM !== undefined ? `${o.sharesM.toFixed(1)}M주` : '—'}
+                            </td>
+                            <td className="py-2.5 px-3 text-right text-xs font-medium text-cf-text-primary">
+                              ${o.valueM.toLocaleString()}M
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              <a href={o.secUrl} target="_blank" rel="noopener noreferrer"
+                                className="text-[10px] text-cf-primary hover:underline flex items-center justify-center gap-0.5">
+                                <ExternalLink className="w-3 h-3" />
+                                13F
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Total institutional ownership */}
+                {(() => {
+                  const total = owned.reduce((s, o) => s + o.pctOfShares, 0);
+                  const totalVal = owned.reduce((s, o) => s + o.valueM, 0);
+                  return (
+                    <div className="mt-3 pt-3 border-t border-cf-border flex items-center gap-4 flex-wrap text-xs text-cf-text-secondary">
+                      <span>추적 기관 합계 지분율: <span className="font-bold text-cf-text-primary">{total.toFixed(2)}%</span></span>
+                      <span>합계 평가액: <span className="font-bold text-cf-text-primary">${totalVal.toLocaleString()}M</span></span>
+                      <span className="ml-auto">SEC EDGAR 13F-HR 기준 · 45일 지연 공시</span>
+                    </div>
+                  );
+                })()}
+              </div>
+            );
+          })()}
 
           {/* AI Analysis */}
           <div className="cf-card p-6">

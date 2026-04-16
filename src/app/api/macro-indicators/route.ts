@@ -1,19 +1,16 @@
 /**
  * /api/macro-indicators
  *
- * Returns key macro-economic indicators that affect interest rates
- * + cascade impact analysis per indicator
+ * Key macro indicators + cascade impact analysis
  *
  * Data sources:
- *   1. FRED (Federal Reserve Economic Data) — free, no key needed for many series
- *   2. Static fallback with recent well-known values
+ *   - FRED (free CSV endpoint) for CPI, PCE, PPI, NFP, GDP, Retail Sales, Unemployment, Yield Curve
+ *   - Static fallback for ISM, FOMC (no free FRED source)
  *
- * Cache: 4h Redis
+ * Cache: daily key (refreshes at midnight KST via cron)
  */
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
-
-const CACHE_TTL = 4 * 60 * 60;
 
 function createRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
@@ -22,7 +19,15 @@ function createRedis(): Redis | null {
   return new Redis({ url, token });
 }
 
-// ── Indicator definitions with cascade logic ──────────────────────────────────
+function kstDate(): string {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().slice(0, 10);
+}
+function cacheKey(): string {
+  return `flowvium:macro-indicators:v3:${kstDate()}`;
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 export interface CascadeStep {
   asset: string;
   direction: 'up' | 'down' | 'mixed';
@@ -46,35 +51,94 @@ export interface MacroIndicator {
   rateImpactKo: string;
   cascade: CascadeStep[];
   summary: string;
+  liveData?: boolean;
 }
 
-// ── FRED API (free, no key) ────────────────────────────────────────────────────
-async function fetchFRED(series: string): Promise<{ value: number; date: string } | null> {
+// ── FRED helpers ──────────────────────────────────────────────────────────────
+async function fetchFREDCsv(series: string, monthsBack: number = 15): Promise<Array<{ date: string; value: number }>> {
   try {
-    const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${series}&vintage_date=${new Date().toISOString().slice(0, 10)}`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null;
+    const startDate = new Date(Date.now() - monthsBack * 30.5 * 24 * 60 * 60 * 1000)
+      .toISOString().slice(0, 10);
+    const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${series}&observation_start=${startDate}`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return [];
     const text = await res.text();
-    const lines = text.trim().split('\n').slice(1).filter(l => !l.includes('.'));
-    const last = lines[lines.length - 1]?.split(',');
-    if (!last || last.length < 2) return null;
-    const value = parseFloat(last[1]);
-    if (isNaN(value)) return null;
-    return { value, date: last[0] };
-  } catch { return null; }
+    return text.trim().split('\n').slice(1)
+      .map(line => {
+        const [date, val] = line.split(',');
+        const value = parseFloat(val);
+        return (!date || isNaN(value)) ? null : { date: date.trim(), value };
+      })
+      .filter((x): x is { date: string; value: number } => x !== null);
+  } catch { return []; }
 }
 
-// ── Yield Curve: fetch US Treasury rates ──────────────────────────────────────
-// FRED series: DGS1MO, DGS3MO, DGS6MO, DGS1, DGS2, DGS5, DGS10, DGS30
+// Latest value
+async function fetchLatest(series: string): Promise<{ value: number; date: string } | null> {
+  const rows = await fetchFREDCsv(series, 3);
+  const last = rows[rows.length - 1];
+  return last ?? null;
+}
+
+// YoY % change (index-based series like CPI, PCE, PPI)
+async function fetchYoY(series: string): Promise<{ value: number; previous: number; date: string } | null> {
+  const rows = await fetchFREDCsv(series, 15);
+  if (rows.length < 13) return null;
+  const last = rows[rows.length - 1];
+  const prev1 = rows[rows.length - 2];
+  // Find ~12 months ago
+  const targetYear = parseInt(last.date.slice(0, 4)) - 1;
+  const targetMonth = last.date.slice(5, 7);
+  const yearAgoIdx = rows.findIndex(r => r.date.startsWith(`${targetYear}-${targetMonth}`));
+  const yearAgo = yearAgoIdx >= 0 ? rows[yearAgoIdx] : rows[rows.length - 13];
+  if (!yearAgo || yearAgo.value === 0) return null;
+  const yoy = parseFloat(((last.value - yearAgo.value) / yearAgo.value * 100).toFixed(2));
+  // Previous month's YoY
+  const prevYearAgo = yearAgoIdx > 0 ? rows[yearAgoIdx - 1] : rows[rows.length - 14];
+  const prevYoY = prevYearAgo && prevYearAgo.value !== 0
+    ? parseFloat(((prev1.value - prevYearAgo.value) / prevYearAgo.value * 100).toFixed(2))
+    : yoy;
+  return { value: yoy, previous: prevYoY, date: last.date };
+}
+
+// MoM absolute change (for NFP: thousands of jobs)
+async function fetchMoMChange(series: string): Promise<{ value: number; previous: number; date: string } | null> {
+  const rows = await fetchFREDCsv(series, 4);
+  if (rows.length < 3) return null;
+  const last = rows[rows.length - 1];
+  const prev = rows[rows.length - 2];
+  const prevprev = rows[rows.length - 3];
+  return {
+    value: parseFloat((last.value - prev.value).toFixed(1)),
+    previous: parseFloat((prev.value - prevprev.value).toFixed(1)),
+    date: last.date,
+  };
+}
+
+// MoM % change (for Retail Sales)
+async function fetchMoMPct(series: string): Promise<{ value: number; previous: number; date: string } | null> {
+  const rows = await fetchFREDCsv(series, 4);
+  if (rows.length < 3) return null;
+  const last = rows[rows.length - 1];
+  const prev = rows[rows.length - 2];
+  const prevprev = rows[rows.length - 3];
+  if (prev.value === 0 || prevprev.value === 0) return null;
+  return {
+    value: parseFloat(((last.value - prev.value) / prev.value * 100).toFixed(1)),
+    previous: parseFloat(((prev.value - prevprev.value) / prevprev.value * 100).toFixed(1)),
+    date: last.date,
+  };
+}
+
+// ── Yield Curve ───────────────────────────────────────────────────────────────
 const YIELD_SERIES = [
-  { label: '1M',  series: 'DGS1MO' },
-  { label: '3M',  series: 'DGS3MO' },
-  { label: '6M',  series: 'DGS6MO' },
-  { label: '1Y',  series: 'DGS1'   },
-  { label: '2Y',  series: 'DGS2'   },
-  { label: '5Y',  series: 'DGS5'   },
-  { label: '10Y', series: 'DGS10'  },
-  { label: '30Y', series: 'DGS30'  },
+  { label: '1M', series: 'DGS1MO' }, { label: '3M', series: 'DGS3MO' },
+  { label: '6M', series: 'DGS6MO' }, { label: '1Y', series: 'DGS1' },
+  { label: '2Y', series: 'DGS2' },   { label: '5Y', series: 'DGS5' },
+  { label: '10Y', series: 'DGS10' }, { label: '30Y', series: 'DGS30' },
 ];
 
 export interface YieldPoint { label: string; value: number | null; }
@@ -82,30 +146,53 @@ export interface YieldPoint { label: string; value: number | null; }
 async function fetchYieldCurve(): Promise<{ points: YieldPoint[]; inverted: boolean; spread10y2y: number | null }> {
   const results = await Promise.all(
     YIELD_SERIES.map(async ({ label, series }) => {
-      const data = await fetchFRED(series);
-      return { label, value: data?.value ?? null };
+      const d = await fetchLatest(series);
+      return { label, value: d?.value ?? null };
     })
   );
   const y2 = results.find(r => r.label === '2Y')?.value ?? null;
   const y10 = results.find(r => r.label === '10Y')?.value ?? null;
   const spread10y2y = y2 !== null && y10 !== null ? parseFloat((y10 - y2).toFixed(2)) : null;
-  const inverted = spread10y2y !== null && spread10y2y < 0;
-  return { points: results, inverted, spread10y2y };
+  return { points: results, inverted: spread10y2y !== null && spread10y2y < 0, spread10y2y };
 }
 
-// ── Cascade logic by indicator ────────────────────────────────────────────────
+// ── Surprise classification ───────────────────────────────────────────────────
+function classify(actual: number | null, forecast: number, higherIsBetter: boolean): 'beat' | 'miss' | 'inline' | 'pending' {
+  if (actual === null) return 'pending';
+  const diff = Math.abs(actual - forecast);
+  const threshold = Math.abs(forecast) * 0.02; // 2% tolerance
+  if (diff <= threshold || diff < 0.05) return 'inline';
+  return (actual > forecast) === higherIsBetter ? 'beat' : 'miss';
+}
+
+function rateImpact(id: string, surprise: string): { impact: 'hawkish' | 'dovish' | 'neutral'; ko: string } {
+  if (surprise === 'inline' || surprise === 'pending') return { impact: 'neutral', ko: '중립' };
+  const hawkishOnBeat = ['cpi', 'pce', 'nfp', 'ppi', 'retail'];
+  const hawkishOnMiss = ['gdp', 'ism', 'unrate'];
+  if (hawkishOnBeat.includes(id)) {
+    return surprise === 'beat'
+      ? { impact: 'hawkish', ko: '매파적 (긴축 압력)' }
+      : { impact: 'dovish', ko: '비둘기파 (인하 기대↑)' };
+  }
+  if (hawkishOnMiss.includes(id)) {
+    return surprise === 'miss'
+      ? { impact: 'hawkish', ko: '매파적' }
+      : { impact: 'dovish', ko: '비둘기파' };
+  }
+  return { impact: 'neutral', ko: '중립' };
+}
+
+// ── Cascade logic ─────────────────────────────────────────────────────────────
 function buildCascade(id: string, surprise: 'beat' | 'miss' | 'inline' | 'pending'): CascadeStep[] {
   if (surprise === 'pending' || surprise === 'inline') return [];
-
   const cascades: Record<string, { beat: CascadeStep[]; miss: CascadeStep[] }> = {
     cpi: {
-      beat: [ // higher than expected = hawkish
+      beat: [
         { asset: '미 국채 금리', direction: 'up', reason: 'Fed 긴축 기대↑ → 채권 매도', magnitude: 'strong' },
         { asset: '달러 (DXY)', direction: 'up', reason: '금리 상승 → 달러 강세', magnitude: 'strong' },
         { asset: '미국 주식 (S&P500)', direction: 'down', reason: '할인율 상승 → 밸류에이션 압박', magnitude: 'moderate' },
         { asset: '금 (GLD)', direction: 'down', reason: '실질금리 상승 → 금 비용 증가', magnitude: 'moderate' },
         { asset: 'EM 주식/통화', direction: 'down', reason: '달러 강세 → 자본 이탈', magnitude: 'strong' },
-        { asset: '부동산/REIT', direction: 'down', reason: '모기지 금리 상승', magnitude: 'moderate' },
       ],
       miss: [
         { asset: '미 국채 금리', direction: 'down', reason: 'Fed 완화 기대↑ → 채권 매수', magnitude: 'strong' },
@@ -120,7 +207,6 @@ function buildCascade(id: string, surprise: 'beat' | 'miss' | 'inline' | 'pendin
         { asset: '미 국채 금리', direction: 'up', reason: 'Fed 선호 지표 상회 → 긴축 강화', magnitude: 'strong' },
         { asset: '미국 주식 (S&P500)', direction: 'down', reason: '금리 인하 시기 후퇴', magnitude: 'strong' },
         { asset: '달러 (DXY)', direction: 'up', reason: '매파적 Fed 입장 강화', magnitude: 'moderate' },
-        { asset: '하이일드채 (HYG)', direction: 'down', reason: '크레딧 스프레드 확대', magnitude: 'weak' },
       ],
       miss: [
         { asset: '미 국채 금리', direction: 'down', reason: 'Fed 목표 근접 → 인하 기대↑', magnitude: 'strong' },
@@ -134,38 +220,18 @@ function buildCascade(id: string, surprise: 'beat' | 'miss' | 'inline' | 'pendin
         { asset: '미 국채 금리', direction: 'up', reason: '고용 강세 → Fed 긴축 여력', magnitude: 'strong' },
         { asset: '달러 (DXY)', direction: 'up', reason: '경제 강세 → 달러 수요', magnitude: 'moderate' },
         { asset: '미국 주식 (S&P500)', direction: 'mixed', reason: '성장 호조 vs 금리 상승 충돌', magnitude: 'weak' },
-        { asset: '원유 (USO)', direction: 'up', reason: '경기 강세 → 수요 확대 기대', magnitude: 'weak' },
       ],
       miss: [
         { asset: '미 국채 금리', direction: 'down', reason: '경기 우려 → 안전자산 매수', magnitude: 'strong' },
         { asset: '미국 주식 (S&P500)', direction: 'down', reason: '경기 침체 우려', magnitude: 'moderate' },
         { asset: '금 (GLD)', direction: 'up', reason: '경기 불확실성 → 안전자산', magnitude: 'moderate' },
-        { asset: '달러 (DXY)', direction: 'mixed', reason: '경기 약화 vs 안전자산 수요 충돌', magnitude: 'weak' },
-      ],
-    },
-    fomc: {
-      beat: [ // beat = more hawkish than expected
-        { asset: '미 국채 금리', direction: 'up', reason: '예상보다 매파 → 즉각 금리 반영', magnitude: 'strong' },
-        { asset: '달러 (DXY)', direction: 'up', reason: '금리 차이 확대', magnitude: 'strong' },
-        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '유동성 축소 우려', magnitude: 'strong' },
-        { asset: '비트코인 (BITO)', direction: 'down', reason: '위험자산 회피', magnitude: 'strong' },
-        { asset: '금 (GLD)', direction: 'down', reason: '실질금리 급등', magnitude: 'moderate' },
-        { asset: 'EM 주식', direction: 'down', reason: '달러 강세 + 자본 이탈', magnitude: 'strong' },
-      ],
-      miss: [
-        { asset: '미 국채 금리', direction: 'down', reason: '완화적 발언 → 채권 랠리', magnitude: 'strong' },
-        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '유동성 기대 + 멀티플 확장', magnitude: 'strong' },
-        { asset: '비트코인 (BITO)', direction: 'up', reason: '위험선호 + 유동성 기대', magnitude: 'strong' },
-        { asset: '금 (GLD)', direction: 'up', reason: '실질금리 하락', magnitude: 'strong' },
-        { asset: 'EM 주식', direction: 'up', reason: '달러 약세 + 자본 유입', magnitude: 'moderate' },
       ],
     },
     gdp: {
       beat: [
-        { asset: '미 국채 금리', direction: 'up', reason: '성장 호조 → 인플레 우려 + 긴축', magnitude: 'moderate' },
+        { asset: '미 국채 금리', direction: 'up', reason: '성장 호조 → 긴축 여지', magnitude: 'moderate' },
         { asset: '미국 주식 (S&P500)', direction: 'up', reason: '기업 실적 기대 강화', magnitude: 'moderate' },
         { asset: '달러 (DXY)', direction: 'up', reason: '경제 강세 → 자본 유입', magnitude: 'moderate' },
-        { asset: '원자재', direction: 'up', reason: '글로벌 수요 증가 기대', magnitude: 'weak' },
       ],
       miss: [
         { asset: '미 국채 금리', direction: 'down', reason: '침체 우려 → 인하 기대', magnitude: 'moderate' },
@@ -173,207 +239,358 @@ function buildCascade(id: string, surprise: 'beat' | 'miss' | 'inline' | 'pendin
         { asset: '금 (GLD)', direction: 'up', reason: '경기 불안 → 안전자산', magnitude: 'moderate' },
       ],
     },
+    ppi: {
+      beat: [
+        { asset: '미 국채 금리', direction: 'up', reason: 'PPI 상승 → CPI 선행 → 긴축 예고', magnitude: 'moderate' },
+        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '기업 원가 부담 + 긴축 우려', magnitude: 'moderate' },
+        { asset: '달러 (DXY)', direction: 'up', reason: '물가 압력 → 금리 유지', magnitude: 'weak' },
+      ],
+      miss: [
+        { asset: '미 국채 금리', direction: 'down', reason: 'PPI 하락 → CPI 안정 기대', magnitude: 'moderate' },
+        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '원가 부담 완화 → 마진 개선', magnitude: 'moderate' },
+        { asset: '금 (GLD)', direction: 'up', reason: '인하 기대 → 실질금리 하락', magnitude: 'weak' },
+      ],
+    },
+    retail: {
+      beat: [
+        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '소비 강세 → 리테일·소비재 수혜', magnitude: 'moderate' },
+        { asset: '미 국채 금리', direction: 'up', reason: '소비 호조 → 인플레 우려', magnitude: 'weak' },
+      ],
+      miss: [
+        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '소비 둔화 → 성장 우려', magnitude: 'moderate' },
+        { asset: '미 국채 금리', direction: 'down', reason: '경기 둔화 → 인하 기대', magnitude: 'moderate' },
+        { asset: '금 (GLD)', direction: 'up', reason: '안전자산 수요', magnitude: 'weak' },
+      ],
+    },
     ism: {
       beat: [
-        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '제조업/서비스업 확장 → 경기 강세', magnitude: 'moderate' },
-        { asset: '미 국채 금리', direction: 'up', reason: '경기 과열 → 긴축 우려', magnitude: 'weak' },
+        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '제조업 확장 → 경기 강세', magnitude: 'moderate' },
         { asset: '원자재', direction: 'up', reason: '산업 수요 확대', magnitude: 'moderate' },
       ],
       miss: [
-        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '경기 둔화 신호', magnitude: 'moderate' },
+        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '제조업 수축 신호', magnitude: 'moderate' },
         { asset: '금 (GLD)', direction: 'up', reason: '경기 우려 → 안전자산', magnitude: 'weak' },
         { asset: '미 국채 금리', direction: 'down', reason: '경기 약화 → 완화 기대', magnitude: 'moderate' },
       ],
     },
+    fomc: {
+      beat: [
+        { asset: '미 국채 금리', direction: 'up', reason: '예상보다 매파 → 즉각 금리 반영', magnitude: 'strong' },
+        { asset: '달러 (DXY)', direction: 'up', reason: '금리 차이 확대', magnitude: 'strong' },
+        { asset: '미국 주식 (S&P500)', direction: 'down', reason: '유동성 축소 우려', magnitude: 'strong' },
+        { asset: '금 (GLD)', direction: 'down', reason: '실질금리 급등', magnitude: 'moderate' },
+      ],
+      miss: [
+        { asset: '미 국채 금리', direction: 'down', reason: '완화적 발언 → 채권 랠리', magnitude: 'strong' },
+        { asset: '미국 주식 (S&P500)', direction: 'up', reason: '유동성 기대 + 멀티플 확장', magnitude: 'strong' },
+        { asset: '금 (GLD)', direction: 'up', reason: '실질금리 하락', magnitude: 'strong' },
+        { asset: 'EM 주식', direction: 'up', reason: '달러 약세 + 자본 유입', magnitude: 'moderate' },
+      ],
+    },
+    unrate: {
+      beat: [ // lower unemployment = beat for employment, hawkish
+        { asset: '미 국채 금리', direction: 'up', reason: '고용 강세 → 임금 인플레 우려', magnitude: 'moderate' },
+        { asset: '달러 (DXY)', direction: 'up', reason: '경제 활력 → 달러 수요', magnitude: 'weak' },
+      ],
+      miss: [
+        { asset: '미 국채 금리', direction: 'down', reason: '고용 약화 → 인하 기대', magnitude: 'moderate' },
+        { asset: '금 (GLD)', direction: 'up', reason: '경기 우려 → 안전자산', magnitude: 'weak' },
+      ],
+    },
   };
-
   const def = cascades[id];
   if (!def) return [];
   return surprise === 'beat' ? def.beat : def.miss;
 }
 
-// ── Static recent data (fallback + context) ───────────────────────────────────
-const STATIC_INDICATORS: Omit<MacroIndicator, 'cascade'>[] = [
-  {
-    id: 'cpi',
-    name: 'CPI (Consumer Price Index)',
-    nameKo: '소비자 물가지수',
-    category: 'inflation',
-    actual: 2.4,
-    forecast: 2.5,
-    previous: 2.8,
-    unit: '%YoY',
-    releaseDate: '2026-04-10',
-    nextRelease: '2026-05-13',
-    surprise: 'miss',   // came in below forecast = dovish
-    rateImpact: 'dovish',
-    rateImpactKo: '비둘기파 (인하 기대↑)',
-    summary: '3월 CPI 2.4%로 예상(2.5%)보다 낮게 발표. 에너지·중고차 하락 주도. Fed 6월 인하 기대 강화.',
+// ── Static fallback data ──────────────────────────────────────────────────────
+// Used when FRED is unavailable; all values as of 2026-04-16
+const STATIC: Record<string, Omit<MacroIndicator, 'cascade' | 'liveData'>> = {
+  cpi: {
+    id: 'cpi', name: 'CPI (Consumer Price Index)', nameKo: '소비자 물가지수',
+    category: 'inflation', actual: 2.4, forecast: 2.5, previous: 2.8, unit: '%YoY',
+    releaseDate: '2026-04-10', nextRelease: '2026-05-13', surprise: 'miss',
+    rateImpact: 'dovish', rateImpactKo: '비둘기파 (인하 기대↑)',
+    summary: '3월 CPI 2.4%로 예상(2.5%)보다 낮게 발표. 에너지·중고차 하락 주도.',
   },
-  {
-    id: 'pce',
-    name: 'PCE Price Index (Core)',
-    nameKo: '근원 개인소비지출 물가',
-    category: 'inflation',
-    actual: 2.6,
-    forecast: 2.6,
-    previous: 2.7,
-    unit: '%YoY',
-    releaseDate: '2026-03-28',
-    nextRelease: '2026-04-30',
-    surprise: 'inline',
-    rateImpact: 'neutral',
-    rateImpactKo: '중립',
+  pce: {
+    id: 'pce', name: 'PCE Price Index (Core)', nameKo: '근원 개인소비지출 물가',
+    category: 'inflation', actual: 2.6, forecast: 2.6, previous: 2.7, unit: '%YoY',
+    releaseDate: '2026-03-28', nextRelease: '2026-04-30', surprise: 'inline',
+    rateImpact: 'neutral', rateImpactKo: '중립',
     summary: 'Fed 선호 인플레 지표 예상치 부합. 2.6%로 목표 2%에 아직 거리 있음.',
   },
-  {
-    id: 'nfp',
-    name: 'Non-Farm Payrolls',
-    nameKo: '비농업 고용지수',
-    category: 'employment',
-    actual: 228000,
-    forecast: 140000,
-    previous: 117000,
-    unit: '천명',
-    releaseDate: '2026-04-04',
-    nextRelease: '2026-05-02',
-    surprise: 'beat',
-    rateImpact: 'hawkish',
-    rateImpactKo: '매파적 (긴축 여력 유지)',
-    summary: '3월 NFP 228K로 예상(140K) 대폭 상회. 실업률 4.2%. 노동시장 강세로 6월 인하 전망 약화.',
+  nfp: {
+    id: 'nfp', name: 'Non-Farm Payrolls', nameKo: '비농업 고용지수',
+    category: 'employment', actual: 228, forecast: 140, previous: 117, unit: '천명',
+    releaseDate: '2026-04-04', nextRelease: '2026-05-02', surprise: 'beat',
+    rateImpact: 'hawkish', rateImpactKo: '매파적 (긴축 여력 유지)',
+    summary: '3월 NFP 228K로 예상(140K) 대폭 상회. 노동시장 강세로 6월 인하 전망 약화.',
   },
-  {
-    id: 'fomc',
-    name: 'FOMC Rate Decision',
-    nameKo: 'FOMC 금리 결정',
-    category: 'monetary',
-    actual: 4.5,
-    forecast: 4.5,
-    previous: 4.5,
-    unit: '%',
-    releaseDate: '2026-03-19',
-    nextRelease: '2026-05-07',
-    surprise: 'inline',
-    rateImpact: 'neutral',
-    rateImpactKo: '동결 (불확실성 유지)',
+  fomc: {
+    id: 'fomc', name: 'FOMC Rate Decision', nameKo: 'FOMC 금리 결정',
+    category: 'monetary', actual: 4.5, forecast: 4.5, previous: 4.5, unit: '%',
+    releaseDate: '2026-03-19', nextRelease: '2026-05-07', surprise: 'inline',
+    rateImpact: 'neutral', rateImpactKo: '동결 (불확실성 유지)',
     summary: '3월 FOMC 동결 결정. 점도표 연내 2회 인하 유지. Powell "데이터 의존" 강조.',
   },
-  {
-    id: 'gdp',
-    name: 'GDP Growth Rate (Q4)',
-    nameKo: 'GDP 성장률',
-    category: 'growth',
-    actual: 2.4,
-    forecast: 2.3,
-    previous: 3.1,
-    unit: '%QoQ SAAR',
-    releaseDate: '2026-03-27',
-    nextRelease: '2026-04-30',
-    surprise: 'beat',
-    rateImpact: 'hawkish',
-    rateImpactKo: '경기 강세 → 긴축 여력',
-    summary: 'Q4 GDP 확정치 2.4%, 속보치 상회. 소비 지출·민간투자 견조. 연착륙 기대 유지.',
+  gdp: {
+    id: 'gdp', name: 'GDP Growth Rate (Q4)', nameKo: 'GDP 성장률',
+    category: 'growth', actual: 2.4, forecast: 2.3, previous: 3.1, unit: '%QoQ SAAR',
+    releaseDate: '2026-03-27', nextRelease: '2026-04-30', surprise: 'beat',
+    rateImpact: 'hawkish', rateImpactKo: '경기 강세 → 긴축 여력',
+    summary: 'Q4 GDP 확정치 2.4%, 속보치 상회. 소비 지출·민간투자 견조.',
   },
-  {
-    id: 'ism',
-    name: 'ISM Manufacturing PMI',
-    nameKo: 'ISM 제조업 PMI',
-    category: 'growth',
-    actual: 49.0,
-    forecast: 49.5,
-    previous: 50.3,
-    unit: '지수',
-    releaseDate: '2026-04-01',
-    nextRelease: '2026-05-01',
-    surprise: 'miss',
-    rateImpact: 'dovish',
-    rateImpactKo: '경기 둔화 → 인하 기대',
-    summary: '4월 ISM 제조 49.0으로 50 기준선 하회. 신규 주문·고용 서브지수 위축. 관세 불확실성 영향.',
+  ism: {
+    id: 'ism', name: 'ISM Manufacturing PMI', nameKo: 'ISM 제조업 PMI',
+    category: 'growth', actual: 49.0, forecast: 49.5, previous: 50.3, unit: '지수',
+    releaseDate: '2026-04-01', nextRelease: '2026-05-01', surprise: 'miss',
+    rateImpact: 'dovish', rateImpactKo: '경기 둔화 → 인하 기대',
+    summary: '4월 ISM 제조 49.0으로 50 기준선 하회. 관세 불확실성 영향.',
   },
-  {
-    id: 'retail',
-    name: 'Retail Sales',
-    nameKo: '소매 판매',
-    category: 'growth',
-    actual: -1.1,
-    forecast: -1.3,
-    previous: 0.7,
-    unit: '%MoM',
-    releaseDate: '2026-04-16',
-    nextRelease: '2026-05-15',
-    surprise: 'beat',
-    rateImpact: 'neutral',
-    rateImpactKo: '예상보다 양호',
-    summary: '3월 소매판매 -1.1%로 예상(-1.3%) 소폭 상회. 자동차 선구매 기저효과 영향. 소비 둔화 흐름.',
+  retail: {
+    id: 'retail', name: 'Retail Sales', nameKo: '소매 판매',
+    category: 'growth', actual: -1.1, forecast: -1.3, previous: 0.7, unit: '%MoM',
+    releaseDate: '2026-04-16', nextRelease: '2026-05-15', surprise: 'beat',
+    rateImpact: 'neutral', rateImpactKo: '예상보다 양호',
+    summary: '3월 소매판매 -1.1%로 예상(-1.3%) 소폭 상회. 소비 둔화 흐름.',
   },
-  {
-    id: 'ppi',
-    name: 'PPI (Producer Price Index)',
-    nameKo: '생산자 물가지수',
-    category: 'inflation',
-    actual: 2.7,
-    forecast: 3.3,
-    previous: 3.2,
-    unit: '%YoY',
-    releaseDate: '2026-04-11',
-    nextRelease: '2026-05-14',
-    surprise: 'miss',
-    rateImpact: 'dovish',
-    rateImpactKo: '비둘기파 (물가 압력 완화)',
-    summary: '3월 PPI 2.7%로 예상(3.3%) 크게 하회. 에너지·서비스 원가 하락. CPI 선행 지표로서 긍정적.',
+  ppi: {
+    id: 'ppi', name: 'PPI (Producer Price Index)', nameKo: '생산자 물가지수',
+    category: 'inflation', actual: 2.7, forecast: 3.3, previous: 3.2, unit: '%YoY',
+    releaseDate: '2026-04-11', nextRelease: '2026-05-14', surprise: 'miss',
+    rateImpact: 'dovish', rateImpactKo: '비둘기파 (물가 압력 완화)',
+    summary: '3월 PPI 2.7%로 예상(3.3%) 크게 하회. 에너지·서비스 원가 하락.',
   },
-];
+  unrate: {
+    id: 'unrate', name: 'Unemployment Rate', nameKo: '실업률',
+    category: 'employment', actual: 4.2, forecast: 4.1, previous: 4.1, unit: '%',
+    releaseDate: '2026-04-04', nextRelease: '2026-05-02', surprise: 'miss',
+    rateImpact: 'dovish', rateImpactKo: '비둘기파',
+    summary: '실업률 4.2% — 고용시장 소폭 냉각 신호.',
+  },
+};
 
+// ── FRED static forecasts (consensus at time of last update) ──────────────────
+// FRED gives actual values; we keep forecasts as static consensus
+const FORECASTS: Record<string, { forecast: number; nextRelease: string }> = {
+  cpi:    { forecast: 2.5,   nextRelease: '2026-05-13' },
+  pce:    { forecast: 2.6,   nextRelease: '2026-04-30' },
+  nfp:    { forecast: 140,   nextRelease: '2026-05-02' },
+  gdp:    { forecast: 2.3,   nextRelease: '2026-04-30' },
+  ppi:    { forecast: 3.3,   nextRelease: '2026-05-14' },
+  retail: { forecast: -1.3,  nextRelease: '2026-05-15' },
+  unrate: { forecast: 4.1,   nextRelease: '2026-05-02' },
+};
+
+// ── Main GET ──────────────────────────────────────────────────────────────────
 export async function GET() {
   const redis = createRedis();
-  const cacheKey = 'flowvium:macro-indicators:v2';
+  const key = cacheKey();
 
   if (redis) {
     try {
-      const cached = await redis.get<object>(cacheKey);
+      const cached = await redis.get<object>(key);
       if (cached) return NextResponse.json(cached);
     } catch { /* non-fatal */ }
   }
 
-  // Build indicators with cascade
-  const indicators: MacroIndicator[] = STATIC_INDICATORS.map((ind) => ({
-    ...ind,
-    cascade: buildCascade(ind.id, ind.surprise),
-  }));
+  // Fetch FRED data in parallel
+  const [
+    fredCPI, fredCoreCPI, fredPCE, fredCorePCE,
+    fredNFP, fredGDP, fredPPI, fredRetail, fredUnrate,
+    yieldCurve,
+  ] = await Promise.allSettled([
+    fetchYoY('CPIAUCSL'),
+    fetchYoY('CPILFESL'),
+    fetchYoY('PCEPI'),
+    fetchYoY('PCEPILFE'),
+    fetchMoMChange('PAYEMS'),
+    fetchLatest('A191RL1Q225SBEA'),  // real GDP QoQ SAAR %
+    fetchYoY('PPIACO'),
+    fetchMoMPct('RSAFS'),
+    fetchLatest('UNRATE'),
+    fetchYieldCurve(),
+  ]);
 
-  // Try to enrich CPI and unemployment from FRED (best-effort)
-  try {
-    const [fredCPI, fredUnemp] = await Promise.allSettled([
-      fetchFRED('CPIAUCSL'),
-      fetchFRED('UNRATE'),
-    ]);
-    if (fredUnemp.status === 'fulfilled' && fredUnemp.value) {
-      indicators.push({
-        id: 'unrate',
-        name: 'Unemployment Rate',
-        nameKo: '실업률',
-        category: 'employment',
-        actual: fredUnemp.value.value,
-        forecast: 4.1,
-        previous: 4.1,
-        unit: '%',
-        releaseDate: fredUnemp.value.date,
-        surprise: fredUnemp.value.value < 4.1 ? 'miss' : fredUnemp.value.value > 4.2 ? 'beat' : 'inline',
-        rateImpact: fredUnemp.value.value < 4.0 ? 'hawkish' : fredUnemp.value.value > 4.3 ? 'dovish' : 'neutral',
-        rateImpactKo: fredUnemp.value.value < 4.0 ? '매파적' : fredUnemp.value.value > 4.3 ? '비둘기파' : '중립',
-        cascade: buildCascade('nfp', fredUnemp.value.value < 4.0 ? 'beat' : 'miss'),
-        summary: `실업률 ${fredUnemp.value.value}% (${fredUnemp.value.date})`,
-      });
-    }
-  } catch { /* non-fatal */ }
+  // Build indicators from FRED data, fall back to static
+  function get<T>(r: PromiseSettledResult<T | null>): T | null {
+    return r.status === 'fulfilled' ? r.value : null;
+  }
 
-  // Yield curve
-  const yieldCurve = await fetchYieldCurve();
+  const indicators: MacroIndicator[] = [];
 
-  const response = { indicators, yieldCurve, updatedAt: new Date().toISOString() };
+  // CPI
+  const cpiData = get(fredCPI);
+  {
+    const base = STATIC.cpi;
+    const actual = cpiData?.value ?? base.actual;
+    const previous = cpiData?.previous ?? base.previous;
+    const fc = FORECASTS.cpi.forecast;
+    const surprise = classify(actual, fc, false); // lower = beat (dovish)
+    const ri = rateImpact('cpi', surprise);
+    indicators.push({
+      ...base,
+      actual, previous, forecast: fc,
+      releaseDate: cpiData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.cpi.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `CPI ${actual.toFixed(1)}%YoY (예상 ${fc}%, 이전 ${previous?.toFixed(1) ?? '?'}%). ${actual < fc ? '예상 하회 — 인하 기대 강화.' : actual > fc ? '예상 상회 — 긴축 압력.' : '예상 부합.'}`
+        : base.summary,
+      cascade: buildCascade('cpi', surprise),
+      liveData: !!cpiData,
+    });
+  }
+
+  // PCE (Core)
+  const pceData = get(fredCorePCE) ?? get(fredPCE);
+  {
+    const base = STATIC.pce;
+    const actual = pceData?.value ?? base.actual;
+    const previous = pceData?.previous ?? base.previous;
+    const fc = FORECASTS.pce.forecast;
+    const surprise = classify(actual, fc, false);
+    const ri = rateImpact('pce', surprise);
+    indicators.push({
+      ...base,
+      actual, previous, forecast: fc,
+      releaseDate: pceData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.pce.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `근원 PCE ${actual.toFixed(1)}%YoY (예상 ${fc}%). Fed 목표 2%${actual > 2.5 ? '에 아직 거리 있음' : '에 근접 중'}.`
+        : base.summary,
+      cascade: buildCascade('pce', surprise),
+      liveData: !!pceData,
+    });
+  }
+
+  // NFP
+  const nfpData = get(fredNFP);
+  {
+    const base = STATIC.nfp;
+    const actual = nfpData ? Math.round(nfpData.value) : base.actual;
+    const previous = nfpData ? Math.round(nfpData.previous) : base.previous;
+    const fc = FORECASTS.nfp.forecast;
+    const surprise = classify(actual, fc, true);
+    const ri = rateImpact('nfp', surprise);
+    indicators.push({
+      ...base,
+      actual, previous, forecast: fc,
+      releaseDate: nfpData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.nfp.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `NFP ${actual.toLocaleString()}K (예상 ${fc}K). ${actual > fc ? '고용 강세 — 인하 시기 후퇴 가능성.' : '고용 둔화 — 인하 기대 강화.'}`
+        : base.summary,
+      cascade: buildCascade('nfp', surprise),
+      liveData: !!nfpData,
+    });
+  }
+
+  // FOMC — static only
+  indicators.push({ ...STATIC.fomc, cascade: buildCascade('fomc', STATIC.fomc.surprise), liveData: false });
+
+  // GDP
+  const gdpData = get(fredGDP);
+  {
+    const base = STATIC.gdp;
+    const actual = gdpData ? parseFloat(gdpData.value.toFixed(1)) : base.actual;
+    const fc = FORECASTS.gdp.forecast;
+    const surprise = classify(actual, fc, true);
+    const ri = rateImpact('gdp', surprise);
+    indicators.push({
+      ...base,
+      actual, previous: base.previous, forecast: fc,
+      releaseDate: gdpData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.gdp.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `GDP ${actual}% QoQ SAAR (예상 ${fc}%). ${actual > 2 ? '성장세 견조.' : actual > 0 ? '성장 둔화 중.' : '마이너스 성장 경고.'}`
+        : base.summary,
+      cascade: buildCascade('gdp', surprise),
+      liveData: !!gdpData,
+    });
+  }
+
+  // ISM — static only (not on FRED)
+  indicators.push({ ...STATIC.ism, cascade: buildCascade('ism', STATIC.ism.surprise), liveData: false });
+
+  // Retail Sales
+  const retailData = get(fredRetail);
+  {
+    const base = STATIC.retail;
+    const actual = retailData ? parseFloat(retailData.value.toFixed(1)) : base.actual;
+    const previous = retailData ? parseFloat(retailData.previous.toFixed(1)) : base.previous;
+    const fc = FORECASTS.retail.forecast;
+    const surprise = classify(actual, fc, true);
+    const ri = rateImpact('retail', surprise);
+    indicators.push({
+      ...base,
+      actual, previous, forecast: fc,
+      releaseDate: retailData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.retail.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `소매판매 ${actual > 0 ? '+' : ''}${actual}%MoM (예상 ${fc > 0 ? '+' : ''}${fc}%). ${actual > 0 ? '소비 회복 신호.' : '소비 위축 흐름.'}`
+        : base.summary,
+      cascade: buildCascade('retail', surprise),
+      liveData: !!retailData,
+    });
+  }
+
+  // PPI
+  const ppiData = get(fredPPI);
+  {
+    const base = STATIC.ppi;
+    const actual = ppiData?.value ?? base.actual;
+    const previous = ppiData?.previous ?? base.previous;
+    const fc = FORECASTS.ppi.forecast;
+    const surprise = classify(actual, fc, false);
+    const ri = rateImpact('ppi', surprise);
+    indicators.push({
+      ...base,
+      actual, previous, forecast: fc,
+      releaseDate: ppiData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.ppi.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `PPI ${actual.toFixed(1)}%YoY (예상 ${fc}%). ${actual < fc ? 'CPI 안정 선행 신호.' : 'CPI 상승 압력 예고.'}`
+        : base.summary,
+      cascade: buildCascade('ppi', surprise),
+      liveData: !!ppiData,
+    });
+  }
+
+  // Unemployment Rate
+  const unrateData = get(fredUnrate);
+  {
+    const base = STATIC.unrate;
+    const actual = unrateData?.value ?? base.actual;
+    const fc = FORECASTS.unrate.forecast;
+    // For unrate: lower is better for economy but higher = dovish for Fed
+    const surprise = classify(actual, fc, false); // lower than forecast = beat (hawkish)
+    const ri = rateImpact('unrate', surprise);
+    indicators.push({
+      ...base,
+      actual, previous: base.previous, forecast: fc,
+      releaseDate: unrateData?.date ?? base.releaseDate,
+      nextRelease: FORECASTS.unrate.nextRelease,
+      surprise, rateImpact: ri.impact, rateImpactKo: ri.ko,
+      summary: actual !== null
+        ? `실업률 ${actual}% (예상 ${fc}%, 이전 ${base.previous}%). ${actual > fc ? '고용시장 냉각 — 인하 압력.' : '고용 견조 유지.'}`
+        : base.summary,
+      cascade: buildCascade('unrate', surprise),
+      liveData: !!unrateData,
+    });
+  }
+
+  const yc = get(yieldCurve) ?? { points: [], inverted: false, spread10y2y: null };
+  const response = { indicators, yieldCurve: yc, updatedAt: new Date().toISOString() };
 
   if (redis) {
-    try { await redis.set(cacheKey, response, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(key, response, { ex: 25 * 60 * 60 }); } catch { /* non-fatal */ }
   }
 
   return NextResponse.json(response);

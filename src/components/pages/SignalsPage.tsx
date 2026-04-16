@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { type InstitutionalSignal } from '@/data/institutional-signals';
+import { newsGapData } from '@/data/news-gap';
 import { sectors } from '@/data/sectors';
 import {
   BarChart,
@@ -262,84 +263,73 @@ export default function SignalsPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-cf-border">
-                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('company')}
-                </th>
-                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('institution')}
-                </th>
-                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('action')}
-                </th>
-                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('sharesChanged')}
-                </th>
-                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('value')}
-                </th>
-                <th className="text-center py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('gapScore')}
-                </th>
-                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium">
-                  {t('filingDate')}
-                </th>
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('company')}</th>
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('institution')}</th>
+                <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('action')}</th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">지분율</th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('sharesChanged')}</th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('value')}</th>
+                <th className="text-center py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('gapScore')}</th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('filingDate')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((sig) => {
                 const action = actionColors[sig.action];
+                // 지분율 데이터 매칭
+                const ownerEntry = newsGapData.find(n => n.ticker === sig.ticker);
+                const ownerRecord = ownerEntry?.ownershipData?.find(
+                  o => o.institution.toLowerCase().includes(sig.institution.toLowerCase().split(' ')[0])
+                ) ?? ownerEntry?.ownershipData?.[0];
+                const diff = ownerRecord?.prevPct !== undefined && ownerRecord?.pctOfShares !== undefined
+                  ? ownerRecord.pctOfShares - ownerRecord.prevPct : null;
                 return (
-                  <tr
-                    key={sig.id}
-                    className="border-b border-cf-border/50 hover:bg-gray-50 transition-colors"
-                  >
+                  <tr key={sig.id} className="border-b border-cf-border/50 hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4">
-                      <Link
-                        href={`/company/${sig.ticker}`}
-                        className="hover:text-cf-primary transition-colors"
-                      >
-                        <span className="font-mono font-bold text-cf-primary text-xs mr-2">
-                          {sig.ticker}
-                        </span>
-                        <span className="text-cf-text-primary">{sig.companyName}</span>
+                      <Link href={`/company/${sig.ticker}`} className="hover:text-cf-primary transition-colors">
+                        <span className="font-mono font-bold text-cf-primary text-xs mr-2">{sig.ticker}</span>
+                        <span className="text-cf-text-primary text-sm">{sig.companyName}</span>
                       </Link>
                     </td>
-                    <td className="py-3 px-4 text-cf-text-secondary">{sig.institution}</td>
+                    <td className="py-3 px-4 text-cf-text-secondary text-sm">{sig.institution}</td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${action.bg} ${action.text}`}
-                      >
+                      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${action.bg} ${action.text}`}>
                         {actionIcons[sig.action]}
                         {t(`actions.${action.key}`)}
                       </span>
                     </td>
+                    {/* 지분율 컬럼 */}
+                    <td className="text-right py-3 px-4">
+                      {ownerRecord ? (
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="text-xs font-bold tabular-nums text-cf-text-primary">
+                            {ownerRecord.pctOfShares.toFixed(2)}%
+                          </span>
+                          {diff !== null && diff !== 0 && (
+                            <span className={`text-[10px] font-bold tabular-nums ${diff > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                              {diff > 0 ? '+' : ''}{diff.toFixed(2)}%p
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
+                    </td>
                     <td className="text-right py-3 px-4 font-mono text-xs text-cf-text-secondary">
                       {sig.sharesChanged.toLocaleString()}
                     </td>
-                    <td className="text-right py-3 px-4 font-medium text-cf-text-primary">
+                    <td className="text-right py-3 px-4 font-medium text-cf-text-primary text-sm">
                       {sig.estimatedValue}
                     </td>
                     <td className="text-center py-3 px-4">
                       <div className="flex items-center justify-center gap-1.5">
-                        {sig.newsGapScore >= 70 && (
-                          <AlertTriangle className="w-3.5 h-3.5 text-cf-accent" />
-                        )}
-                        <span
-                          className={`text-xs font-bold ${
-                            sig.newsGapScore >= 70
-                              ? 'text-cf-accent'
-                              : sig.newsGapScore >= 40
-                              ? 'text-cf-primary'
-                              : 'text-cf-text-secondary'
-                          }`}
-                        >
+                        {sig.newsGapScore >= 70 && <AlertTriangle className="w-3.5 h-3.5 text-cf-accent" />}
+                        <span className={`text-xs font-bold ${sig.newsGapScore >= 70 ? 'text-cf-accent' : sig.newsGapScore >= 40 ? 'text-cf-primary' : 'text-cf-text-secondary'}`}>
                           {sig.newsGapScore}
                         </span>
                       </div>
                     </td>
-                    <td className="text-right py-3 px-4 text-xs text-cf-text-secondary">
-                      {sig.filingDate}
-                    </td>
+                    <td className="text-right py-3 px-4 text-xs text-cf-text-secondary">{sig.filingDate}</td>
                   </tr>
                 );
               })}
