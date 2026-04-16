@@ -58,18 +58,49 @@ const SENTIMENT_LABEL: Record<string, string> = {
   hawkish: '매파', dovish: '비둘기파', bullish: '강세', bearish: '약세', neutral: '중립',
 };
 
+// ── X (Twitter) logo SVG ───────────────────────────────────────────────────────
+function XLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-label="X">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.733-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
+
 // ── Tab: Social (key figures) ─────────────────────────────────────────────────
 interface SocialEntry {
   person: string; role: string; flag: string; tag: string;
   title: string; summary: string; source: string; url: string;
   publishedAt: string; sentiment: string; impact: string;
   istweet?: boolean;
+  isFed?: boolean;
+  votingMember?: boolean;
+  cascade?: string[];
 }
+
+function CascadeChain({ items }: { items: string[] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mt-2 pt-2 border-t border-cf-border">
+      <p className="text-xs text-cf-text-secondary mb-1 font-medium">📡 파급 효과</p>
+      <div className="flex flex-wrap items-center gap-1">
+        {items.map((item, i) => (
+          <span key={i} className="flex items-center gap-1">
+            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{item}</span>
+            {i < items.length - 1 && <span className="text-slate-300 text-xs">→</span>}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SocialTab() {
   const [data, setData] = useState<SocialEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
+  const [fedOnly, setFedOnly] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -85,21 +116,38 @@ function SocialTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  const people = ['all', ...Array.from(new Set<string>(data.map(e => e.tag)))];
-  const filtered = filter === 'all' ? data : data.filter(e => e.tag === filter);
+  const baseData = fedOnly ? data.filter(e => e.isFed) : data;
+  const people = ['all', ...Array.from(new Set<string>(baseData.map(e => e.tag)))];
+  const filtered = filter === 'all' ? baseData : baseData.filter(e => e.tag === filter);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-xs text-cf-text-secondary">
-          주요 인물 최신 발언·뉴스 자동 수집 · 30분 캐시
+          주요 인물 발언·X 포스트 자동 수집 · 30분 캐시
         </p>
         <button onClick={load} className="flex items-center gap-1 text-xs text-cf-primary hover:underline">
           <RefreshCw className="w-3 h-3" /> 새로고침
         </button>
       </div>
 
-      {/* Filter chips */}
+      {/* Fed filter toggle */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => { setFedOnly(false); setFilter('all'); }}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!fedOnly ? 'bg-cf-primary text-white' : 'bg-white border border-cf-border text-cf-text-secondary'}`}
+        >
+          전체 인물
+        </button>
+        <button
+          onClick={() => { setFedOnly(true); setFilter('all'); }}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${fedOnly ? 'bg-blue-600 text-white' : 'bg-white border border-cf-border text-cf-text-secondary'}`}
+        >
+          🏦 연준(Fed) 위원만
+        </button>
+      </div>
+
+      {/* Person filter chips */}
       <div className="flex flex-wrap gap-2">
         {people.map(p => (
           <button
@@ -134,9 +182,17 @@ function SocialTab() {
               <div className="flex items-center gap-2">
                 <span className="text-lg">{entry.flag}</span>
                 <div>
-                  <p className="text-sm font-semibold text-cf-text-primary group-hover:text-cf-primary">
-                    {entry.person}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold text-cf-text-primary group-hover:text-cf-primary">
+                      {entry.person}
+                    </p>
+                    {entry.isFed && entry.votingMember && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 font-bold">투표권</span>
+                    )}
+                    {entry.isFed && !entry.votingMember && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-500 font-medium">비투표</span>
+                    )}
+                  </div>
                   <p className="text-xs text-cf-text-secondary">{entry.role}</p>
                 </div>
               </div>
@@ -153,13 +209,17 @@ function SocialTab() {
             {entry.summary && (
               <p className="text-xs text-cf-text-secondary line-clamp-2">{entry.summary}</p>
             )}
+            {/* Cascade */}
+            {entry.cascade && entry.cascade.length > 0 && (
+              <CascadeChain items={entry.cascade} />
+            )}
             <div className="flex items-center gap-2 mt-2 text-xs text-cf-text-secondary">
               {entry.istweet
-                ? <MessageSquare className="w-3 h-3 text-sky-500" />
+                ? <XLogo className="w-3 h-3 text-black" />
                 : <Newspaper className="w-3 h-3" />
               }
-              <span className={entry.istweet ? 'text-sky-600 font-medium' : ''}>
-                {entry.istweet ? `X · ${entry.source}` : entry.source}
+              <span className={entry.istweet ? 'text-black font-medium' : ''}>
+                {entry.istweet ? `X (트위터) · ${entry.source}` : entry.source}
               </span>
               <span>·</span>
               <span>{new Date(entry.publishedAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
@@ -475,8 +535,12 @@ function SanctionsTab() {
                           {e.type || '-'}
                         </span>
                       </td>
-                      <td className="py-2 pr-4 text-xs text-cf-text-secondary">{e.program}</td>
-                      <td className="py-2 text-xs text-cf-text-secondary max-w-[200px] truncate hidden md:table-cell">{e.remarks || '-'}</td>
+                      <td className="py-2 pr-4 text-xs text-cf-text-secondary">
+                        {(e as {programLabel?: string}).programLabel || e.program}
+                      </td>
+                      <td className="py-2 text-xs text-cf-text-secondary max-w-[200px] hidden md:table-cell">
+                        {(e as {remarks?: string}).remarks || '-'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -510,8 +574,12 @@ function SanctionsTab() {
                         <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-semibold text-cf-text-primary">{e.name}</p>
-                          <p className="text-xs text-cf-text-secondary">{e.program} · {e.type}</p>
-                          {e.remarks && <p className="text-xs text-cf-text-secondary mt-0.5">{e.remarks}</p>}
+                          <p className="text-xs text-cf-text-secondary">
+                            {(e as {programLabel?: string}).programLabel || e.program} · {e.type}
+                          </p>
+                          {(e as {remarks?: string}).remarks && (
+                            <p className="text-xs text-cf-text-secondary mt-0.5">{(e as {remarks?: string}).remarks}</p>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -626,6 +694,11 @@ function CorporateTab() {
                 {c.dissolved && <span className="text-red-600">해산: {c.dissolved}</span>}
               </div>
               {c.address && <p className="text-xs text-cf-text-secondary">📍 {c.address}</p>}
+              {(c as {note?: string}).note && (
+                <p className="text-xs text-blue-700 bg-blue-50 rounded px-2 py-1 mt-1">
+                  💡 {(c as {note?: string}).note}
+                </p>
+              )}
             </div>
           ))}
         </div>
