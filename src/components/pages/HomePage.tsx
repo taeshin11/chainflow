@@ -32,9 +32,107 @@ import {
   Monitor,
   ShoppingCart,
   GitCompare,
+  Search,
+  X,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import EmailCTA from '@/components/EmailCTA';
+import { useRouter } from '@/i18n/routing';
+import { allCompanies } from '@/data/companies';
+import { companyNamesI18n } from '@/data/company-names-i18n';
+
+const searchCompanies = allCompanies.map((c) => ({
+  name: c.name,
+  ticker: c.ticker,
+  sector: c.sector,
+}));
+
+function HeroSearch() {
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const filtered = query.trim().length > 0
+    ? searchCompanies.filter((c) => {
+        const q = query.toLowerCase();
+        if (c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q)) return true;
+        const loc = companyNamesI18n[c.ticker];
+        if (loc?.some((n) => n.toLowerCase().includes(q))) return true;
+        return false;
+      }).slice(0, 8)
+    : [];
+
+  const handleSelect = useCallback((ticker: string) => {
+    setQuery('');
+    router.push(`/company/${ticker}`);
+  }, [router]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (filtered.length === 0) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex((p) => (p < filtered.length - 1 ? p + 1 : 0)); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex((p) => (p > 0 ? p - 1 : filtered.length - 1)); }
+    if (e.key === 'Enter' && activeIndex >= 0) { e.preventDefault(); handleSelect(filtered[activeIndex].ticker); }
+    if (e.key === 'Enter' && activeIndex < 0 && filtered.length > 0) { e.preventDefault(); handleSelect(filtered[0].ticker); }
+  };
+
+  useEffect(() => { setActiveIndex(-1); }, [query]);
+
+  useEffect(() => {
+    if (activeIndex >= 0 && listRef.current) {
+      (listRef.current.children[activeIndex] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [activeIndex]);
+
+  return (
+    <div className="relative w-full max-w-md mt-6">
+      <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-cf-border shadow-md focus-within:border-cf-primary focus-within:shadow-lg transition-all">
+        <Search className="w-4 h-4 text-cf-text-secondary flex-shrink-0" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="NVDA, Apple, 삼성전자..."
+          className="flex-1 text-sm outline-none text-cf-text-primary placeholder:text-cf-text-secondary/60 bg-transparent"
+        />
+        {query && (
+          <button onClick={() => setQuery('')} className="text-cf-text-secondary hover:text-cf-text-primary transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {filtered.length > 0 && (
+        <ul
+          ref={listRef}
+          className="absolute top-full mt-1.5 left-0 right-0 bg-white rounded-xl border border-cf-border shadow-xl z-50 max-h-64 overflow-y-auto"
+        >
+          {filtered.map((c, i) => (
+            <li
+              key={c.ticker}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => handleSelect(c.ticker)}
+              className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-colors ${
+                i === activeIndex ? 'bg-cf-primary/5' : 'hover:bg-gray-50'
+              }`}
+            >
+              <div>
+                <p className="text-sm font-medium text-cf-text-primary">{c.name}</p>
+                <p className="text-xs text-cf-text-secondary capitalize">{c.sector?.replace(/-/g, ' ')}</p>
+              </div>
+              <span className="text-xs font-mono font-bold text-cf-primary bg-cf-primary/10 px-2.5 py-1 rounded-lg">
+                {c.ticker}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 const sectorIcons: Record<string, React.ReactNode> = {
   Cpu: <Cpu className="w-6 h-6" />,
@@ -302,6 +400,7 @@ export default function HomePage() {
                   {tHome('viewSignals')}
                 </Link>
               </div>
+              <HeroSearch />
             </div>
             <div className="cf-card p-6">
               <p className="text-xs text-cf-text-secondary mb-2 font-medium uppercase tracking-wider">
