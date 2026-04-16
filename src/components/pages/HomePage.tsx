@@ -41,6 +41,8 @@ import EmailCTA from '@/components/EmailCTA';
 import { useRouter } from '@/i18n/routing';
 import { allCompanies } from '@/data/companies';
 import { companyNamesI18n } from '@/data/company-names-i18n';
+import { useUser, SignInButton } from '@clerk/nextjs';
+// SignInButton is re-exported from @clerk/nextjs in v7
 
 const searchCompanies = allCompanies.map((c) => ({
   name: c.name,
@@ -189,6 +191,174 @@ function useInView(threshold = 0.15) {
 }
 
 // Cascade animation: nodes light up in sequence, then ripple outward
+// ── AI Daily Brief ─────────────────────────────────────────────────────────────
+type Timeframe = '1w' | '4w' | '13w';
+
+interface BriefSection { title: string; content: string; bullets: string[]; }
+interface DailyBrief {
+  market: BriefSection;
+  capital: BriefSection;
+  company: BriefSection;
+  outlook: string;
+  generatedAt: string;
+  tf: Timeframe;
+  cached?: boolean;
+}
+
+function AIDailyBrief() {
+  const { isSignedIn, isLoaded } = useUser();
+  const [tf, setTf] = useState<Timeframe>('4w');
+  const [brief, setBrief] = useState<DailyBrief | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    setLoading(true);
+    setBrief(null);
+    fetch(`/api/daily-brief?tf=${tf}`)
+      .then((r) => r.json())
+      .then((data: DailyBrief) => setBrief(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [tf, isSignedIn]);
+
+  const tfLabel = { '1w': '1주', '4w': '4주', '13w': '13주' } as const;
+  const tfBtns: Timeframe[] = ['1w', '4w', '13w'];
+
+  const sectionColors = [
+    { bg: 'bg-blue-50', border: 'border-blue-200', dot: 'bg-blue-500', label: 'text-blue-700' },
+    { bg: 'bg-violet-50', border: 'border-violet-200', dot: 'bg-violet-500', label: 'text-violet-700' },
+    { bg: 'bg-emerald-50', border: 'border-emerald-200', dot: 'bg-emerald-500', label: 'text-emerald-700' },
+  ];
+
+  const sections: (keyof Pick<DailyBrief, 'market' | 'capital' | 'company'>)[] = ['market', 'capital', 'company'];
+
+  return (
+    <div className="border-b border-cf-border bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5">
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-4 gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+              </span>
+              <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">AI Daily Brief</span>
+            </div>
+            {brief?.generatedAt && (
+              <span className="text-slate-500 text-xs hidden sm:inline">
+                {new Date(brief.generatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 생성
+              </span>
+            )}
+          </div>
+          {/* Timeframe toggle */}
+          <div className="flex items-center gap-1 bg-slate-800 rounded-lg p-0.5">
+            {tfBtns.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTf(t)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  tf === t
+                    ? 'bg-amber-400 text-slate-900'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {tfLabel[t]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Auth gate */}
+        {isLoaded && !isSignedIn && (
+          <div className="relative">
+            {/* Blurred preview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 select-none pointer-events-none" style={{ filter: 'blur(4px)' }}>
+              {(['시장 동향', '자금 흐름', '주목 기업'] as const).map((title, i) => (
+                <div key={i} className={`rounded-xl border p-4 ${['border-blue-200 bg-blue-50', 'border-violet-200 bg-violet-50', 'border-emerald-200 bg-emerald-50'][i]}`}>
+                  <p className={`text-xs font-bold uppercase mb-2 ${['text-blue-700', 'text-violet-700', 'text-emerald-700'][i]}`}>{title}</p>
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 bg-slate-300 rounded w-full" />
+                    <div className="h-2.5 bg-slate-300 rounded w-4/5" />
+                    <div className="h-2.5 bg-slate-300 rounded w-3/4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* CTA overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/60 rounded-xl backdrop-blur-[2px]">
+              <p className="text-white text-sm font-semibold text-center">AI 일일 브리핑은 로그인 후 확인 가능합니다</p>
+              <SignInButton mode="modal">
+                <button className="px-5 py-2 bg-amber-400 text-slate-900 rounded-lg text-sm font-bold hover:bg-amber-300 transition-colors">
+                  무료 로그인 / 회원가입
+                </button>
+              </SignInButton>
+            </div>
+          </div>
+        )}
+
+        {/* Loading skeleton */}
+        {isSignedIn && loading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-xl bg-slate-800/60 animate-pulse h-28" />
+            ))}
+          </div>
+        )}
+
+        {/* Brief cards */}
+        {isSignedIn && !loading && brief && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {sections.map((key, i) => {
+                const sec = brief[key];
+                const col = sectionColors[i];
+                return (
+                  <div key={key} className={`rounded-xl border ${col.border} ${col.bg} p-4`}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${col.dot}`} />
+                      <span className={`text-xs font-bold uppercase tracking-wide ${col.label}`}>
+                        {sec.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed mb-2">{sec.content}</p>
+                    {expanded && (
+                      <ul className="space-y-1">
+                        {sec.bullets.map((b, j) => (
+                          <li key={j} className="flex items-start gap-1.5 text-xs text-slate-600">
+                            <span className={`mt-0.5 w-1 h-1 rounded-full flex-shrink-0 ${col.dot}`} />
+                            {b}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Outlook + expand toggle */}
+            <div className="mt-3 flex items-center justify-between gap-4">
+              <p className="text-xs text-amber-300/80 italic">
+                <span className="font-semibold text-amber-300">전망:</span> {brief.outlook}
+              </p>
+              <button
+                onClick={() => setExpanded((p) => !p)}
+                className="flex-shrink-0 text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1"
+              >
+                {expanded ? '접기' : '상세 보기'}
+                <ArrowRight className={`w-3 h-3 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const CASCADE_STEPS = [
   ['NVDA'],                   // step 0 — leader ignites
   ['TSM', 'MSFT'],            // step 1
@@ -371,6 +541,9 @@ export default function HomePage() {
 
   return (
     <div>
+      {/* AI Daily Brief */}
+      <AIDailyBrief />
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cf-primary/5 via-cf-secondary/5 to-cf-accent/5" />

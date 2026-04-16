@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { type NewsGapEntry, edgarTicker } from '@/data/news-gap';
@@ -33,6 +33,9 @@ import {
   Calendar,
   Globe,
   BarChart2,
+  RefreshCw,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 
@@ -410,6 +413,164 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
   );
 }
 
+// ── Types for news cascade ────────────────────────────────────────────────────
+interface CascadeEffect {
+  asset: string;
+  direction: 'positive' | 'negative' | 'neutral';
+  magnitude: 'high' | 'medium' | 'low';
+  reason: string;
+  timeframe: string;
+}
+interface NewsArticle {
+  id: string;
+  title: string;
+  link: string;
+  pubDate: string;
+  source: string;
+  summary: string;
+  cascades: CascadeEffect[];
+  sentiment: 'bullish' | 'bearish' | 'neutral';
+  importance: 'high' | 'medium' | 'low';
+}
+
+function NewsCascadeSection() {
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const load = () => {
+    setLoading(true);
+    fetch('/api/news-cascade')
+      .then((r) => r.json())
+      .then((d: { articles: NewsArticle[] }) => setArticles(d.articles ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const sentimentColor = {
+    bullish: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    bearish: 'text-red-600 bg-red-50 border-red-200',
+    neutral: 'text-slate-600 bg-slate-50 border-slate-200',
+  };
+  const importanceColor = {
+    high: 'bg-red-500',
+    medium: 'bg-amber-400',
+    low: 'bg-slate-300',
+  };
+  const dirIcon = (dir: string) =>
+    dir === 'positive' ? <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+    : dir === 'negative' ? <ArrowDownRight className="w-3 h-3 text-red-500" />
+    : <Minus className="w-3 h-3 text-slate-400" />;
+  const magColor = { high: 'text-red-600', medium: 'text-amber-600', low: 'text-slate-500' };
+
+  return (
+    <div className="mb-10">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Zap className="w-5 h-5 text-amber-500" />
+          <h2 className="text-lg font-heading font-bold text-cf-text-primary">실시간 뉴스 Cascade 분석</h2>
+          <span className="text-xs text-cf-text-secondary bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            AI (EXAONE)
+          </span>
+        </div>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="flex items-center gap-1.5 text-xs text-cf-text-secondary hover:text-cf-primary transition-colors"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          새로고침
+        </button>
+      </div>
+
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[0,1,2,3].map(i => (
+            <div key={i} className="h-24 rounded-xl bg-cf-border/30 animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {!loading && articles.length === 0 && (
+        <div className="cf-card p-6 text-center text-cf-text-secondary text-sm">
+          뉴스를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+        </div>
+      )}
+
+      {!loading && articles.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {articles.map((a) => (
+            <div
+              key={a.id}
+              className="cf-card p-4 cursor-pointer hover:border-cf-primary/30 transition-all"
+              onClick={() => setExpanded(expanded === a.id ? null : a.id)}
+            >
+              {/* Header */}
+              <div className="flex items-start gap-2 mb-2">
+                <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${importanceColor[a.importance]}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-cf-text-primary leading-snug line-clamp-2">{a.title}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] text-cf-text-secondary">{a.source}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${sentimentColor[a.sentiment]}`}>
+                      {a.sentiment === 'bullish' ? '강세' : a.sentiment === 'bearish' ? '약세' : '중립'}
+                    </span>
+                  </div>
+                </div>
+                <a
+                  href={a.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex-shrink-0 text-cf-text-secondary hover:text-cf-primary"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* Summary */}
+              <p className="text-xs text-cf-text-secondary leading-relaxed mb-2 line-clamp-2">{a.summary}</p>
+
+              {/* Cascade pills */}
+              <div className="flex flex-wrap gap-1">
+                {a.cascades.slice(0, 3).map((c, i) => (
+                  <span key={i} className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-cf-border/60 text-cf-text-secondary">
+                    {dirIcon(c.direction)}
+                    {c.asset}
+                  </span>
+                ))}
+              </div>
+
+              {/* Expanded cascade detail */}
+              {expanded === a.id && (
+                <div className="mt-3 border-t border-cf-border pt-3 space-y-2">
+                  {a.cascades.map((c, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs">
+                      <div className="flex items-center gap-1 flex-shrink-0 w-28">
+                        {dirIcon(c.direction)}
+                        <span className="font-semibold text-cf-text-primary truncate">{c.asset}</span>
+                      </div>
+                      <div className="flex-1">
+                        <span className={`text-[10px] font-bold mr-1 ${magColor[c.magnitude]}`}>
+                          [{c.magnitude === 'high' ? '강' : c.magnitude === 'medium' ? '중' : '약'}]
+                        </span>
+                        <span className="text-cf-text-secondary">{c.reason}</span>
+                        <span className="ml-1 text-[10px] text-cf-text-muted">({c.timeframe})</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function NewsGapPage({
   initialEntries,
   lastUpdated,
@@ -530,6 +691,9 @@ export default function NewsGapPage({
         ))}
         <span className="ml-auto text-xs text-cf-text-muted">카드를 클릭해서 펼쳐보세요 ↓</span>
       </div>
+
+      {/* AI News Cascade */}
+      <NewsCascadeSection />
 
       {/* Gap Cards */}
       <div className="space-y-3 mb-12">
