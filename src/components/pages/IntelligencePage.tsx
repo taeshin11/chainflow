@@ -568,7 +568,7 @@ function CapitalFlowsTab() {
       </div>
 
       <p className="text-xs text-cf-text-secondary text-center">
-        Yahoo Finance 실시간 · ETF 기반 자산군별 수익률 분석 · 4시간 캐시
+        Yahoo Finance (15분 지연) · ETF 기반 자산군별 수익률 분석 · 4시간 캐시
         {data.updatedAt && ` · ${new Date(data.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트`}
       </p>
     </div>
@@ -711,7 +711,7 @@ export default function IntelligencePage() {
                     )}
                   </div>
                   <p className="text-xs text-cf-text-secondary mb-4">
-                    {fgData ? 'CNN F&G 원리 (RSI · 125일 모멘텀 · 변동성) · Yahoo Finance 실시간' : '정적 데이터'}
+                    {fgData ? 'CNN F&G 원리 (RSI · 125일 모멘텀 · 변동성) · Yahoo Finance (15분 지연)' : '정적 데이터'}
                     {' '}· 0 = 극단적 공포, 100 = 극단적 탐욕
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
