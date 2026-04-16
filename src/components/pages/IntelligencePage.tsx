@@ -82,7 +82,7 @@ function FearGreedGauge({ score }: { score: number }) {
   const segCount = gradColors.length;
 
   return (
-    <svg viewBox="0 0 120 70" className="w-full max-w-[110px]">
+    <svg viewBox="0 0 120 82" className="w-full max-w-[110px]">
       {/* Arc segments */}
       {gradColors.map((color, i) => {
         const startAngle = (i / segCount) * Math.PI;
