@@ -144,6 +144,77 @@ const STATIC_DATA: FedWatchData = {
   source: 'CME FedWatch 기반 시장 컨센서스',
 };
 
+// ── CME live fetch (unofficial endpoint) ─────────────────────────────────────
+async function fetchCMEImpliedRates(): Promise<Record<string, number> | null> {
+  try {
+    const res = await fetch(
+      'https://www.cmegroup.com/CmeWS/mvc/ProductCalendar/V2/FF/FUTURE?type=AC&venue=G&pageSize=24&pageNum=0',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/plain, */*',
+          'Referer': 'https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html',
+          'Origin': 'https://www.cmegroup.com',
+        },
+        signal: AbortSignal.timeout(10000),
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const items: Array<Record<string, string>> = data?.items ?? data?.rows ?? [];
+    if (!items.length) return null;
+
+    // Map month label → implied rate (100 - settlePx)
+    const rates: Record<string, number> = {};
+    for (const item of items) {
+      const price = parseFloat(item.settlePx ?? item.lastPx ?? item.last ?? '0');
+      const month = (item.month ?? item.expirationDate ?? '').toString().toUpperCase();
+      if (price > 90 && month) {
+        rates[month] = parseFloat((100 - price).toFixed(4));
+      }
+    }
+    return Object.keys(rates).length ? rates : null;
+  } catch {
+    return null;
+  }
+}
+
+// Map CME month code to a meeting, compute probability from implied rate
+function computeMeetingProbs(
+  meeting: FomcMeeting,
+  impliedRates: Record<string, number>,
+  currentMid: number,
+): Partial<FomcMeeting> {
+  // Month codes: MAY26, JUN26, etc.
+  const d = new Date(meeting.date);
+  const monthCodes = [
+    `${['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]}${String(d.getFullYear()).slice(2)}`,
+    `${['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]}${d.getFullYear()}`,
+  ];
+  const implied = monthCodes.reduce((acc: number | null, code) => {
+    const r = impliedRates[code];
+    return r !== undefined ? r : acc;
+  }, null);
+
+  if (implied === null) return {};
+
+  const diff = currentMid - implied; // positive = market expects cuts
+  // Each 25bp cut reduces rate by 0.25
+  const rawCuts = diff / 0.25;
+  const probCut25 = Math.min(100, Math.max(0, Math.round(rawCuts * 100)));
+  const probHold = Math.max(0, 100 - probCut25);
+
+  return {
+    impliedRate: parseFloat(implied.toFixed(3)),
+    probHold: parseFloat(probHold.toFixed(1)),
+    probCut25: parseFloat(probCut25.toFixed(1)),
+    probCut50: 0,
+    probCut75: 0,
+    probHike: 0,
+    cumulativeCuts: Math.round(Math.max(0, diff) * 4) * 25,
+  };
+}
+
 export async function GET() {
   const redis = createRedis();
   if (redis) {
@@ -153,7 +224,33 @@ export async function GET() {
     } catch { /* non-fatal */ }
   }
 
-  const result = { ...STATIC_DATA, cached: false };
+  // Try live CME data
+  const cmeRates = await fetchCMEImpliedRates();
+  let meetings = STATIC_DATA.meetings;
+  let source = STATIC_DATA.source;
+  let liveData = false;
+
+  if (cmeRates && Object.keys(cmeRates).length >= 3) {
+    liveData = true;
+    source = 'CME Fed Funds Futures 실시간';
+    meetings = STATIC_DATA.meetings.map(m => {
+      const live = computeMeetingProbs(m, cmeRates, STATIC_DATA.currentRateMid);
+      return { ...m, ...live };
+    });
+    // Recompute year-end implied
+    const lastMeeting = meetings[meetings.length - 1];
+  }
+
+  const result: FedWatchData & { cached: boolean; liveData: boolean } = {
+    ...STATIC_DATA,
+    meetings,
+    source,
+    yearEndImpliedRate: meetings[meetings.length - 1]?.impliedRate ?? STATIC_DATA.yearEndImpliedRate,
+    totalImpliedCuts: meetings[meetings.length - 1]?.cumulativeCuts ?? STATIC_DATA.totalImpliedCuts,
+    updatedAt: liveData ? new Date().toISOString().slice(0, 10) : STATIC_DATA.updatedAt,
+    cached: false,
+    liveData,
+  };
 
   if (redis) {
     try { await redis.set(cacheKey(), result, { ex: 4 * 60 * 60 }); } catch { /* non-fatal */ }

@@ -61,7 +61,7 @@ export async function callAI(prompt: string): Promise<string> {
             },
             { role: 'user', content: prompt },
           ],
-          max_tokens: 1600,
+          max_tokens: 2200,
           temperature: 0.65,
         }),
         signal: AbortSignal.timeout(45000),
