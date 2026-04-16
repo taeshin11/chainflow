@@ -86,6 +86,7 @@ interface NewsGapPageProps {
 
 function GapCard({ entry }: { entry: NewsGapEntry }) {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations('newsGap');
   const sectorClass = sectorColors[entry.sector] ?? 'bg-gray-50 text-gray-700 border-gray-200';
 
   return (
@@ -217,17 +218,17 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
           {/* 기관 보유 현황 (13F) */}
           <div>
             <h4 className="text-xs font-bold text-cf-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5" /> 기관 보유 현황 (13F)
+              <Building2 className="w-3.5 h-3.5" /> {t('institutionalHoldings')}
             </h4>
             <div className="bg-white rounded-lg border border-cf-border/50 overflow-hidden">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-gray-50 border-b border-cf-border/50">
-                    <th className="text-left py-2 px-3 text-cf-text-secondary font-medium">기관</th>
-                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">포지션</th>
-                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">지분율</th>
-                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">동향</th>
-                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">공시일</th>
+                    <th className="text-left py-2 px-3 text-cf-text-secondary font-medium">{t('institution')}</th>
+                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">{t('position')}</th>
+                    <th className="text-right py-2 px-3 text-cf-text-secondary font-medium">{t('ownershipPct')}</th>
+                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">{t('trend')}</th>
+                    <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">{t('filingDate')}</th>
                     <th className="text-center py-2 px-3 text-cf-text-secondary font-medium">13F</th>
                   </tr>
                 </thead>
@@ -260,7 +261,7 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
                             o.action === 'reduced' ? 'bg-red-50 text-red-700' :
                             'bg-gray-50 text-gray-600'
                           }`}>
-                            {o.action === 'new' ? '신규' : o.action === 'increased' ? '증가' : o.action === 'reduced' ? '감소' : '유지'}
+                            {o.action === 'new' ? t('actionNew') : o.action === 'increased' ? t('actionIncreased') : o.action === 'reduced' ? t('actionReduced') : t('actionMaintained')}
                           </span>
                         </td>
                         <td className="py-2 px-3 text-center text-cf-text-secondary whitespace-nowrap">
@@ -288,7 +289,7 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
           {/* 요약 */}
           <div>
             <h4 className="text-xs font-bold text-cf-text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5" /> 기관 행동 요약
+              <TrendingUp className="w-3.5 h-3.5" /> {t('institutionalActivitySummary')}
             </h4>
             <div className="space-y-2 mb-4">
               {entry.ibActions.map((action, i) => (
@@ -301,18 +302,18 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
               ))}
             </div>
             <div className="bg-white rounded-lg p-3 border border-cf-border/50">
-              <p className="text-xs font-bold text-cf-text-primary mb-2">신호 강도</p>
+              <p className="text-xs font-bold text-cf-text-primary mb-2">{t('signalStrength')}</p>
               <div className="space-y-1.5 text-xs text-cf-text-secondary">
                 <div className="flex justify-between">
                   <span>기관 활동 수준</span>
                   <span className={`font-bold ${entry.ibActivityLevel === 'high' ? 'text-cf-primary' : 'text-cf-text-secondary'}`}>
-                    {entry.ibActivityLevel === 'high' ? '높음 🔥' : entry.ibActivityLevel === 'medium' ? '보통' : '낮음'}
+                    {entry.ibActivityLevel === 'high' ? t('activityHigh') : entry.ibActivityLevel === 'medium' ? t('activityMedium') : t('activityLow')}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>미디어 커버리지</span>
                   <span className={`font-bold ${entry.mediaScore <= 20 ? 'text-cf-accent' : 'text-cf-text-secondary'}`}>
-                    {entry.mediaScore <= 20 ? '거의 없음 ⚡' : entry.mediaScore <= 50 ? '낮음' : '보통'}
+                    {entry.mediaScore <= 20 ? t('coverageMinimal') : entry.mediaScore <= 50 ? t('activityLow') : t('activityMedium')}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -434,6 +435,7 @@ interface NewsArticle {
 }
 
 function NewsCascadeSection() {
+  const t = useTranslations('newsGap');
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -481,7 +483,7 @@ function NewsCascadeSection() {
           className="flex items-center gap-1.5 text-xs text-cf-text-secondary hover:text-cf-primary transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          새로고침
+          {t('refresh')}
         </button>
       </div>
 
@@ -515,7 +517,7 @@ function NewsCascadeSection() {
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-[10px] text-cf-text-secondary">{a.source}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${sentimentColor[a.sentiment]}`}>
-                      {a.sentiment === 'bullish' ? '강세' : a.sentiment === 'bearish' ? '약세' : '중립'}
+                      {a.sentiment === 'bullish' ? t('bullish') : a.sentiment === 'bearish' ? t('bearish') : t('neutral')}
                     </span>
                   </div>
                 </div>
@@ -630,11 +632,11 @@ export default function NewsGapPage({
             </div>
           ) : source === 'live' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
-              <Zap className="w-3.5 h-3.5" />Live — {updatedTickers} tickers refreshed
+              <Zap className="w-3.5 h-3.5" />{t('liveRefreshed', { count: updatedTickers })}
             </div>
           ) : (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
-              <Database className="w-3.5 h-3.5" />Static data
+              <Database className="w-3.5 h-3.5" />{t('staticData')}
             </div>
           )}
           <span className="text-xs text-cf-text-muted">
@@ -689,7 +691,7 @@ export default function NewsGapPage({
             {opt.label}
           </button>
         ))}
-        <span className="ml-auto text-xs text-cf-text-muted">카드를 클릭해서 펼쳐보세요 ↓</span>
+        <span className="ml-auto text-xs text-cf-text-muted">{t('clickToExpand')}</span>
       </div>
 
       {/* AI News Cascade */}

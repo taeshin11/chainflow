@@ -266,11 +266,120 @@ export function parseAIResponse(raw: string, tf: Timeframe): DailyBrief | null {
   }
 }
 
-export function fallbackBrief(tf: Timeframe): DailyBrief {
+/** Data-driven brief — used when AI is unavailable, still shows real numbers */
+export function fallbackBrief(tf: Timeframe, capitalData?: unknown, macroData?: unknown): DailyBrief {
   const tfLabel = tf === '1w' ? '1주' : tf === '4w' ? '4주' : '13주';
-  const s = (title: string): BriefSection => ({ title, content: `${tfLabel} 데이터 분석 중입니다.`, bullets: ['준비 중'] });
+  const retKey = tf === '1w' ? 'ret1w' : tf === '4w' ? 'ret4w' : 'ret13w';
+
+  // ── Market section from capital data ──────────────────────────────────────
+  let marketTitle = '글로벌 시장 동향';
+  let marketContent = `${tfLabel} 주요 자산 수익률 요약`;
+  const marketBullets: string[] = [];
+
+  try {
+    const cd = capitalData as Record<string, unknown>;
+    const assets = (cd?.assets as Array<Record<string, unknown>>) ?? [];
+    if (assets.length > 0) {
+      const sorted = [...assets].sort((a, b) => ((b[retKey] as number) ?? 0) - ((a[retKey] as number) ?? 0));
+      const top3 = sorted.slice(0, 3).map(a => `${a.ticker} +${((a[retKey] as number) ?? 0).toFixed(1)}%`);
+      const bot3 = sorted.slice(-3).reverse().map(a => `${a.ticker} ${((a[retKey] as number) ?? 0).toFixed(1)}%`);
+      marketBullets.push(`상승 자산: ${top3.join(', ')}`);
+      marketBullets.push(`하락 자산: ${bot3.join(', ')}`);
+    }
+    const fg = cd?.fearGreed as Record<string, unknown>;
+    if (fg?.value) {
+      const val = fg.value as number;
+      const label = val >= 75 ? '극도 탐욕' : val >= 55 ? '탐욕' : val >= 45 ? '중립' : val >= 25 ? '공포' : '극도 공포';
+      marketBullets.push(`공포탐욕지수: ${val} (${label})`);
+    }
+    const gvd = cd?.goldVsDollar as Record<string, unknown>;
+    if (gvd) {
+      const g = (tf === '1w' ? gvd.goldRet1w : tf === '4w' ? gvd.goldRet4w : gvd.goldRet13w) as number;
+      const d = (tf === '1w' ? gvd.dollarRet1w : tf === '4w' ? gvd.dollarRet4w : gvd.dollarRet13w) as number;
+      if (g != null && d != null) marketBullets.push(`금 ${g.toFixed(1)}% / 달러지수 ${d.toFixed(1)}%`);
+    }
+  } catch { /* ignore */ }
+
+  if (marketBullets.length === 0) marketBullets.push(`${tfLabel} 시장 데이터를 불러오는 중입니다`);
+
+  // ── Capital section ────────────────────────────────────────────────────────
+  let capitalTitle = '자금 흐름';
+  let capitalContent = `${tfLabel} 국가별 자금 이동 현황`;
+  const capitalBullets: string[] = [];
+
+  try {
+    const cd = capitalData as Record<string, unknown>;
+    const cf = cd?.countryFlow as Record<string, unknown>;
+    const countries = (cf?.countries as Array<Record<string, unknown>>) ?? [];
+    if (countries.length > 0) {
+      const sorted = [...countries].sort((a, b) => ((b[retKey] as number) ?? 0) - ((a[retKey] as number) ?? 0));
+      const inflow = sorted.slice(0, 3).map(c => `${c.country}(+${((c[retKey] as number) ?? 0).toFixed(1)}%)`);
+      const outflow = sorted.slice(-2).reverse().map(c => `${c.country}(${((c[retKey] as number) ?? 0).toFixed(1)}%)`);
+      capitalBullets.push(`자금 유입: ${inflow.join(', ')}`);
+      capitalBullets.push(`자금 유출: ${outflow.join(', ')}`);
+    }
+    const md = macroData as Record<string, unknown>;
+    const yc = md?.yieldCurve as Record<string, unknown>;
+    if (yc?.spread10y2y != null) {
+      const spread = yc.spread10y2y as number;
+      capitalBullets.push(`미국채 10Y-2Y 스프레드: ${spread.toFixed(0)}bp${(yc.inverted as boolean) ? ' ⚠️ 역전 중' : ''}`);
+    }
+  } catch { /* ignore */ }
+
+  if (capitalBullets.length === 0) capitalBullets.push(`${tfLabel} 자금 흐름 데이터를 집계 중입니다`);
+
+  // ── Company section from institutional signals ─────────────────────────────
+  const companyBullets: string[] = [];
+  try {
+    const top = institutionalSignals
+      .filter(s => s.action === 'accumulating' || s.action === 'new_position')
+      .slice(0, 3)
+      .map(s => `${s.institution} → ${s.ticker} (${s.estimatedValue})`);
+    if (top.length > 0) companyBullets.push(...top);
+
+    const topGap = [...newsGapData]
+      .sort((a, b) => b.gapScore - a.gapScore)
+      .slice(0, 2)
+      .map(n => `${n.ticker} 뉴스갭 ${n.gapScore}점 — 기관 침묵 매집 신호`);
+    if (topGap.length > 0) companyBullets.push(...topGap);
+  } catch { /* ignore */ }
+
+  if (companyBullets.length === 0) companyBullets.push(`기관 매집 데이터 ${institutionalSignals.length}건 분석 중`);
+
+  // ── Signals section ────────────────────────────────────────────────────────
+  const signalBullets: string[] = [];
+  try {
+    const stakeChanges = newsGapData
+      .flatMap(n => n.ownershipData.filter(o => o.action === 'new' || o.action === 'increased').map(o => ({ ticker: n.ticker, ...o })))
+      .sort((a, b) => b.valueM - a.valueM)
+      .slice(0, 3)
+      .map(s => {
+        const pct = s.pctOfShares;
+        const change = s.prevPct !== undefined ? `${s.prevPct.toFixed(1)}%→${pct.toFixed(1)}%` : `신규 ${pct.toFixed(1)}%`;
+        return `${s.ticker}: ${s.institution} ${change} ($${s.valueM}M, ${s.quarter})`;
+      });
+    if (stakeChanges.length > 0) signalBullets.push(...stakeChanges);
+  } catch { /* ignore */ }
+
+  if (signalBullets.length === 0) signalBullets.push(`13F 기관 보유 데이터 분석 중`);
+
+  // ── Macro for risk level ───────────────────────────────────────────────────
+  let riskLevel: 'low' | 'medium' | 'high' = 'medium';
+  try {
+    const cd = capitalData as Record<string, unknown>;
+    const fg = cd?.fearGreed as Record<string, unknown>;
+    const val = fg?.value as number;
+    if (val != null) riskLevel = val < 30 ? 'high' : val > 70 ? 'low' : 'medium';
+  } catch { /* ignore */ }
+
   return {
-    market: s('시장 동향'), capital: s('자금 흐름'), company: s('주목 종목'), signals: s('기관 신호'),
-    outlook: 'AI 분석 준비 중입니다.', riskLevel: 'medium', generatedAt: new Date().toISOString(), tf,
+    market: { title: marketTitle, content: marketContent, bullets: marketBullets },
+    capital: { title: capitalTitle, content: capitalContent, bullets: capitalBullets },
+    company: { title: '주목 종목 & 기관 매집', content: `${tfLabel} 기관 매집 상위 종목`, bullets: companyBullets },
+    signals: { title: '기관 지분율 변화 (13F)', content: `${tfLabel} 주요 지분율 변동`, bullets: signalBullets },
+    outlook: `실시간 데이터 기반 ${tfLabel} 요약 — AI 분석 준비 중 (환경변수 GEMINI_API_KEY 필요)`,
+    riskLevel,
+    generatedAt: new Date().toISOString(),
+    tf,
   };
 }

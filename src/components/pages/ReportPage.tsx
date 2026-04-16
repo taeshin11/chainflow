@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 type Timeframe = '1w' | '4w' | '13w';
 
@@ -20,20 +21,22 @@ interface BriefData {
   source: string;
 }
 
-const TF_LABELS: Record<Timeframe, string> = {
-  '1w': '1주',
-  '4w': '4주',
-  '13w': '13주',
-};
-
-const SECTION_CONFIG = [
-  { key: 'market' as const, label: '글로벌 시장', icon: '📊', color: 'bg-blue-50 border-blue-200' },
-  { key: 'capital' as const, label: '자본 흐름', icon: '💰', color: 'bg-emerald-50 border-emerald-200' },
-  { key: 'company' as const, label: '기업 신호', icon: '🏢', color: 'bg-violet-50 border-violet-200' },
-  { key: 'signals' as const, label: '기관 시그널', icon: '📡', color: 'bg-amber-50 border-amber-200' },
-];
-
 export default function ReportPage() {
+  const t = useTranslations('report');
+
+  const TF_LABELS: Record<Timeframe, string> = {
+    '1w': t('week1'),
+    '4w': t('week4'),
+    '13w': t('week13'),
+  };
+
+  const SECTION_CONFIG = [
+    { key: 'market' as const, label: t('sectionMarket'), icon: '📊', color: 'bg-blue-50 border-blue-200' },
+    { key: 'capital' as const, label: t('sectionCapital'), icon: '💰', color: 'bg-emerald-50 border-emerald-200' },
+    { key: 'company' as const, label: t('sectionCompany'), icon: '🏢', color: 'bg-violet-50 border-violet-200' },
+    { key: 'signals' as const, label: t('sectionSignals'), icon: '📡', color: 'bg-amber-50 border-amber-200' },
+  ];
+
   const [tf, setTf] = useState<Timeframe>('1w');
   const [data, setData] = useState<BriefData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,8 +74,8 @@ export default function ReportPage() {
       <div className="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">AI 리포트</h1>
-            <p className="text-xs text-gray-500 mt-0.5">글로벌 자금 흐름 · 기관 시그널 · 기업 분석</p>
+            <h1 className="text-lg font-bold text-gray-900">{t('title')}</h1>
+            <p className="text-xs text-gray-500 mt-0.5">{t('subtitle')}</p>
           </div>
           <button
             onClick={() => fetchBrief(tf)}
@@ -80,7 +83,7 @@ export default function ReportPage() {
             className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-40 bg-white"
           >
             <span className={loading ? 'animate-spin inline-block' : ''}>↻</span>
-            새로고침
+            {t('refresh')}
           </button>
         </div>
       </div>
@@ -88,17 +91,17 @@ export default function ReportPage() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Timeframe selector */}
         <div className="flex gap-2 mb-8">
-          {(Object.keys(TF_LABELS) as Timeframe[]).map(t => (
+          {(Object.keys(TF_LABELS) as Timeframe[]).map(key => (
             <button
-              key={t}
-              onClick={() => setTf(t)}
+              key={key}
+              onClick={() => setTf(key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                tf === t
+                tf === key
                   ? 'bg-violet-600 text-white shadow-md'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:text-violet-600'
               }`}
             >
-              {TF_LABELS[t]}
+              {TF_LABELS[key]}
             </button>
           ))}
         </div>
@@ -107,7 +110,7 @@ export default function ReportPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="w-10 h-10 border-2 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
-            <p className="text-sm text-gray-500">AI 리포트 생성 중...</p>
+            <p className="text-sm text-gray-500">{t('loading')}</p>
           </div>
         )}
 
@@ -119,7 +122,7 @@ export default function ReportPage() {
               onClick={() => fetchBrief(tf)}
               className="mt-3 text-xs text-red-500 hover:text-red-700 underline"
             >
-              다시 시도
+              {t('retry')}
             </button>
           </div>
         )}
@@ -129,7 +132,7 @@ export default function ReportPage() {
           <>
             {/* Meta */}
             <div className="flex items-center gap-3 mb-6 text-xs text-gray-400">
-              <span>생성: {new Date(data.generatedAt).toLocaleString('ko-KR')}</span>
+              <span>{t('generatedAt').replace('{date}', new Date(data.generatedAt).toLocaleString())}</span>
               <span>·</span>
               <span>{data.source || 'AI'}</span>
             </div>
@@ -165,7 +168,7 @@ export default function ReportPage() {
                       </ul>
                     )}
                     {!isOpen && (
-                      <p className="text-xs text-gray-400 mt-1">클릭하여 접기</p>
+                      <p className="text-xs text-gray-400 mt-1">{t('collapse')}</p>
                     )}
                   </div>
                 );
@@ -177,7 +180,7 @@ export default function ReportPage() {
               <div className="rounded-xl border border-violet-200 bg-violet-50 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm">🔮</span>
-                  <span className="text-sm font-semibold text-violet-700">AI 전망</span>
+                  <span className="text-sm font-semibold text-violet-700">{t('aiOutlook')}</span>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{data.outlook}</p>
               </div>

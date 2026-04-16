@@ -26,6 +26,7 @@ const companies = allCompanies.map((c) => ({
 
 function GlobalSearch({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const t = useTranslations('nav');
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +86,7 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="기업명 또는 티커 검색 (예: NVIDIA, NVDA)"
+            placeholder={t('companySearchFull')}
             className="flex-1 text-sm outline-none text-cf-text-primary placeholder:text-cf-text-secondary/60 bg-transparent"
           />
           {query && (
@@ -124,13 +125,13 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
 
         {query.trim().length > 0 && filtered.length === 0 && (
           <div className="px-4 py-8 text-center text-sm text-cf-text-secondary">
-            &quot;{query}&quot; 검색 결과 없음
+            &quot;{query}&quot; {t('noResults')}
           </div>
         )}
 
         {query.trim().length === 0 && (
           <div className="px-4 py-5 text-center text-xs text-cf-text-secondary">
-            전체 {companies.length}개 기업 검색 가능
+            {t('totalCompanies', { count: companies.length })}
           </div>
         )}
       </div>
@@ -192,7 +193,7 @@ export default function Navbar() {
               className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-cf-border bg-gray-50 hover:bg-white hover:border-cf-primary/30 transition-all duration-200 text-sm text-cf-text-secondary min-w-[220px]"
             >
               <Search className="w-4 h-4" />
-              <span className="flex-1 text-left">기업 검색...</span>
+              <span className="flex-1 text-left">{t('companySearchShort')}</span>
               <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-500 font-mono">⌘K</kbd>
             </button>
 
@@ -225,7 +226,7 @@ export default function Navbar() {
               <button
                 onClick={() => setSearchOpen(true)}
                 className="flex items-center justify-center w-10 h-10 rounded-lg text-cf-text-secondary hover:text-cf-text-primary hover:bg-cf-primary/5 transition-all duration-200"
-                aria-label="검색"
+                aria-label={t('companySearchShort')}
               >
                 <Search className="w-5 h-5" />
               </button>

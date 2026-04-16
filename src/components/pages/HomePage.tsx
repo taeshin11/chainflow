@@ -50,6 +50,7 @@ const searchCompanies = allCompanies.map((c) => ({
 
 function HeroSearch() {
   const router = useRouter();
+  const tHome = useTranslations('home');
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -90,7 +91,7 @@ function HeroSearch() {
     <div className="relative w-full max-w-md mt-6">
       <p className="text-xs font-semibold text-cf-text-secondary uppercase tracking-wider mb-2 flex items-center gap-1.5">
         <Search className="w-3.5 h-3.5" />
-        기업 직접 검색 — {searchCompanies.length}개 기업
+        {tHome('companySearchLabel', { count: searchCompanies.length })}
       </p>
       <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-cf-border shadow-md focus-within:border-cf-primary focus-within:shadow-lg transition-all">
         <Search className="w-4 h-4 text-cf-primary flex-shrink-0" />
@@ -100,7 +101,7 @@ function HeroSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="티커 또는 기업명 입력 (NVDA, Apple...)"
+          placeholder={tHome('companySearchPlaceholder')}
           className="flex-1 text-sm outline-none text-cf-text-primary placeholder:text-cf-text-secondary/60 bg-transparent"
         />
         {query && (
@@ -633,7 +634,7 @@ export default function HomePage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
                   </span>
-                  비밀 머니 추적
+                  {tHome('secretMoneyTrack')}
                 </Link>
                 <Link
                   href="/news-gap"
@@ -643,7 +644,7 @@ export default function HomePage() {
                              transition-all duration-200"
                 >
                   <Radar className="w-4 h-4" />
-                  뉴스 갭 스캔
+                  {tHome('newsGapScan')}
                 </Link>
                 <Link
                   href="/report"
@@ -656,7 +657,7 @@ export default function HomePage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
                   </span>
-                  AI 리포트
+                  {tHome('aiReport')}
                 </Link>
                 <Link
                   href="/osint"
@@ -666,7 +667,7 @@ export default function HomePage() {
                              transition-all duration-200"
                 >
                   <Search className="w-4 h-4" />
-                  자금 추적
+                  {tHome('fundTracking')}
                 </Link>
               </div>
               <HeroSearch />

@@ -136,7 +136,7 @@ export default function SignalsPage({
           {source === 'live' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
               <Zap className="w-3.5 h-3.5" />
-              Live — {updatedTickers} tickers refreshed
+              {t('liveRefreshed', { count: updatedTickers })}
             </div>
           ) : source === 'cached' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-200">
@@ -146,7 +146,7 @@ export default function SignalsPage({
           ) : (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
               <Database className="w-3.5 h-3.5" />
-              Static data
+              {t('staticData')}
             </div>
           )}
           <span className="text-xs text-cf-text-muted ml-auto">
@@ -266,7 +266,7 @@ export default function SignalsPage({
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('company')}</th>
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('institution')}</th>
                 <th className="text-left py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('action')}</th>
-                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">지분율</th>
+                <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('ownershipPct')}</th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('sharesChanged')}</th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('value')}</th>
                 <th className="text-center py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('gapScore')}</th>

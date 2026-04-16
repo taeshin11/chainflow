@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     if (raw) brief = parseAIResponse(raw, tf);
   } catch { /* fallback */ }
 
-  if (!brief) brief = fallbackBrief(tf);
+  if (!brief) brief = fallbackBrief(tf, capitalData, macroData);
 
   if (redis) {
     try { await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 }); } catch { /* non-fatal */ }

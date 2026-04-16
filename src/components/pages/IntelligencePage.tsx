@@ -131,6 +131,7 @@ function FactorBar({ label, score, weight }: { label: string; score: number; wei
 
 function FearGreedCard({ entry }: { entry: FearGreedEntryExtended }) {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations('intelligence');
   const level = getLevel(entry.score);
   const meta = levelLabels[level];
   const delta = entry.prevScore !== undefined ? entry.score - entry.prevScore : 0;
@@ -186,9 +187,9 @@ function FearGreedCard({ entry }: { entry: FearGreedEntryExtended }) {
           {entry.factors && (
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold text-cf-text-secondary uppercase tracking-wide mb-1.5">📊 심리 구성 요소</p>
-              <FactorBar label="RSI 모멘텀" score={entry.factors.rsi} weight="40%" />
-              <FactorBar label="추세 강도" score={entry.factors.momentum} weight="35%" />
-              <FactorBar label="변동성" score={entry.factors.volatility} weight="25%" />
+              <FactorBar label={t('rsiMomentum')} score={entry.factors.rsi} weight="40%" />
+              <FactorBar label={t('trendStrength')} score={entry.factors.momentum} weight="35%" />
+              <FactorBar label={t('volatility')} score={entry.factors.volatility} weight="25%" />
               <p className="text-[9px] text-gray-400 mt-1">0=극단공포 · 50=중립 · 100=극단탐욕</p>
             </div>
           )}
@@ -232,22 +233,24 @@ function weeksAgo(dateStr: string): string {
   return `${months}개월 전 시작 (${dateLabel})`;
 }
 
-const signalBadge: Record<string, { label: string; cls: string }> = {
-  accelerating: { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700 border border-amber-200' },
-  holding:      { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600 border border-slate-200' },
-  fading:       { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500 border border-gray-200' },
+const signalBadgeCls: Record<string, string> = {
+  accelerating: 'bg-amber-100 text-amber-700 border border-amber-200',
+  holding:      'bg-slate-100 text-slate-600 border border-slate-200',
+  fading:       'bg-gray-100 text-gray-500 border border-gray-200',
 };
 
 function MoneyFlowRow({ flow }: { flow: MoneyFlowSector }) {
+  const t = useTranslations('intelligence');
   const isInflow = flow.direction === 'inflow';
-  const sig = signalBadge[flow.signal];
+  const signalLabel = flow.signal === 'accelerating' ? t('accelerating') : flow.signal === 'fading' ? t('weakening') : t('maintaining');
+  const sigCls = signalBadgeCls[flow.signal] ?? signalBadgeCls['holding'];
   return (
     <div className={`rounded-xl border p-4 ${isInflow ? 'border-green-200 bg-green-50/40' : 'border-red-200 bg-red-50/40'}`}>
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isInflow ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {isInflow ? '▲ INFLOW' : '▼ OUTFLOW'}
+              {isInflow ? t('inflow') : t('outflow')}
             </span>
             <span className="text-sm font-bold text-cf-text-primary">{flow.sector}</span>
             <span className="text-xs text-cf-text-secondary">({flow.sectorKo})</span>
@@ -258,8 +261,8 @@ function MoneyFlowRow({ flow }: { flow: MoneyFlowSector }) {
             <span className="text-[11px] text-cf-text-secondary flex items-center gap-1">
               🕐 {weeksAgo(flow.sinceDate)}
             </span>
-            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${sig.cls}`}>
-              {sig.label}
+            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${sigCls}`}>
+              {signalLabel}
             </span>
           </div>
         </div>
@@ -745,6 +748,7 @@ interface FlowAnalysis {
 }
 
 function FlowAnalysisPanel({ tf }: { tf: Timeframe }) {
+  const t = useTranslations('intelligence');
   const [analysis, setAnalysis] = useState<FlowAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -829,7 +833,7 @@ function FlowAnalysisPanel({ tf }: { tf: Timeframe }) {
             </div>
           </div>
           <button onClick={load} className="flex-shrink-0 flex items-center gap-1 text-[11px] text-cf-text-secondary hover:text-cf-primary transition-colors">
-            <RefreshCw className="w-3.5 h-3.5" /> 새로고침
+            <RefreshCw className="w-3.5 h-3.5" /> {t('refresh')}
           </button>
         </div>
         {/* Main theme badge */}
@@ -926,6 +930,7 @@ function FlowAnalysisPanel({ tf }: { tf: Timeframe }) {
 }
 
 function CapitalFlowsTab() {
+  const t = useTranslations('intelligence');
   const [data, setData] = useState<FlowData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tf, setTf] = useState<Timeframe>('4w');
@@ -976,10 +981,10 @@ function CapitalFlowsTab() {
           <div className="space-y-3">
             {activeRotations.map((r, i) => {
               const momentumBadge = r.momentum === 'accelerating'
-                ? { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700' }
+                ? { label: t('accelerating'), cls: 'bg-amber-100 text-amber-700' }
                 : r.momentum === 'fading'
-                ? { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500' }
-                : { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600' };
+                ? { label: t('weakening'), cls: 'bg-gray-100 text-gray-500' }
+                : { label: t('maintaining'), cls: 'bg-slate-100 text-slate-600' };
               return (
                 <div key={i} className="p-3 rounded-lg bg-cf-bg border border-cf-border space-y-2">
                   <div className="flex items-center gap-3">
@@ -1022,10 +1027,10 @@ function CapitalFlowsTab() {
               <div className="space-y-2 mb-4">
                 {cr.map((r, i) => {
                   const mb = r.momentum === 'accelerating'
-                    ? { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700' }
+                    ? { label: t('accelerating'), cls: 'bg-amber-100 text-amber-700' }
                     : r.momentum === 'fading'
-                    ? { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500' }
-                    : { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600' };
+                    ? { label: t('weakening'), cls: 'bg-gray-100 text-gray-500' }
+                    : { label: t('maintaining'), cls: 'bg-slate-100 text-slate-600' };
                   return (
                     <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-cf-bg border border-cf-border">
                       <span className="text-base leading-none flex-shrink-0">{r.fromFlag}</span>

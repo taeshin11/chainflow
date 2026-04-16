@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Search, AlertTriangle, ExternalLink, Shield, Globe, Bitcoin,
   Building2, BookOpen, Loader2, CheckCircle, XCircle,
@@ -54,9 +55,6 @@ const SENTIMENT_STYLE: Record<string, string> = {
   bearish: 'bg-orange-100 text-orange-700',
   neutral: 'bg-gray-100 text-gray-600',
 };
-const SENTIMENT_LABEL: Record<string, string> = {
-  hawkish: '매파', dovish: '비둘기파', bullish: '강세', bearish: '약세', neutral: '중립',
-};
 
 // ── X (Twitter) logo SVG ───────────────────────────────────────────────────────
 function XLogo({ className }: { className?: string }) {
@@ -79,10 +77,11 @@ interface SocialEntry {
 }
 
 function CascadeChain({ items }: { items: string[] }) {
+  const t = useTranslations('osint');
   if (!items || items.length === 0) return null;
   return (
     <div className="mt-2 pt-2 border-t border-cf-border">
-      <p className="text-xs text-cf-text-secondary mb-1 font-medium">📡 파급 효과</p>
+      <p className="text-xs text-cf-text-secondary mb-1 font-medium">{t('cascadeLabel')}</p>
       <div className="flex flex-wrap items-center gap-1">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-1">
@@ -96,11 +95,20 @@ function CascadeChain({ items }: { items: string[] }) {
 }
 
 function SocialTab() {
+  const t = useTranslations('osint');
   const [data, setData] = useState<SocialEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const [fedOnly, setFedOnly] = useState(false);
+
+  const SENTIMENT_LABEL: Record<string, string> = {
+    hawkish: t('sentimentHawkish'),
+    dovish: t('sentimentDovish'),
+    bullish: t('sentimentBullish'),
+    bearish: t('sentimentBearish'),
+    neutral: t('sentimentNeutral'),
+  };
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -124,10 +132,10 @@ function SocialTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-xs text-cf-text-secondary">
-          주요 인물 발언·X 포스트 자동 수집 · 30분 캐시
+          {t('socialDesc')}
         </p>
         <button onClick={load} className="flex items-center gap-1 text-xs text-cf-primary hover:underline">
-          <RefreshCw className="w-3 h-3" /> 새로고침
+          <RefreshCw className="w-3 h-3" /> {t('refresh')}
         </button>
       </div>
 
@@ -137,13 +145,13 @@ function SocialTab() {
           onClick={() => { setFedOnly(false); setFilter('all'); }}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!fedOnly ? 'bg-cf-primary text-white' : 'bg-white border border-cf-border text-cf-text-secondary'}`}
         >
-          전체 인물
+          {t('allPeople')}
         </button>
         <button
           onClick={() => { setFedOnly(true); setFilter('all'); }}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${fedOnly ? 'bg-blue-600 text-white' : 'bg-white border border-cf-border text-cf-text-secondary'}`}
         >
-          🏦 연준(Fed) 위원만
+          {t('fedOnly')}
         </button>
       </div>
 
@@ -157,16 +165,16 @@ function SocialTab() {
               filter === p ? 'bg-cf-primary text-white' : 'bg-white border border-cf-border text-cf-text-secondary hover:border-cf-primary/40'
             }`}
           >
-            {p === 'all' ? '전체' : p}
+            {p === 'all' ? t('allFilter') : p}
           </button>
         ))}
       </div>
 
-      {loading && <LoadingCard msg="주요 인물 발언 수집 중..." />}
+      {loading && <LoadingCard msg={t('loadingStatements')} />}
       {error && <ErrorCard msg={error} />}
 
       {!loading && filtered.length === 0 && !error && (
-        <div className="text-center py-10 text-cf-text-secondary text-sm">현재 관련 뉴스 없음</div>
+        <div className="text-center py-10 text-cf-text-secondary text-sm">{t('noNews')}</div>
       )}
 
       <div className="grid gap-3">
@@ -187,10 +195,10 @@ function SocialTab() {
                       {entry.person}
                     </p>
                     {entry.isFed && entry.votingMember && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 font-bold">투표권</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 font-bold">{t('votingMember')}</span>
                     )}
                     {entry.isFed && !entry.votingMember && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-500 font-medium">비투표</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-500 font-medium">{t('nonVoting')}</span>
                     )}
                   </div>
                   <p className="text-xs text-cf-text-secondary">{entry.role}</p>
@@ -219,7 +227,7 @@ function SocialTab() {
                 : <Newspaper className="w-3 h-3" />
               }
               <span className={entry.istweet ? 'text-black font-medium' : ''}>
-                {entry.istweet ? `X (트위터) · ${entry.source}` : entry.source}
+                {entry.istweet ? `X · ${entry.source}` : entry.source}
               </span>
               <span>·</span>
               <span>{new Date(entry.publishedAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
@@ -233,12 +241,12 @@ function SocialTab() {
 }
 
 // ── Tab: Crypto (notable wallets + search) ────────────────────────────────────
-const NOTABLE_WALLETS = [
-  { label: 'Satoshi Genesis', address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', chain: 'btc' as const, note: '비트코인 최초 블록 채굴 주소' },
-  { label: 'Binance Cold', address: '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo', chain: 'btc' as const, note: '바이낸스 콜드 월렛' },
-  { label: 'Ethereum Foundation', address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', chain: 'eth' as const, note: '이더리움 재단 공식 주소' },
-  { label: 'Vitalik Buterin', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', chain: 'eth' as const, note: 'Vitalik 개인 지갑' },
-  { label: 'US DOJ Seized BTC', address: '1HQ3Go3ggs8pFnXuHVHRytPCq5fGG8Hbhx', chain: 'btc' as const, note: '미 법무부 압수 비트코인' },
+const NOTABLE_WALLETS_DATA = [
+  { label: 'Satoshi Genesis', address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', chain: 'btc' as const, note: 'Bitcoin genesis block mining address' },
+  { label: 'Binance Cold', address: '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo', chain: 'btc' as const, note: 'Binance cold wallet' },
+  { label: 'Ethereum Foundation', address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', chain: 'eth' as const, note: 'Ethereum Foundation official address' },
+  { label: 'Vitalik Buterin', address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', chain: 'eth' as const, note: 'Vitalik personal wallet' },
+  { label: 'US DOJ Seized BTC', address: '1HQ3Go3ggs8pFnXuHVHRytPCq5fGG8Hbhx', chain: 'btc' as const, note: 'US DOJ seized Bitcoin' },
 ];
 
 interface CryptoResult {
@@ -249,6 +257,7 @@ interface CryptoResult {
 }
 
 function CryptoTab() {
+  const t = useTranslations('osint');
   const [walletData, setWalletData] = useState<Record<string, CryptoResult | 'loading' | 'error'>>({});
   const [address, setAddress] = useState('');
   const [chainParam, setChainParam] = useState<'auto' | 'eth' | 'btc'>('auto');
@@ -258,7 +267,7 @@ function CryptoTab() {
 
   // Auto-load notable wallets
   useEffect(() => {
-    NOTABLE_WALLETS.forEach(async (w) => {
+    NOTABLE_WALLETS_DATA.forEach(async (w) => {
       setWalletData(prev => ({ ...prev, [w.address]: 'loading' }));
       try {
         const res = await fetch(`/api/osint/crypto?address=${encodeURIComponent(w.address)}&chain=${w.chain}`);
@@ -286,10 +295,10 @@ function CryptoTab() {
       {/* Notable wallets */}
       <div>
         <h3 className="text-sm font-semibold text-cf-text-primary mb-3 flex items-center gap-2">
-          <Bitcoin className="w-4 h-4 text-amber-500" /> 주목할 지갑
+          <Bitcoin className="w-4 h-4 text-amber-500" /> {t('notableWallets')}
         </h3>
         <div className="grid gap-3">
-          {NOTABLE_WALLETS.map((w) => {
+          {NOTABLE_WALLETS_DATA.map((w) => {
             const d = walletData[w.address];
             const result = typeof d === 'object' && d !== null ? d : null;
             const ticker = w.chain === 'eth' ? 'ETH' : 'BTC';
@@ -316,16 +325,16 @@ function CryptoTab() {
                 <p className="font-mono text-xs text-cf-text-secondary bg-gray-50 rounded px-2 py-1 mb-2 truncate">{w.address}</p>
                 {d === 'loading' && (
                   <div className="flex items-center gap-2 text-xs text-cf-text-secondary">
-                    <Loader2 className="w-3 h-3 animate-spin" /> 잔고 조회 중...
+                    <Loader2 className="w-3 h-3 animate-spin" /> {t('loadingChain')}
                   </div>
                 )}
                 {d === 'error' && <p className="text-xs text-red-500">조회 실패</p>}
                 {result && (
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { label: '잔고', value: `${fmt(result.balance)} ${ticker}` },
-                      { label: '거래 수', value: result.txCount.toLocaleString() },
-                      { label: '리스크', value: result.riskFlags.length > 0 ? '⚠️ ' + result.riskFlags[0] : '✅ 없음' },
+                      { label: t('balance'), value: `${fmt(result.balance)} ${ticker}` },
+                      { label: t('txCount'), value: result.txCount.toLocaleString() },
+                      { label: t('risk'), value: result.riskFlags.length > 0 ? '⚠️ ' + result.riskFlags[0] : '✅ ' + t('noRisk') },
                     ].map(({ label, value }) => (
                       <div key={label} className="text-center bg-gray-50 rounded p-2">
                         <p className="text-xs text-cf-text-secondary">{label}</p>
@@ -342,39 +351,39 @@ function CryptoTab() {
 
       {/* Search */}
       <div className="cf-card space-y-3">
-        <h3 className="text-sm font-semibold text-cf-text-primary">직접 주소 분석</h3>
+        <h3 className="text-sm font-semibold text-cf-text-primary">{t('directAnalysis')}</h3>
         <div className="flex gap-2">
           <input
             type="text" value={address}
             onChange={e => setAddress(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && search()}
-            placeholder="지갑 주소 (ETH: 0x... / BTC: 1...bc1...)"
+            placeholder={t('walletPlaceholder')}
             className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
           />
           <button onClick={search} disabled={searching || !address.trim()}
             className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
             {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            분석
+            {t('analyze')}
           </button>
         </div>
         <div className="flex gap-3 text-sm">
           {(['auto', 'eth', 'btc'] as const).map(c => (
             <label key={c} className="flex items-center gap-1 cursor-pointer">
               <input type="radio" checked={chainParam === c} onChange={() => setChainParam(c)} className="accent-cf-primary" />
-              {c === 'auto' ? '자동' : c.toUpperCase()}
+              {c === 'auto' ? t('autoChain') : c.toUpperCase()}
             </label>
           ))}
         </div>
-        {searching && <LoadingCard msg="블록체인 조회 중..." />}
+        {searching && <LoadingCard msg={t('loadingChain')} />}
         {searchError && <ErrorCard msg={searchError} />}
         {searchResult && (
           <div className="space-y-2 pt-2 border-t border-cf-border">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[
-                { label: '잔고', value: `${fmt(searchResult.balance)} ${searchResult.chain.toUpperCase()}` },
-                { label: '총 수신', value: fmt(searchResult.totalReceived) },
-                { label: '총 송신', value: fmt(searchResult.totalSent) },
-                { label: '거래 수', value: searchResult.txCount.toLocaleString() },
+                { label: t('balance'), value: `${fmt(searchResult.balance)} ${searchResult.chain.toUpperCase()}` },
+                { label: t('totalReceived'), value: fmt(searchResult.totalReceived) },
+                { label: t('totalSent'), value: fmt(searchResult.totalSent) },
+                { label: t('txCount'), value: searchResult.txCount.toLocaleString() },
               ].map(({ label, value }) => (
                 <div key={label} className="text-center bg-gray-50 rounded-lg p-3">
                   <p className="text-xs text-cf-text-secondary">{label}</p>
@@ -392,7 +401,7 @@ function CryptoTab() {
             )}
             {searchResult.riskFlags.length === 0 && (
               <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg text-green-700 text-sm">
-                <CheckCircle className="w-4 h-4" /> 위험 신호 없음
+                <CheckCircle className="w-4 h-4" /> {t('noRiskSignal')}
               </div>
             )}
             {searchResult.recentTxs?.length > 0 && (
@@ -400,10 +409,10 @@ function CryptoTab() {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-cf-text-secondary border-b border-cf-border">
-                      <th className="text-left py-2 pr-3">해시</th>
-                      <th className="text-left py-2 pr-3">시간</th>
-                      <th className="text-right py-2 pr-3">금액</th>
-                      <th className="text-center py-2">방향</th>
+                      <th className="text-left py-2 pr-3">{t('txHash')}</th>
+                      <th className="text-left py-2 pr-3">{t('txTime')}</th>
+                      <th className="text-right py-2 pr-3">{t('txAmount')}</th>
+                      <th className="text-center py-2">{t('txDirection')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -417,8 +426,8 @@ function CryptoTab() {
                         <td className="py-2 pr-3 text-right font-mono">{fmt(tx.value)}</td>
                         <td className="py-2 text-center">
                           {tx.direction === 'in'
-                            ? <span className="text-green-600 flex items-center justify-center gap-0.5"><ArrowDownRight className="w-3 h-3" />수신</span>
-                            : <span className="text-red-500 flex items-center justify-center gap-0.5"><ArrowUpRight className="w-3 h-3" />송신</span>}
+                            ? <span className="text-green-600 flex items-center justify-center gap-0.5"><ArrowDownRight className="w-3 h-3" />{t('incoming')}</span>
+                            : <span className="text-red-500 flex items-center justify-center gap-0.5"><ArrowUpRight className="w-3 h-3" />{t('outgoing')}</span>}
                         </td>
                       </tr>
                     ))}
@@ -449,6 +458,7 @@ const BADGE_STYLE: Record<string, string> = {
 };
 
 function SanctionsTab() {
+  const t = useTranslations('osint');
   const [groups, setGroups] = useState<Record<string, SanctionsGroup>>({});
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -490,12 +500,12 @@ function SanctionsTab() {
       <div className="flex items-center justify-between text-xs text-cf-text-secondary">
         <div className="flex items-center gap-2">
           <Shield className="w-3.5 h-3.5" />
-          <span>OFAC SDN 명단 · 총 {total.toLocaleString()}개 제재 대상</span>
+          <span>{t('ofacList').replace('{total}', total.toLocaleString())}</span>
         </div>
-        <span className="text-green-600 font-medium">24시간 자동 갱신</span>
+        <span className="text-green-600 font-medium">{t('ofacAutoUpdate')}</span>
       </div>
 
-      {loading && <LoadingCard msg="OFAC 제재 명단 로딩 중 (최초 로딩은 시간이 걸림)..." />}
+      {loading && <LoadingCard msg={t('loadingSanctions')} />}
       {error && <ErrorCard msg={error} />}
 
       {!loading && !error && (
@@ -520,10 +530,10 @@ function SanctionsTab() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs text-cf-text-secondary border-b border-cf-border">
-                    <th className="text-left py-2 pr-4 font-medium">이름</th>
-                    <th className="text-left py-2 pr-4 font-medium">유형</th>
-                    <th className="text-left py-2 pr-4 font-medium">프로그램</th>
-                    <th className="text-left py-2 font-medium hidden md:table-cell">비고</th>
+                    <th className="text-left py-2 pr-4 font-medium">{t('colName')}</th>
+                    <th className="text-left py-2 pr-4 font-medium">{t('colType')}</th>
+                    <th className="text-left py-2 pr-4 font-medium">{t('colProgram')}</th>
+                    <th className="text-left py-2 font-medium hidden md:table-cell">{t('colRemarks')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -550,23 +560,23 @@ function SanctionsTab() {
 
           {/* Search */}
           <div className="cf-card space-y-3">
-            <p className="text-sm font-medium text-cf-text-primary">인물/기업 직접 검색</p>
+            <p className="text-sm font-medium text-cf-text-primary">{t('directSearch')}</p>
             <div className="flex gap-2">
               <input value={query} onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && search()}
-                placeholder="예: PUTIN, ROSNEFT, SAMSUNG"
+                placeholder={t('sanctionsPlaceholder')}
                 className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
               />
               <button onClick={search} disabled={searching || !query.trim()}
                 className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
                 {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                검색
+                {t('search')}
               </button>
             </div>
             {searchResult !== null && (
               searchResult.length === 0
                 ? <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-3">
-                    <CheckCircle className="w-4 h-4" /> 제재 명단에 없음 ✓
+                    <CheckCircle className="w-4 h-4" /> {t('notListed')}
                   </div>
                 : <div className="space-y-2">
                     {searchResult.map((e, i) => (
@@ -594,10 +604,10 @@ function SanctionsTab() {
 
 // ── Tab: Corporate ────────────────────────────────────────────────────────────
 const FEATURED_QUERIES = [
-  { label: 'Gazprom', desc: '러시아 국영 가스 기업' },
-  { label: 'Wagner Group', desc: '러시아 민간 군사 기업' },
-  { label: 'Alibaba', desc: '중국 기술 대기업' },
-  { label: 'Huawei', desc: '미국 제재 대상 통신 기업' },
+  { label: 'Gazprom', desc: 'Russian state-owned gas company' },
+  { label: 'Wagner Group', desc: 'Russian private military company' },
+  { label: 'Alibaba', desc: 'Chinese technology conglomerate' },
+  { label: 'Huawei', desc: 'US-sanctioned telecom company' },
 ];
 
 interface CorporateCompany {
@@ -615,6 +625,7 @@ const J_FLAGS: Record<string, string> = {
 function jFlag(code: string) { return J_FLAGS[code?.slice(0, 2).toLowerCase()] ?? '🌐'; }
 
 function CorporateTab() {
+  const t = useTranslations('osint');
   const [results, setResults] = useState<Record<string, CorporateResult>>({});
   const [loadingKeys, setLoadingKeys] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState('');
@@ -652,7 +663,7 @@ function CorporateTab() {
   return (
     <div className="space-y-4">
       <div className="text-xs text-cf-text-secondary">
-        OpenCorporates · 전 세계 {'>'}200개국 기업 등록 정보
+        {t('corporateSource')}
       </div>
 
       {/* Featured tabs */}
@@ -668,12 +679,12 @@ function CorporateTab() {
         ))}
       </div>
 
-      {isLoading && <LoadingCard msg="기업 정보 조회 중..." />}
+      {isLoading && <LoadingCard msg={t('loadingCorporate')} />}
       {!isLoading && activeResult && (
         <div className="space-y-3">
-          <p className="text-xs text-cf-text-secondary">{activeResult.total?.toLocaleString()}건 · 상위 5건 표시</p>
+          <p className="text-xs text-cf-text-secondary">{t('resultsCount').replace('{count}', String(activeResult.total?.toLocaleString() ?? 0))} · 상위 5건 표시</p>
           {activeResult.companies?.length === 0 && (
-            <div className="text-center py-8 text-cf-text-secondary text-sm">검색 결과 없음</div>
+            <div className="text-center py-8 text-cf-text-secondary text-sm">{t('noResults')}</div>
           )}
           {activeResult.companies?.map((c, i) => (
             <div key={i} className="cf-card space-y-2">
@@ -689,9 +700,9 @@ function CorporateTab() {
                 </a>
               </div>
               <div className="flex flex-wrap gap-3 text-xs text-cf-text-secondary">
-                {c.type && <span>유형: {c.type}</span>}
-                {c.incorporated && <span>설립: {c.incorporated}</span>}
-                {c.dissolved && <span className="text-red-600">해산: {c.dissolved}</span>}
+                {c.type && <span>{t('colType')}: {c.type}</span>}
+                {c.incorporated && <span>{t('colIncorporated')}: {c.incorporated}</span>}
+                {c.dissolved && <span className="text-red-600">{t('colDissolved')}: {c.dissolved}</span>}
               </div>
               {c.address && <p className="text-xs text-cf-text-secondary">📍 {c.address}</p>}
               {(c as {note?: string}).note && (
@@ -706,17 +717,17 @@ function CorporateTab() {
 
       {/* Search */}
       <div className="cf-card space-y-3">
-        <p className="text-sm font-medium">기업 직접 검색</p>
+        <p className="text-sm font-medium">{t('corporateSearch')}</p>
         <div className="flex gap-2">
           <input value={query} onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && search()}
-            placeholder="기업명 (예: Samsung, Baidu, Rosneft)"
+            placeholder={t('corporatePlaceholder')}
             className="cf-input flex-1 px-3 py-2 rounded-lg border border-cf-border text-sm"
           />
           <button onClick={search} disabled={searching || !query.trim()}
             className="cf-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-1">
             {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            검색
+            {t('search')}
           </button>
         </div>
         <div className="flex gap-2">
@@ -771,14 +782,15 @@ function GuideTab() {
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function OSINTPage() {
+  const t = useTranslations('osint');
   const [activeTab, setActiveTab] = useState<TabId>('social');
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { id: 'social', label: '인물 발언', icon: <MessageSquare className="w-4 h-4" />, badge: 'LIVE' },
-    { id: 'crypto', label: '암호화폐', icon: <Bitcoin className="w-4 h-4" /> },
-    { id: 'sanctions', label: 'OFAC 제재', icon: <Shield className="w-4 h-4" /> },
-    { id: 'corporate', label: '기업 구조', icon: <Building2 className="w-4 h-4" /> },
-    { id: 'guide', label: '조사 가이드', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'social', label: t('tabSocial'), icon: <MessageSquare className="w-4 h-4" />, badge: t('tabSocialLive') },
+    { id: 'crypto', label: t('tabCrypto'), icon: <Bitcoin className="w-4 h-4" /> },
+    { id: 'sanctions', label: t('tabSanctions'), icon: <Shield className="w-4 h-4" /> },
+    { id: 'corporate', label: t('tabCorporate'), icon: <Building2 className="w-4 h-4" /> },
+    { id: 'guide', label: t('tabGuide'), icon: <BookOpen className="w-4 h-4" /> },
   ];
 
   return (
@@ -789,13 +801,13 @@ export default function OSINTPage() {
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
               <Search className="w-5 h-5 text-white" />
             </div>
-            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">글로벌 정보 추적</span>
+            <span className="text-sm font-medium text-slate-300 uppercase tracking-widest">{t('pageCategory')}</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">실시간 자금·정보 추적</h1>
-          <p className="text-slate-300 mb-5">주요 인물 발언 · 블록체인 지갑 · 국제 제재 · 기업 연결망 실시간 모니터링</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{t('pageTitle')}</h1>
+          <p className="text-slate-300 mb-5">{t('pageSubtitle')}</p>
           <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/40 rounded-full px-4 py-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="text-amber-300 text-sm font-medium">교육·연구·합법적 조사 목적으로만 사용하세요</span>
+            <span className="text-amber-300 text-sm font-medium">{t('legalWarning')}</span>
           </div>
         </div>
       </div>
