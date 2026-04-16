@@ -34,6 +34,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
+  GitMerge,
 } from 'lucide-react';
 
 // ── Icon map for narratives ───────────────────────────────────────────────────
@@ -380,8 +381,202 @@ Answer concisely (3–5 paragraphs). Be specific — name tickers, mechanisms, a
   );
 }
 
+// ── Capital Flows Component ──────────────────────────────────────────────────
+interface AssetReturn { id: string; label: string; flag: string; group: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
+interface FlowData { assets: AssetReturn[]; flow: { topInflows: AssetReturn[]; topOutflows: AssetReturn[]; groupAvg: {group:string;avg4w:number}[]; rotations: {from:string;to:string;magnitude:number;label:string}[]; }; goldVsDollar: {goldRet4w:number;dollarRet4w:number;signal:string}; updatedAt: string; }
+
+const GROUP_LABELS: Record<string, string> = { equity: '주식', bonds: '채권', alts: '대안자산', commodities: '원자재', currency: '통화' };
+const GROUP_COLORS: Record<string, string> = { equity: 'bg-blue-500', bonds: 'bg-amber-500', alts: 'bg-yellow-400', commodities: 'bg-orange-500', currency: 'bg-purple-500' };
+const GROUP_LIGHT: Record<string, string> = { equity: 'bg-blue-50 text-blue-700 border-blue-200', bonds: 'bg-amber-50 text-amber-700 border-amber-200', alts: 'bg-yellow-50 text-yellow-700 border-yellow-200', commodities: 'bg-orange-50 text-orange-700 border-orange-200', currency: 'bg-purple-50 text-purple-700 border-purple-200' };
+
+function ReturnBar({ val, max }: { val: number; max: number }) {
+  const pct = Math.min(Math.abs(val) / max * 100, 100);
+  const positive = val >= 0;
+  return (
+    <div className="flex items-center gap-2 min-w-0">
+      <div className="w-24 bg-gray-100 rounded-full h-2 overflow-hidden flex-shrink-0">
+        <div
+          className={`h-2 rounded-full ${positive ? 'bg-green-500' : 'bg-red-500'}`}
+          style={{ width: `${pct}%`, marginLeft: positive ? 0 : 'auto' }}
+        />
+      </div>
+      <span className={`text-xs font-bold tabular-nums ${positive ? 'text-green-600' : 'text-red-500'}`}>
+        {val > 0 ? '+' : ''}{val.toFixed(1)}%
+      </span>
+    </div>
+  );
+}
+
+function CapitalFlowsTab() {
+  const [data, setData] = useState<FlowData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/capital-flows')
+      .then((r) => r.json())
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="flex items-center justify-center gap-2 py-16 text-cf-text-secondary">
+      <Loader2 className="w-5 h-5 animate-spin" />
+      <span className="text-sm">글로벌 자금흐름 분석 중...</span>
+    </div>
+  );
+  if (!data) return <p className="text-center text-cf-text-secondary py-8 text-sm">데이터를 불러올 수 없습니다</p>;
+
+  const maxAbs = Math.max(...data.assets.map((a) => Math.abs(a.ret4w)), 1);
+
+  return (
+    <div className="space-y-6">
+      {/* 주요 로테이션 */}
+      {data.flow.rotations.length > 0 && (
+        <div className="cf-card p-4">
+          <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+            <GitMerge className="w-4 h-4 text-cf-primary" />
+            현재 자금 로테이션 (4주 기준)
+          </h3>
+          <div className="space-y-2">
+            {data.flow.rotations.map((r, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-cf-bg border border-cf-border">
+                <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">{r.from}</span>
+                <ArrowRight className="w-4 h-4 text-cf-primary flex-shrink-0" />
+                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">{r.to}</span>
+                <span className="ml-auto text-xs font-bold text-cf-primary">격차 {r.magnitude > 0 ? '+' : ''}{r.magnitude}%p</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 금 vs 달러 */}
+      <div className="cf-card p-4">
+        <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+          <span>⚖️</span> 금 vs 달러 (안전자산 선호 지표)
+        </h3>
+        <div className="flex gap-4 mb-3">
+          <div className="flex-1 text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+            <div className="text-2xl mb-1">🥇</div>
+            <div className={`text-xl font-extrabold ${data.goldVsDollar.goldRet4w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {data.goldVsDollar.goldRet4w > 0 ? '+' : ''}{data.goldVsDollar.goldRet4w.toFixed(1)}%
+            </div>
+            <div className="text-[11px] text-gray-500">금 (4주)</div>
+          </div>
+          <div className="flex items-center text-gray-400 font-bold">vs</div>
+          <div className="flex-1 text-center p-3 rounded-lg bg-blue-50 border border-blue-200">
+            <div className="text-2xl mb-1">💵</div>
+            <div className={`text-xl font-extrabold ${data.goldVsDollar.dollarRet4w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {data.goldVsDollar.dollarRet4w > 0 ? '+' : ''}{data.goldVsDollar.dollarRet4w.toFixed(1)}%
+            </div>
+            <div className="text-[11px] text-gray-500">달러 (4주)</div>
+          </div>
+        </div>
+        <div className="text-center text-xs font-semibold text-cf-primary bg-cf-primary/5 rounded-lg py-2 px-3">
+          📌 {data.goldVsDollar.signal}
+        </div>
+      </div>
+
+      {/* 자산군별 성과 */}
+      <div className="cf-card p-4">
+        <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-cf-primary" />
+          자산군별 4주 수익률 (자금 유입 방향)
+        </h3>
+        <div className="space-y-1">
+          {data.flow.groupAvg.map((g) => (
+            <div key={g.group} className="flex items-center gap-3 py-2 border-b border-cf-border last:border-0">
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded border ${GROUP_LIGHT[g.group] ?? 'bg-gray-100 text-gray-600 border-gray-200'} w-20 text-center flex-shrink-0`}>
+                {GROUP_LABELS[g.group] ?? g.group}
+              </span>
+              <ReturnBar val={g.avg4w} max={maxAbs} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 상위 유입/유출 개별 자산 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="cf-card p-4">
+          <h3 className="text-sm font-bold text-green-700 mb-3 flex items-center gap-2">
+            <ArrowUpRight className="w-4 h-4" /> 자금 유입 TOP 5
+          </h3>
+          <div className="space-y-2">
+            {data.flow.topInflows.map((a, i) => (
+              <div key={a.id} className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
+                <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
+                <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
+                <span className="text-xs font-bold text-green-600 flex-shrink-0">+{a.ret4w.toFixed(1)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="cf-card p-4">
+          <h3 className="text-sm font-bold text-red-600 mb-3 flex items-center gap-2">
+            <ArrowDownRight className="w-4 h-4" /> 자금 이탈 TOP 5
+          </h3>
+          <div className="space-y-2">
+            {data.flow.topOutflows.map((a, i) => (
+              <div key={a.id} className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
+                <span className="text-base leading-none flex-shrink-0">{a.flag}</span>
+                <span className="text-xs font-medium text-cf-text-primary truncate flex-1">{a.label}</span>
+                <span className="text-xs font-bold text-red-500 flex-shrink-0">{a.ret4w.toFixed(1)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 전체 테이블 */}
+      <div className="cf-card p-4">
+        <h3 className="text-sm font-bold text-cf-text-primary mb-3">전체 자산 수익률</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-cf-border text-cf-text-secondary">
+                <th className="text-left pb-2 font-medium">자산</th>
+                <th className="text-right pb-2 font-medium">1주</th>
+                <th className="text-right pb-2 font-medium">4주</th>
+                <th className="text-right pb-2 font-medium">13주</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...data.assets].sort((a, b) => b.ret4w - a.ret4w).map((a) => (
+                <tr key={a.id} className="border-b border-cf-border/50 last:border-0">
+                  <td className="py-2 flex items-center gap-1.5">
+                    <span>{a.flag}</span>
+                    <span className="font-medium text-cf-text-primary">{a.label}</span>
+                    <span className="text-gray-400 font-mono">{a.ticker}</span>
+                  </td>
+                  <td className={`py-2 text-right font-bold tabular-nums ${a.ret1w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    {a.ret1w > 0 ? '+' : ''}{a.ret1w.toFixed(1)}%
+                  </td>
+                  <td className={`py-2 text-right font-bold tabular-nums ${a.ret4w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    {a.ret4w > 0 ? '+' : ''}{a.ret4w.toFixed(1)}%
+                  </td>
+                  <td className={`py-2 text-right font-bold tabular-nums ${a.ret13w >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    {a.ret13w > 0 ? '+' : ''}{a.ret13w.toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p className="text-xs text-cf-text-secondary text-center">
+        Yahoo Finance 실시간 · ETF 기반 자산군별 수익률 분석 · 4시간 캐시
+        {data.updatedAt && ` · ${new Date(data.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트`}
+      </p>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const TABS = ['flows', 'fear-greed', 'narratives'] as const;
+const TABS = ['capital', 'flows', 'fear-greed', 'narratives'] as const;
 type Tab = typeof TABS[number];
 
 interface LiveFGData {
@@ -413,6 +608,7 @@ export default function IntelligencePage() {
   const liveAsset = fgData?.byAsset ?? fearGreedByAsset;
 
   const tabConfig: Record<Tab, { label: string; icon: React.ReactNode }> = {
+    'capital':     { label: '자금 흐름 지도',  icon: <GitMerge className="w-4 h-4" /> },
     'flows':       { label: '비밀 머니 흐름', icon: <Activity className="w-4 h-4" /> },
     'fear-greed':  { label: 'Fear & Greed',   icon: <BarChart3 className="w-4 h-4" /> },
     'narratives':  { label: '매크로 테마',     icon: <Brain className="w-4 h-4" /> },
@@ -458,6 +654,9 @@ export default function IntelligencePage() {
             </button>
           ))}
         </div>
+
+        {/* Tab: 자금 흐름 지도 */}
+        {activeTab === 'capital' && <CapitalFlowsTab />}
 
         {/* Tab: 비밀 머니 흐름 */}
         {activeTab === 'flows' && (
