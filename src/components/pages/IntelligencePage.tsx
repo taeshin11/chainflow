@@ -744,15 +744,19 @@ const MAG_OPACITY: Record<string, string> = { strong: 'opacity-100', moderate: '
 const CAT_LABELS: Record<string, string> = { inflation: '물가', employment: '고용', growth: '경기', monetary: '통화정책', trade: '무역' };
 const CAT_COLORS: Record<string, string> = { inflation: 'bg-orange-50 text-orange-700', employment: 'bg-green-50 text-green-700', growth: 'bg-blue-50 text-blue-700', monetary: 'bg-purple-50 text-purple-700', trade: 'bg-teal-50 text-teal-700' };
 
+interface YieldPoint { label: string; value: number | null; }
+interface YieldCurve { points: YieldPoint[]; inverted: boolean; spread10y2y: number | null; }
+
 function MacroIndicatorsTab() {
   const [indicators, setIndicators] = useState<MacroIndicator[]>([]);
+  const [yieldCurve, setYieldCurve] = useState<YieldCurve | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/macro-indicators')
       .then(r => r.json())
-      .then(d => setIndicators(d.indicators ?? []))
+      .then(d => { setIndicators(d.indicators ?? []); setYieldCurve(d.yieldCurve ?? null); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -766,6 +770,58 @@ function MacroIndicatorsTab() {
 
   return (
     <div className="space-y-4">
+      {/* Yield Curve */}
+      {yieldCurve && (
+        <div className="cf-card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold text-cf-text-primary flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-cf-primary" />
+              미 국채 수익률 곡선
+            </h3>
+            <div className="flex items-center gap-2">
+              {yieldCurve.spread10y2y !== null && (
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${yieldCurve.inverted ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                  10Y-2Y: {yieldCurve.spread10y2y > 0 ? '+' : ''}{yieldCurve.spread10y2y}%p
+                </span>
+              )}
+              {yieldCurve.inverted && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-600 text-white">⚠ 역전</span>
+              )}
+            </div>
+          </div>
+          {/* Bar chart */}
+          {(() => {
+            const pts = yieldCurve.points.filter(p => p.value !== null);
+            const maxVal = Math.max(...pts.map(p => p.value!), 0.1);
+            return (
+              <div className="flex items-end gap-1.5 h-24">
+                {yieldCurve.points.map((pt, i) => {
+                  if (pt.value === null) return null;
+                  const heightPct = (pt.value / maxVal) * 100;
+                  const prev = i > 0 ? yieldCurve.points[i - 1].value : null;
+                  const isDown = prev !== null && pt.value < prev;
+                  return (
+                    <div key={pt.label} className="flex flex-col items-center gap-0.5 flex-1">
+                      <span className={`text-[9px] font-bold tabular-nums ${isDown ? 'text-red-500' : 'text-green-600'}`}>{pt.value.toFixed(2)}</span>
+                      <div
+                        className={`w-full rounded-t-sm transition-all ${isDown ? 'bg-red-400' : 'bg-blue-500'}`}
+                        style={{ height: `${Math.max(heightPct, 5)}%` }}
+                      />
+                      <span className="text-[9px] text-gray-400">{pt.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+          {yieldCurve.inverted && (
+            <p className="text-xs text-red-600 mt-2 font-medium">
+              ⚠ 수익률 곡선 역전 — 역사적으로 경기침체 선행 지표. 은행 대출 마진 축소, 크레딧 긴축 우려.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="cf-card p-4">
         <h3 className="text-sm font-bold text-cf-text-primary mb-1 flex items-center gap-2">
           <Activity className="w-4 h-4 text-cf-primary" />

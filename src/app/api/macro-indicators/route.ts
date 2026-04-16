@@ -64,6 +64,35 @@ async function fetchFRED(series: string): Promise<{ value: number; date: string 
   } catch { return null; }
 }
 
+// ── Yield Curve: fetch US Treasury rates ──────────────────────────────────────
+// FRED series: DGS1MO, DGS3MO, DGS6MO, DGS1, DGS2, DGS5, DGS10, DGS30
+const YIELD_SERIES = [
+  { label: '1M',  series: 'DGS1MO' },
+  { label: '3M',  series: 'DGS3MO' },
+  { label: '6M',  series: 'DGS6MO' },
+  { label: '1Y',  series: 'DGS1'   },
+  { label: '2Y',  series: 'DGS2'   },
+  { label: '5Y',  series: 'DGS5'   },
+  { label: '10Y', series: 'DGS10'  },
+  { label: '30Y', series: 'DGS30'  },
+];
+
+export interface YieldPoint { label: string; value: number | null; }
+
+async function fetchYieldCurve(): Promise<{ points: YieldPoint[]; inverted: boolean; spread10y2y: number | null }> {
+  const results = await Promise.all(
+    YIELD_SERIES.map(async ({ label, series }) => {
+      const data = await fetchFRED(series);
+      return { label, value: data?.value ?? null };
+    })
+  );
+  const y2 = results.find(r => r.label === '2Y')?.value ?? null;
+  const y10 = results.find(r => r.label === '10Y')?.value ?? null;
+  const spread10y2y = y2 !== null && y10 !== null ? parseFloat((y10 - y2).toFixed(2)) : null;
+  const inverted = spread10y2y !== null && spread10y2y < 0;
+  return { points: results, inverted, spread10y2y };
+}
+
 // ── Cascade logic by indicator ────────────────────────────────────────────────
 function buildCascade(id: string, surprise: 'beat' | 'miss' | 'inline' | 'pending'): CascadeStep[] {
   if (surprise === 'pending' || surprise === 'inline') return [];
@@ -338,7 +367,10 @@ export async function GET() {
     }
   } catch { /* non-fatal */ }
 
-  const response = { indicators, updatedAt: new Date().toISOString() };
+  // Yield curve
+  const yieldCurve = await fetchYieldCurve();
+
+  const response = { indicators, yieldCurve, updatedAt: new Date().toISOString() };
 
   if (redis) {
     try { await redis.set(cacheKey, response, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
