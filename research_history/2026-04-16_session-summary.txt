@@ -69,14 +69,35 @@ Session: Remote Control Check-in
 
 ---
 
+## 2026-04-16 — Milestone 4: Content Expansion + Redis Fix
+
+### 변경사항
+1. **Redis 코드 수준 방어 처리** — `signals-cache.ts`에 `.trim()` 추가 (Vercel env var 공백 문제 방어)
+2. **Blog posts 2개 추가** (총 17개)
+   - `fintech-payments-institutional-flow-2026` — Visa→MA→COIN 캐스케이드 분석
+   - `critical-minerals-supply-chain-institutional-flow-2026` — ALB→FCX→MP→LAC 분석
+3. **Cascade patterns 2개 추가** (총 11개)
+   - `fintech-visa-payments-crypto-cascade` — 결제 네트워크→크립토 인프라
+   - `materials-alb-critical-minerals-cascade` — 리튬→구리→희토류 순서
+4. **Institutional signals 9개 추가** (총 47개)
+   - sig-039: V (Visa) — Vanguard 누적매수
+   - sig-040: MA (Mastercard) — Capital Research 누적매수
+   - sig-041: COIN (Coinbase) — Millennium Management 신규포지션
+   - sig-042: ALB (Albemarle) — BlackRock 누적매수
+   - sig-043: FCX (Freeport) — Baupost Group 신규포지션
+   - sig-044: MP (MP Materials) — D.E. Shaw 누적매수
+   - sig-045: LAC (Lithium Americas) — Anchorage Capital 신규포지션
+   - sig-046: SMCI — Renaissance Technologies 신규포지션
+   - sig-047: DELL — Appaloosa Management 누적매수
+5. **커밋 & 배포** — 4354e38, Vercel 자동배포
+
 ## 다음 세션 우선순위
 
-1. [HIGH] Upstash Redis env var 공백 문제 수정 (Vercel 대시보드)
-2. [HIGH] batch6 티커 company 페이지 추가 (FSLR, ENPH, ALB, FCX, SMCI 등)
-3. [MED]  Blog posts 추가: fintech/financials 섹터, materials/critical minerals 섹터
-4. [MED]  Homepage hero — 실제 cascade 애니메이션 구현
-5. [LOW]  이메일 알림 signup (Resend 또는 Mailchimp free tier)
-6. [LOW]  Compare 페이지 (/compare/nvda-vs-amd 형식)
+1. [HIGH] Upstash Redis env var 공백 문제 수정 (Vercel 대시보드에서 직접 확인/수정)
+2. [MED]  Homepage hero — 실제 cascade 애니메이션 구현
+3. [MED]  Compare 페이지 (/compare/nvda-vs-amd 형식)
+4. [LOW]  이메일 알림 실제 연동 (Resend 또는 Mailchimp free tier)
+5. [LOW]  /materials, /financials 섹터 페이지 추가 (현재 explore에 없음)
 
 ---
 

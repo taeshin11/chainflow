@@ -15,13 +15,13 @@ import {
  * 23 tickers × 1 AV call each = 23 calls/day → safely within 25/day free tier limit.
  */
 const US_TICKERS_BY_PRIORITY = [
-  // Mid/small caps — news gap signal is strongest here
+  // Tier 1: Mid/small caps + high news-gap names — signal strongest here
   'MU',   'AMAT', 'LRCX', 'KLAC', 'ALB',
   'KTOS', 'MRVL', 'RTX',  'NOC',  'LHX',
-  'REGN', 'MRNA', 'PFE',  'ORCL', 'NVO',
-  'TSM',  'ASML',
-  // Large caps — still useful but always in the news
-  'NVDA', 'MSFT', 'GOOGL', 'META', 'AMZN',
+  'REGN', 'MRNA', 'COIN', 'FCX',  'SMCI',
+  'DELL', 'ORCL', 'TSM',  'ASML',
+  // Tier 2: Large caps — still useful for cascade context
+  'NVDA', 'MSFT', 'GOOGL',
   'TSLA', 'LLY',  'LMT',
 ]; // 25 tickers = Alpha Vantage free tier daily limit
 

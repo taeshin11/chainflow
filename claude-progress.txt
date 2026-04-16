@@ -14,10 +14,10 @@ Last updated: 2026-04-16
 - All 16 languages (en, ko, ja, zh-CN, zh-TW, es, de, fr, pt, hi, ar, vi, th, id, ru, tr) ✅
 
 ## Content State (as of 2026-04-16)
-- Blog posts: 15 articles
+- Blog posts: 17 articles
 - Companies: ~137 (116 original + 21 in batch6)
-- Cascade patterns: 9 (7 original + 2 new: energy-fslr, ai-msft-azure)
-- Institutional signals: ~47 entries (Q1 2026 filing dates)
+- Cascade patterns: 11 (7 original + 4 new: energy-fslr, ai-msft-azure, fintech-visa, materials-alb)
+- Institutional signals: 47 entries (Q1 2026 filing dates, sig-001~sig-047)
 - Sectors covered: semiconductors, ai-cloud, ev-battery, defense, pharma-biotech, energy, financials, materials
 
 ## Environment Variables (all set in Vercel Production)
@@ -29,14 +29,14 @@ Last updated: 2026-04-16
 
 ## Next Session Goals (Builder Agent picks one)
 Priority order:
-1. Fix Upstash Redis env vars (whitespace/newline in values) — check Vercel dashboard
-2. Add company pages for batch6 tickers (FSLR, ENPH, ALB, FCX, SMCI etc.)
-3. Add more blog posts: fintech/financials sector, materials/critical minerals sector
-4. Improve homepage hero section with real cascade animation
-5. Add email alert signup (Resend or Mailchimp free tier) for cascade notifications
-6. Add compare pages: company vs company (like /compare/nvda-vs-amd)
+1. Fix Upstash Redis env vars (whitespace/newline in values) — check Vercel dashboard directly (code-level .trim() fix already applied)
+2. Improve homepage hero section with real cascade animation
+3. Add compare pages: company vs company (like /compare/nvda-vs-amd)
+4. Add email alert real integration (Resend or Mailchimp free tier)
+5. Add /materials and /financials sector pages to explore (batch6 sectors not yet in explore nav)
 
 ## Session Log
 - 2026-03-31: MVP built (all 14 features), deployed to Vercel
 - 2026-04-15: Dynamic signals + news-gap pipeline (3 milestones)
 - 2026-04-16: Remote trigger restored. Added 5 blog posts, 9 signals (Q1 2026), 2 cascades, 21 companies. Deployed.
+- 2026-04-16: Redis .trim() fix. Added 2 blog posts (fintech, materials), 2 cascades (fintech/materials), 9 signals (sig-039~047). Deployed.

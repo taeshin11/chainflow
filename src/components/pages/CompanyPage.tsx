@@ -212,8 +212,14 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
           </span>
         </div>
         <p className="text-cf-text-secondary leading-relaxed mb-4"><T text={company.description} /></p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <ShareButtons title={`${company.name} (${company.ticker}) - Supply Chain Analysis | Flowvium`} />
+          <Link
+            href={`/compare/${company.ticker.toLowerCase()}-vs-nvda`}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded border border-cf-border hover:border-cf-primary hover:text-cf-primary transition-colors text-cf-text-secondary"
+          >
+            <span>⇄</span> Compare
+          </Link>
           <button
             onClick={() => setTerminalView((v) => !v)}
             className={`inline-flex items-center gap-2 text-xs font-mono font-bold px-3 py-1.5 rounded transition-colors ${

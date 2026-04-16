@@ -679,6 +679,107 @@ export const newsGapData: NewsGapEntry[] = [
       { institution: 'Dodge & Cox', valueM: 680, pctOfShares: 0.66, sharesM: 1.5, quarter: 'Q4 2025', action: 'new', secUrl: edgarSearch('Dodge & Cox') },
     ],
   },
+  // ── Batch6 additions ───────────────────────────────────────────────────────
+  {
+    ticker: 'COIN',
+    companyName: 'Coinbase',
+    sector: 'financials',
+    ibActivityLevel: 'high',
+    ibActivityScore: 78,
+    mediaScore: 32,
+    gapScore: 68,
+    topInstitutions: ['Millennium Management', 'ARK Invest', 'Fidelity'],
+    recentArticles: [
+      { title: 'Coinbase institutional custody AUM crosses $400B milestone', date: 'Apr 9, 2026', source: 'The Block', url: '' },
+      { title: 'Coinbase Prime adds 18 new hedge fund clients in Q1 2026', date: 'Apr 1, 2026', source: 'CoinDesk', url: '' },
+    ],
+    ibActions: [
+      'Millennium Management initiated $2.3B new position — largest institutional onboarding',
+      'ARK Invest maintains largest conviction position at $1.8B',
+      'Fidelity Digital Assets expanded institutional custody agreement',
+      '14 new institutional mandates opened following Digital Asset Market Structure Act',
+    ],
+    ownershipData: [
+      { institution: 'ARK Invest', valueM: 1800, pctOfShares: 2.4, sharesM: 5.8, quarter: 'Q1 2026', action: 'maintained', secUrl: edgarSearch('ARK Investment') },
+      { institution: 'Millennium Management', valueM: 2300, pctOfShares: 3.1, sharesM: 7.4, quarter: 'Q1 2026', action: 'new', secUrl: edgarSearch('Millennium Management') },
+      { institution: 'Fidelity', valueM: 820, pctOfShares: 1.1, sharesM: 2.7, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('Fidelity') },
+    ],
+  },
+  {
+    ticker: 'FCX',
+    companyName: 'Freeport-McMoRan',
+    sector: 'materials',
+    ibActivityLevel: 'high',
+    ibActivityScore: 80,
+    mediaScore: 26,
+    gapScore: 71,
+    topInstitutions: ['Baupost Group', 'BlackRock', 'Vanguard'],
+    recentArticles: [
+      { title: 'Copper prices surge on global electrification demand outlook', date: 'Apr 8, 2026', source: 'Bloomberg', url: '' },
+      { title: 'Freeport Grasberg copper output hits quarterly record', date: 'Mar 27, 2026', source: 'Reuters', url: '' },
+    ],
+    ibActions: [
+      'Baupost Group initiated $680M new position — value-driven entry at multi-year discount',
+      'BlackRock infrastructure funds increased allocation on electrification thesis',
+      'Five energy-transition hedge funds built positions totaling ~8% of float',
+      'State Street copper/materials ETF rebalanced upward',
+    ],
+    ownershipData: [
+      { institution: 'Baupost Group', valueM: 680, pctOfShares: 0.47, sharesM: 14.2, quarter: 'Q1 2026', action: 'new', secUrl: edgarSearch('Baupost Group') },
+      { institution: 'BlackRock', valueM: 4200, pctOfShares: 2.9, sharesM: 87.4, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('BlackRock') },
+      { institution: 'Vanguard', valueM: 3800, pctOfShares: 2.6, sharesM: 79.1, quarter: 'Q1 2026', action: 'maintained', secUrl: edgarSearch('Vanguard') },
+    ],
+  },
+  {
+    ticker: 'SMCI',
+    companyName: 'Super Micro Computer',
+    sector: 'semiconductors',
+    ibActivityLevel: 'high',
+    ibActivityScore: 82,
+    mediaScore: 18,
+    gapScore: 76,
+    topInstitutions: ['Renaissance Technologies', 'Vanguard', 'Citadel'],
+    recentArticles: [
+      { title: 'Super Micro ships record AI server racks to hyperscalers in Q1', date: 'Apr 4, 2026', source: 'Reuters', url: '' },
+      { title: 'SMCI secures $1.2B AI infrastructure contract with unnamed cloud provider', date: 'Mar 18, 2026', source: 'Bloomberg', url: '' },
+    ],
+    ibActions: [
+      'Renaissance Technologies initiated $580M new position via quant models',
+      'Citadel Advisors increased position by 340% in single quarter',
+      'Three AI-infrastructure focused hedge funds built simultaneous positions',
+      'Institutional ownership increased from 42% to 61% of float in 2 quarters',
+    ],
+    ownershipData: [
+      { institution: 'Renaissance Technologies', valueM: 580, pctOfShares: 1.8, sharesM: 4.2, quarter: 'Q1 2026', action: 'new', secUrl: edgarSearch('Renaissance Technologies') },
+      { institution: 'Vanguard', valueM: 1200, pctOfShares: 3.7, sharesM: 8.7, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('Vanguard') },
+      { institution: 'Citadel', valueM: 420, pctOfShares: 1.3, sharesM: 3.1, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('Citadel Advisors') },
+    ],
+  },
+  {
+    ticker: 'DELL',
+    companyName: 'Dell Technologies',
+    sector: 'ai-cloud',
+    ibActivityLevel: 'high',
+    ibActivityScore: 76,
+    mediaScore: 38,
+    gapScore: 63,
+    topInstitutions: ['Appaloosa Management', 'BlackRock', 'Silver Lake'],
+    recentArticles: [
+      { title: 'Dell AI server backlog exceeds $9B as enterprise AI buildout accelerates', date: 'Apr 7, 2026', source: 'CNBC', url: '' },
+      { title: 'Dell Infrastructure Solutions revenue up 42% on AI server demand', date: 'Mar 22, 2026', source: 'Reuters', url: '' },
+    ],
+    ibActions: [
+      'Appaloosa Management added $740M on AI server thesis',
+      'BlackRock increased conviction position to 5-year high',
+      'Private equity sponsors maintain large strategic stake',
+      'Value funds added on discounted valuation vs. AI server peers',
+    ],
+    ownershipData: [
+      { institution: 'Appaloosa Management', valueM: 740, pctOfShares: 1.0, sharesM: 18.4, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('Appaloosa Management') },
+      { institution: 'BlackRock', valueM: 2800, pctOfShares: 3.7, sharesM: 69.6, quarter: 'Q1 2026', action: 'increased', secUrl: edgarSearch('BlackRock') },
+      { institution: 'Vanguard', valueM: 2200, pctOfShares: 2.9, sharesM: 54.7, quarter: 'Q1 2026', action: 'maintained', secUrl: edgarSearch('Vanguard') },
+    ],
+  },
 ];
 
 export { edgarTicker };

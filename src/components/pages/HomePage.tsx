@@ -21,6 +21,17 @@ import {
   Plus,
   LogOut,
   TrendingDown,
+  Landmark,
+  Flame,
+  Heart,
+  Factory,
+  Radio,
+  Building2,
+  Gem,
+  ShoppingBag,
+  Monitor,
+  ShoppingCart,
+  GitCompare,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import EmailCTA from '@/components/EmailCTA';
@@ -32,6 +43,16 @@ const sectorIcons: Record<string, React.ReactNode> = {
   Shield: <Shield className="w-6 h-6" />,
   FlaskConical: <FlaskConical className="w-6 h-6" />,
   Zap: <Zap className="w-6 h-6" />,
+  Landmark: <Landmark className="w-6 h-6" />,
+  Flame: <Flame className="w-6 h-6" />,
+  Heart: <Heart className="w-6 h-6" />,
+  Factory: <Factory className="w-6 h-6" />,
+  Radio: <Radio className="w-6 h-6" />,
+  Building2: <Building2 className="w-6 h-6" />,
+  Gem: <Gem className="w-6 h-6" />,
+  ShoppingBag: <ShoppingBag className="w-6 h-6" />,
+  Monitor: <Monitor className="w-6 h-6" />,
+  ShoppingCart: <ShoppingCart className="w-6 h-6" />,
 };
 
 const actionIcons: Record<string, React.ReactNode> = {
@@ -64,74 +85,167 @@ function useInView(threshold = 0.15) {
   return { ref, visible };
 }
 
+// Cascade animation: nodes light up in sequence, then ripple outward
+const CASCADE_STEPS = [
+  ['NVDA'],                   // step 0 — leader ignites
+  ['TSM', 'MSFT'],            // step 1
+  ['AMD', 'GOOGL'],           // step 2
+  ['SMCI', 'ASML'],           // step 3
+];
+const STEP_MS = 500;
+const HOLD_MS = 1200;
+const FADE_MS = 800;
+
 function MiniGraph() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [activeStep, setActiveStep] = useState(-1);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    let step = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    function advance() {
+      if (step < CASCADE_STEPS.length) {
+        setActiveStep(step);
+        step++;
+        timer = setTimeout(advance, STEP_MS);
+      } else {
+        // hold then fade
+        timer = setTimeout(() => {
+          setActiveStep(-1);
+          step = 0;
+          timer = setTimeout(advance, FADE_MS + 400);
+        }, HOLD_MS);
+      }
+    }
+
+    timer = setTimeout(advance, 600);
+    return () => clearTimeout(timer);
+  }, [mounted]);
+
   if (!mounted) return <div className="w-full h-64 bg-cf-border/30 rounded-xl animate-pulse" />;
 
   const nodes = [
-    { id: 'NVDA', x: 200, y: 120, r: 28, color: '#4F8FBF' },
-    { id: 'TSM', x: 80, y: 80, r: 22, color: '#6366f1' },
-    { id: 'MSFT', x: 320, y: 60, r: 26, color: '#3b82f6' },
-    { id: 'AMD', x: 120, y: 200, r: 18, color: '#6366f1' },
-    { id: 'SMCI', x: 300, y: 190, r: 14, color: '#6366f1' },
-    { id: 'GOOGL', x: 370, y: 140, r: 24, color: '#3b82f6' },
-    { id: 'ASML', x: 50, y: 170, r: 16, color: '#6366f1' },
+    { id: 'NVDA', x: 200, y: 115, r: 28, color: '#4F8FBF', label: 'NVDA' },
+    { id: 'TSM',  x: 82,  y: 78,  r: 22, color: '#6366f1', label: 'TSM'  },
+    { id: 'MSFT', x: 318, y: 60,  r: 26, color: '#3b82f6', label: 'MSFT' },
+    { id: 'AMD',  x: 118, y: 195, r: 18, color: '#6366f1', label: 'AMD'  },
+    { id: 'SMCI', x: 300, y: 188, r: 14, color: '#6366f1', label: 'SMCI' },
+    { id: 'GOOGL',x: 372, y: 142, r: 24, color: '#3b82f6', label: 'GOOGL'},
+    { id: 'ASML', x: 50,  y: 168, r: 16, color: '#8b5cf6', label: 'ASML' },
   ];
   const links = [
-    { from: 'TSM', to: 'NVDA' },
+    { from: 'TSM',  to: 'NVDA' },
     { from: 'NVDA', to: 'MSFT' },
-    { from: 'TSM', to: 'AMD' },
+    { from: 'TSM',  to: 'AMD'  },
     { from: 'NVDA', to: 'SMCI' },
-    { from: 'NVDA', to: 'GOOGL' },
-    { from: 'ASML', to: 'TSM' },
-    { from: 'AMD', to: 'MSFT' },
+    { from: 'NVDA', to: 'GOOGL'},
+    { from: 'ASML', to: 'TSM'  },
+    { from: 'AMD',  to: 'MSFT' },
   ];
   const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
 
+  // Which nodes are "lit" (all steps up to and including activeStep)
+  const litIds = new Set<string>(
+    activeStep >= 0
+      ? CASCADE_STEPS.slice(0, activeStep + 1).flat()
+      : []
+  );
+  // Which links are "active" (both endpoints lit)
+  const isLinkActive = (from: string, to: string) => litIds.has(from) && litIds.has(to);
+
   return (
-    <svg viewBox="0 0 420 260" className="w-full h-64">
+    <svg viewBox="0 0 420 260" className="w-full h-64" aria-hidden="true">
       <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+        <filter id="glow-strong">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="glow-soft">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
+
+      {/* Links */}
       {links.map((l, i) => {
         const from = nodeMap[l.from];
-        const to = nodeMap[l.to];
+        const to   = nodeMap[l.to];
+        const active = isLinkActive(l.from, l.to);
         return (
           <line
             key={i}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-            stroke="#E2E8F0"
-            strokeWidth={2}
-            opacity={0.6}
+            x1={from.x} y1={from.y}
+            x2={to.x}   y2={to.y}
+            stroke={active ? '#4F8FBF' : '#CBD5E1'}
+            strokeWidth={active ? 2.5 : 1.5}
+            opacity={active ? 0.85 : 0.35}
+            style={{ transition: 'all 0.4s ease' }}
           />
         );
       })}
-      {nodes.map((n) => (
-        <g key={n.id}>
-          <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} opacity={0.15} />
-          <circle cx={n.x} cy={n.y} r={n.r * 0.7} fill={n.color} opacity={0.8} filter="url(#glow)" />
-          <text
-            x={n.x}
-            y={n.y + 4}
-            textAnchor="middle"
-            fill="white"
-            fontSize={n.r > 20 ? 10 : 8}
-            fontWeight="bold"
-          >
-            {n.id}
-          </text>
-        </g>
-      ))}
+
+      {/* Nodes */}
+      {nodes.map((n) => {
+        const lit = litIds.has(n.id);
+        return (
+          <g key={n.id} style={{ transition: 'all 0.4s ease' }}>
+            {/* Outer pulse ring — only when lit */}
+            {lit && (
+              <circle
+                cx={n.x} cy={n.y} r={n.r + 8}
+                fill="none"
+                stroke={n.color}
+                strokeWidth={1.5}
+                opacity={0.4}
+              />
+            )}
+            {/* Halo */}
+            <circle
+              cx={n.x} cy={n.y} r={n.r}
+              fill={n.color}
+              opacity={lit ? 0.22 : 0.10}
+              style={{ transition: 'opacity 0.4s ease' }}
+            />
+            {/* Core */}
+            <circle
+              cx={n.x} cy={n.y} r={n.r * 0.72}
+              fill={n.color}
+              opacity={lit ? 1 : 0.5}
+              filter={lit ? 'url(#glow-strong)' : 'url(#glow-soft)'}
+              style={{ transition: 'opacity 0.4s ease' }}
+            />
+            {/* Label */}
+            <text
+              x={n.x} y={n.y + 4}
+              textAnchor="middle"
+              fill="white"
+              fontSize={n.r > 20 ? 10 : 8}
+              fontWeight="bold"
+              opacity={lit ? 1 : 0.7}
+              style={{ transition: 'opacity 0.4s ease' }}
+            >
+              {n.label}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Cascade label */}
+      {activeStep >= 0 && (
+        <text x="210" y="245" textAnchor="middle" fill="#4F8FBF" fontSize={10} opacity={0.7}>
+          cascade flowing →
+        </text>
+      )}
     </svg>
   );
 }
@@ -210,9 +324,9 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { value: '10,000+', label: tHome('socialProof.investors'), icon: <Users className="w-5 h-5" /> },
-              { value: '30+', label: tHome('socialProof.companies'), icon: <Network className="w-5 h-5" /> },
-              { value: '5', label: tHome('socialProof.sectors'), icon: <Globe className="w-5 h-5" /> },
-              { value: '$12B+', label: tHome('socialProof.flows'), icon: <BarChart3 className="w-5 h-5" /> },
+              { value: '137+', label: tHome('socialProof.companies'), icon: <Network className="w-5 h-5" /> },
+              { value: '16', label: tHome('socialProof.sectors'), icon: <Globe className="w-5 h-5" /> },
+              { value: '$48B+', label: tHome('socialProof.flows'), icon: <BarChart3 className="w-5 h-5" /> },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-cf-primary/10 text-cf-primary mb-3">
@@ -352,7 +466,7 @@ export default function HomePage() {
             {tHome('fourLensesDesc')}
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[
             {
               icon: <Network className="w-6 h-6" />,
@@ -381,6 +495,13 @@ export default function HomePage() {
               desc: t('features.newsGapDesc'),
               color: 'text-cf-danger bg-cf-danger/10',
               href: '/news-gap',
+            },
+            {
+              icon: <GitCompare className="w-6 h-6" />,
+              title: 'Company Comparator',
+              desc: 'Compare any two companies side-by-side — revenue, supply chain role, institutional signals, and news gap score.',
+              color: 'text-purple-600 bg-purple-100',
+              href: '/compare/nvda-vs-amd',
             },
           ].map((feature) => (
             <Link
