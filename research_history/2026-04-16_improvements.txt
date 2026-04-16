@@ -1,0 +1,79 @@
+=====================================
+FlowVium Improvements Session
+Date: 2026-04-16
+Commit: af9a4db
+=====================================
+
+## Milestone 5: Full Improvements Sweep
+
+### 1. /compare/[slug] — Company Comparator (NEW FEATURE)
+파일: src/app/[locale]/compare/[slug]/page.tsx
+파일: src/components/pages/ComparePage.tsx
+
+기능:
+- URL 형식: /compare/nvda-vs-amd (두 티커를 -vs- 로 구분)
+- 티커 검색 드롭다운 (이름/티커 검색)
+- Quick Summary Bar: 마켓캡, 체인 역할, Gap Score, IB Activity Score 비교
+- Revenue Mix 비교 바차트 (Recharts)
+- 좌우 나란히: About/기업정보, Revenue segments, News Gap 스코어바, 기관 신호, Cascade 패턴, 공급망 관계
+- 인기 비교 쌍 빠른 링크 (10개)
+- 각 Company 페이지에 "Compare" 버튼 추가
+
+### 2. Homepage Hero — 실제 Cascade 애니메이션
+파일: src/components/pages/HomePage.tsx (MiniGraph)
+
+변경:
+- 정적 SVG → 단계별 애니메이션
+- CASCADE_STEPS: [NVDA] → [TSM, MSFT] → [AMD, GOOGL] → [SMCI, ASML]
+- 500ms 간격으로 노드 점등
+- 1200ms 홀드 → 800ms 페이드 → 반복
+- 점등된 노드: 링 + 강한 glow, 연결선 활성화 (파란색)
+- 미점등 노드: 50% 투명도, 부드러운 glow
+- CSS transition으로 부드러운 전환
+
+### 3. sectorIcons 전체 섹터 매핑
+파일: src/components/pages/HomePage.tsx
+
+추가된 아이콘:
+- Landmark (Financials), Flame (Energy), Heart (Healthcare)
+- Factory (Industrials), Radio (Communication Services)
+- Building2 (Real Estate), Gem (Materials)
+- ShoppingBag (Consumer Discretionary), Monitor (IT/Software)
+- ShoppingCart (Consumer Defensive)
+이전: 6개 매핑 → 이후: 16개 매핑 (전체 섹터 커버)
+
+### 4. Homepage Stats 업데이트
+- Companies: 30+ → 137+
+- Sectors: 5 → 16
+- Flows: $12B+ → $48B+
+
+### 5. Features Grid → Compare 카드 추가
+- 4개 → 5개 카드
+- Compare 카드: /compare/nvda-vs-amd 연결
+
+### 6. News-Gap 티커 확장
+파일: src/data/news-gap.ts
+
+추가:
+- COIN (Coinbase) — gapScore 68, ibActivityScore 78
+- FCX (Freeport-McMoRan) — gapScore 71, ibActivityScore 80
+- SMCI (Super Micro) — gapScore 76, ibActivityScore 82
+- DELL (Dell Technologies) — gapScore 63, ibActivityScore 76
+각 항목: 13F ownership 데이터, recentArticles, ibActions 포함
+
+### 7. signals-service.ts 티커 리스트 업데이트
+COIN, FCX, SMCI, DELL 추가 (PFE, NVO, META, AMZN 교체)
+총 25개 유지 (Alpha Vantage 무료 한도)
+
+## 배포 정보
+- Commit: af9a4db
+- Push: master → origin/master
+- Vercel 자동 배포 트리거됨
+- Production: https://flowvium.vercel.app/en/compare/nvda-vs-amd
+
+## 다음 세션 우선순위
+1. [HIGH] Vercel 대시보드에서 Redis env var 공백 직접 수정
+2. [MED]  Compare 페이지 SEO 개선 (더 많은 slugs를 sitemap에 추가)
+3. [MED]  Blog posts 추가 (crypto/blockchain, healthcare 섹터)
+4. [LOW]  이메일 실제 연동 (Resend API)
+5. [LOW]  Compare 페이지에서 티커 변경 시 URL 업데이트 (router.push)

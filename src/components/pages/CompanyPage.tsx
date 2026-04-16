@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { allCompanies, type Company } from '@/data/companies';
+import { allCompanies, type Company, type RevenueSegment } from '@/data/companies';
 import { institutionalSignals } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { cascadePatterns } from '@/data/cascades';
@@ -41,6 +41,10 @@ import {
   Minus,
   ArrowUpRight,
   ArrowDownRight,
+  FlaskConical,
+  ChevronDown,
+  ChevronUp,
+  Users2,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -74,6 +78,67 @@ const actionColors: Record<string, string> = {
   new_position: 'text-blue-600 bg-blue-50',
   exit: 'text-orange-600 bg-orange-50',
 };
+
+function SegmentRow({ seg, idx }: { seg: RevenueSegment; idx: number }) {
+  const [open, setOpen] = useState(false);
+  const hasExtra = !!(seg.topCustomers?.length || seg.description);
+  return (
+    <div className="rounded-lg border border-cf-border overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+        onClick={() => hasExtra && setOpen((v) => !v)}
+        disabled={!hasExtra}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+            style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+          />
+          <span className="text-sm font-medium text-cf-text-primary truncate">{seg.name}</span>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className="text-sm text-cf-text-secondary">{seg.amount}</span>
+          <div className="flex items-center gap-1">
+            <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-cf-primary" style={{ width: `${seg.percentage}%` }} />
+            </div>
+            <span className="text-xs text-cf-text-secondary w-8 text-right">{seg.percentage}%</span>
+          </div>
+          {hasExtra && (
+            open ? <ChevronUp className="w-3.5 h-3.5 text-cf-text-secondary" /> : <ChevronDown className="w-3.5 h-3.5 text-cf-text-secondary" />
+          )}
+        </div>
+      </button>
+      {open && hasExtra && (
+        <div className="px-4 pb-3 bg-gray-50 border-t border-cf-border">
+          {seg.description && (
+            <p className="text-xs text-cf-text-secondary leading-relaxed pt-2 mb-2">{seg.description}</p>
+          )}
+          {seg.topCustomers && seg.topCustomers.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-cf-text-secondary mb-1.5">주요 고객사</p>
+              <div className="space-y-1">
+                {seg.topCustomers.map((c, i) => (
+                  <div key={i} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5">
+                      {c.ticker && (
+                        <span className="font-mono font-bold text-cf-primary">{c.ticker}</span>
+                      )}
+                      <span className="text-cf-text-secondary">{c.name}</span>
+                    </div>
+                    {c.share && (
+                      <span className="font-medium text-cf-text-primary bg-white border border-cf-border px-1.5 py-0.5 rounded text-xs">{c.share}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function quarterToFilingDate(quarter: string): string {
   const parts = quarter.split(' ');
@@ -309,46 +374,78 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </div>
             </div>
 
-            {/* Revenue segments table */}
+            {/* Revenue segments table with customer breakdown */}
+            <div className="mt-6 space-y-2">
+              <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
+                <Users2 className="w-4 h-4 text-cf-primary" />
+                {t('segment')} 구성 및 주요 고객
+              </h3>
+              {company.revenue.segments.map((s, idx) => (
+                <SegmentRow key={s.name} seg={s} idx={idx} />
+              ))}
+            </div>
+
+            {/* Product descriptions */}
             <div className="mt-6">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-cf-border">
-                    <th className="text-left py-2 text-cf-text-secondary font-medium">
-                      {t('segment')}
-                    </th>
-                    <th className="text-right py-2 text-cf-text-secondary font-medium">
-                      {t('revenue')}
-                    </th>
-                    <th className="text-right py-2 text-cf-text-secondary font-medium">
-                      {t('share')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {company.revenue.segments.map((s) => (
-                    <tr key={s.name} className="border-b border-cf-border/50">
-                      <td className="py-2 text-cf-text-primary">{s.name}</td>
-                      <td className="text-right py-2 text-cf-text-secondary">{s.amount}</td>
-                      <td className="text-right py-2">
-                        <div className="flex items-center justify-end gap-2">
-                          <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-cf-primary"
-                              style={{ width: `${s.percentage}%` }}
-                            />
-                          </div>
-                          <span className="text-cf-text-secondary text-xs w-8 text-right">
-                            {s.percentage}%
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <h3 className="text-sm font-bold text-cf-text-primary mb-3">제품 상세 설명</h3>
+              <div className="space-y-2">
+                {company.products.map((p, i) => (
+                  <div key={i} className="rounded-lg bg-gray-50 p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-cf-text-primary">{p.name}</span>
+                      <span className="text-xs font-bold text-cf-primary bg-blue-50 px-2 py-0.5 rounded-full">{p.revenueShare}%</span>
+                    </div>
+                    <p className="text-xs text-cf-text-secondary leading-relaxed">{p.description}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* R&D Pipeline */}
+          {company.rdPipeline && company.rdPipeline.length > 0 && (
+            <div className="cf-card p-6">
+              <h2 className="text-xl font-heading font-bold text-cf-text-primary mb-6 flex items-center gap-2">
+                <FlaskConical className="w-5 h-5 text-purple-500" />
+                R&D 파이프라인
+              </h2>
+              <div className="space-y-3">
+                {company.rdPipeline.map((item, i) => {
+                  const stageColors: Record<string, string> = {
+                    research: 'bg-purple-50 border-purple-200 text-purple-700',
+                    development: 'bg-blue-50 border-blue-200 text-blue-700',
+                    validation: 'bg-amber-50 border-amber-200 text-amber-700',
+                    commercial: 'bg-green-50 border-green-200 text-green-700',
+                  };
+                  const stageLabels: Record<string, string> = {
+                    research: '연구',
+                    development: '개발',
+                    validation: '검증',
+                    commercial: '상용화',
+                  };
+                  return (
+                    <div key={i} className="border border-cf-border rounded-lg p-4">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${stageColors[item.stage]}`}>
+                            {stageLabels[item.stage]}
+                          </span>
+                          <span className="text-sm font-medium text-cf-text-primary">{item.name}</span>
+                        </div>
+                        {item.targetDate && (
+                          <span className="text-xs text-cf-text-secondary whitespace-nowrap flex-shrink-0">{item.targetDate}</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-cf-text-secondary leading-relaxed">{item.description}</p>
+                      {item.budget && (
+                        <p className="text-xs mt-1.5 text-cf-primary font-medium">예산: {item.budget}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Supply Chain Relationships */}
           <div className="cf-card p-6">

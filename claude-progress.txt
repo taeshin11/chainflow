@@ -40,3 +40,4 @@ Priority order:
 - 2026-04-15: Dynamic signals + news-gap pipeline (3 milestones)
 - 2026-04-16: Remote trigger restored. Added 5 blog posts, 9 signals (Q1 2026), 2 cascades, 21 companies. Deployed.
 - 2026-04-16: Redis .trim() fix. Added 2 blog posts (fintech, materials), 2 cascades (fintech/materials), 9 signals (sig-039~047). Deployed.
+- 2026-04-16: Compare page (/compare/[slug]), cascade hero animation, sectorIcons 16개, stats update, news-gap +4 tickers. Deployed.

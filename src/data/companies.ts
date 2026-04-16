@@ -4,6 +4,7 @@ import { companiesBatch3 } from './companies-batch3';
 import { companiesBatch4 } from './companies-batch4';
 import { companiesBatch5 } from './companies-batch5';
 import { companiesBatch6 } from './companies-batch6';
+import { companiesBatch7 } from './companies-batch7';
 
 export interface Product {
   name: string;
@@ -11,9 +12,25 @@ export interface Product {
   revenueShare: number;
 }
 
+export interface RevenueSegment {
+  name: string;
+  percentage: number;
+  amount: string;
+  topCustomers?: { name: string; ticker?: string; share?: string }[];
+  description?: string;
+}
+
 export interface RevenueBreakdown {
   total: string;
-  segments: { name: string; percentage: number; amount: string }[];
+  segments: RevenueSegment[];
+}
+
+export interface RdPipelineItem {
+  name: string;
+  stage: "research" | "development" | "validation" | "commercial";
+  description: string;
+  targetDate?: string;
+  budget?: string;
 }
 
 export interface Relationship {
@@ -34,6 +51,7 @@ export interface Company {
   products: Product[];
   revenue: RevenueBreakdown;
   relationships: Relationship[];
+  rdPipeline?: RdPipelineItem[];
   description: string;
   headquarters: string;
   founded: number;
@@ -63,13 +81,85 @@ export const companies: Company[] = [
     revenue: {
       total: "$130.5B",
       segments: [
-        { name: "Data Center", percentage: 78, amount: "$101.8B" },
-        { name: "Gaming", percentage: 12, amount: "$15.7B" },
-        { name: "Professional Visualization", percentage: 4, amount: "$5.2B" },
-        { name: "Automotive & Robotics", percentage: 4, amount: "$5.2B" },
+        {
+          name: "Data Center",
+          percentage: 78,
+          amount: "$101.8B",
+          description: "AI training/inference GPUs (H100, H200, Blackwell), DGX systems, and networking sold to cloud hyperscalers and enterprises.",
+          topCustomers: [
+            { name: "Microsoft Azure", ticker: "MSFT", share: "~15%" },
+            { name: "Meta Platforms", ticker: "META", share: "~12%" },
+            { name: "Amazon AWS", ticker: "AMZN", share: "~10%" },
+            { name: "Google Cloud", ticker: "GOOG", share: "~8%" },
+            { name: "Oracle Cloud", ticker: "ORCL", share: "~4%" },
+          ],
+        },
+        {
+          name: "Gaming",
+          percentage: 12,
+          amount: "$15.7B",
+          description: "GeForce RTX GPUs for consumer gaming PCs, sold through AIB partners (ASUS, MSI, Gigabyte) and retail channels.",
+          topCustomers: [
+            { name: "ASUS / MSI / Gigabyte (AIBs)", share: "~60% of segment" },
+            { name: "Direct consumer (GeForce.com)", share: "~10%" },
+          ],
+        },
+        {
+          name: "Professional Visualization",
+          percentage: 4,
+          amount: "$5.2B",
+          description: "NVIDIA RTX and Quadro workstation GPUs for CAD, 3D rendering, and AI-assisted design workflows.",
+          topCustomers: [
+            { name: "Autodesk / Adobe enterprise deals", share: "indirect" },
+            { name: "Dell, HP Workstation OEMs", share: "~50% of segment" },
+          ],
+        },
+        {
+          name: "Automotive & Robotics",
+          percentage: 4,
+          amount: "$5.2B",
+          description: "DRIVE Orin/Thor SoCs for autonomous vehicles and robotics, plus NVIDIA Jetson embedded compute modules.",
+          topCustomers: [
+            { name: "Mercedes-Benz", share: "~20%" },
+            { name: "BYD / Xpeng / Li Auto", share: "~25%" },
+            { name: "Tesla (FSD training)", ticker: "TSLA", share: "~15%" },
+          ],
+        },
         { name: "OEM & Other", percentage: 2, amount: "$2.6B" },
       ],
     },
+    rdPipeline: [
+      {
+        name: "Blackwell Ultra (B300)",
+        stage: "development",
+        description: "Next-gen GPU with 288GB HBM3e and 1.5x the Blackwell B200 performance. Targets 2025 data-center deployments for hyperscalers.",
+        targetDate: "H2 2025",
+      },
+      {
+        name: "Rubin Architecture (R100)",
+        stage: "research",
+        description: "Post-Blackwell architecture with NVLink 6, next-gen HBM4 memory, and enhanced transformer-engine for future LLM training workloads.",
+        targetDate: "2026",
+      },
+      {
+        name: "NVIDIA Blackwell NVL72 System",
+        stage: "commercial",
+        description: "Full rack-scale AI supercomputer combining 72 Blackwell GPUs with NVLink switches. Available now to hyperscalers; backlog extends into 2026.",
+        targetDate: "2025 (available)",
+      },
+      {
+        name: "NVIDIA Cosmos (World Foundation Models)",
+        stage: "development",
+        description: "Physical AI and robotics simulation platform using video-generative world foundation models for training autonomous vehicles and industrial robots.",
+        targetDate: "2025-2026",
+      },
+      {
+        name: "Thor Automotive SoC",
+        stage: "validation",
+        description: "2000 TOPS automotive compute platform for level 4 autonomous driving. Replacing Orin in next-gen vehicle platforms at Mercedes, BYD.",
+        targetDate: "2025",
+      },
+    ],
     relationships: [
       { targetId: "tsmc", type: "supplier", products: ["Wafer fabrication for all NVIDIA GPUs"], revenueImpact: "Critical — sole advanced-node foundry" },
       { targetId: "samsung-elec", type: "supplier", products: ["HBM3e memory for H100/H200"], revenueImpact: "High — secondary HBM supplier" },
@@ -4018,4 +4108,5 @@ export const allCompanies: Company[] = [
   ...companiesBatch4,
   ...companiesBatch5,
   ...companiesBatch6,
+  ...companiesBatch7,
 ];
