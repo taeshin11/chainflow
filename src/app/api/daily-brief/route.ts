@@ -17,9 +17,11 @@ export async function GET(request: Request) {
     } catch { /* non-fatal */ }
   }
 
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+  // Always use the stable production domain for internal API fetches.
+  // VERCEL_URL changes per deployment (preview URLs) — not reliable for self-calls.
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    'https://flowvium.vercel.app';
 
   let capitalData: unknown = null;
   let macroData: unknown = null;

@@ -377,7 +377,7 @@ export function fallbackBrief(tf: Timeframe, capitalData?: unknown, macroData?: 
     capital: { title: capitalTitle, content: capitalContent, bullets: capitalBullets },
     company: { title: '주목 종목 & 기관 매집', content: `${tfLabel} 기관 매집 상위 종목`, bullets: companyBullets },
     signals: { title: '기관 지분율 변화 (13F)', content: `${tfLabel} 주요 지분율 변동`, bullets: signalBullets },
-    outlook: `실시간 데이터 기반 ${tfLabel} 요약 — AI 분석 준비 중 (환경변수 GEMINI_API_KEY 필요)`,
+    outlook: `${tfLabel} 기관 매집·자금흐름 데이터 기반 요약입니다. 공포탐욕지수 ${riskLevel === 'high' ? '공포 구간 — 리스크 관리 필요' : riskLevel === 'low' ? '탐욕 구간 — 과열 주의' : '중립 구간 — 방향성 탐색 중'}.`,
     riskLevel,
     generatedAt: new Date().toISOString(),
     tf,
