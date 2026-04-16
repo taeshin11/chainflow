@@ -1,5 +1,4 @@
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
 const inter = Inter({
@@ -26,14 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html suppressHydrationWarning>
-        <body
-          className={`${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} font-sans bg-cf-bg text-cf-text antialiased`}
-        >
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} font-sans bg-cf-bg text-cf-text antialiased`}
+      >
+        {children}
+      </body>
+    </html>
   );
 }

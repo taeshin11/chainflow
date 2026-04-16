@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Menu, X, Link as LinkIcon, MessageCircle, Search } from 'lucide-react';
-import { SignInButton, SignOutButton, UserButton, useUser } from '@clerk/nextjs';
 import { allCompanies } from '@/data/companies';
 import { companyNamesI18n } from '@/data/company-names-i18n';
 
@@ -139,7 +138,6 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
 
 export default function Navbar() {
   const t = useTranslations('nav');
-  const { isSignedIn, user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -218,16 +216,6 @@ export default function Navbar() {
                 <MessageCircle className="w-3 h-3" />
                 {t('feedback')}
               </a>
-              {/* Auth */}
-              {!isSignedIn ? (
-                <SignInButton mode="modal">
-                  <button className="ml-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 hover:bg-amber-300 transition-colors">
-                    로그인
-                  </button>
-                </SignInButton>
-              ) : (
-                <UserButton />
-              )}
             </div>
 
             {/* Mobile: search icon + hamburger */}
