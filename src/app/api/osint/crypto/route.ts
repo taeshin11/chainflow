@@ -78,73 +78,63 @@ async function fetchBtc(address: string) {
   };
 }
 
-// ── ETH fetch via Etherscan ────────────────────────────────────────────────────
-interface EtherscanTx {
-  hash: string;
-  timeStamp: string;
+// ── ETH fetch via Ethplorer (free, no rate-limit issues on shared IPs) ────────
+interface EthplorerTransfer {
+  transactionHash: string;
+  timestamp: number;
   from: string;
   to: string;
-  value: string;
-  isError: string;
+  value: number;
+  type: string;
+}
+
+interface EthplorerResponse {
+  address: {
+    balance: number;      // in ETH (not Wei)
+    countTxs?: number;
+    receivedEth?: number;
+    sentEth?: number;
+  };
+  ETH?: {
+    balance: number;
+    price?: { rate: number };
+  };
+  transfers?: EthplorerTransfer[];
+  error?: { code: number; message: string };
 }
 
 async function fetchEth(address: string) {
-  const apiKey = process.env.ETHERSCAN_API_KEY?.trim() ?? '';
-  const keyParam = apiKey ? `&apikey=${apiKey}` : '';
-  const base = 'https://api.etherscan.io/api';
+  // Ethplorer provides a free 'freekey' for public use (10 req/min limit)
+  const apiKey = process.env.ETHPLORER_API_KEY?.trim() || 'freekey';
+  const res = await fetch(
+    `https://api.ethplorer.io/getAddressInfo/${address}?apiKey=${apiKey}`,
+    {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(10000),
+    }
+  );
+  if (!res.ok) throw new Error(`Ethplorer HTTP ${res.status}`);
+  const data: EthplorerResponse = await res.json();
 
-  const [balRes, txRes] = await Promise.all([
-    fetch(
-      `${base}?module=account&action=balance&address=${address}&tag=latest${keyParam}`,
-      { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) }
-    ),
-    fetch(
-      `${base}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc${keyParam}`,
-      { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) }
-    ),
-  ]);
+  if (data.error) throw new Error(`Ethplorer: ${data.error.message}`);
 
-  if (!balRes.ok) throw new Error(`Etherscan balance HTTP ${balRes.status}`);
-  if (!txRes.ok) throw new Error(`Etherscan txlist HTTP ${txRes.status}`);
+  const balance = data.ETH?.balance ?? data.address?.balance ?? 0;
+  const totalReceived = data.address?.receivedEth ?? 0;
+  const totalSent = data.address?.sentEth ?? 0;
+  const txCount = data.address?.countTxs ?? 0;
+  const usdRate = data.ETH?.price?.rate ?? null;
+  const balanceUsd = usdRate ? Math.round(balance * usdRate) : null;
 
-  const balData = await balRes.json();
-  const txData = await txRes.json();
-
-  if (balData.status !== '1' && balData.message !== 'OK') {
-    throw new Error(`Etherscan balance error: ${balData.message}`);
-  }
-
-  const weiToEth = (wei: string) => parseFloat(wei) / 1e18;
-  const balance = weiToEth(balData.result ?? '0');
-
-  const txList: EtherscanTx[] = txData.status === '1' ? (txData.result ?? []) : [];
-
-  // Compute total received and sent from tx list (approximation)
-  let totalReceived = 0;
-  let totalSent = 0;
-  for (const tx of txList) {
-    const val = weiToEth(tx.value);
-    const isIncoming = tx.to?.toLowerCase() === address.toLowerCase();
-    if (isIncoming) totalReceived += val;
-    else totalSent += val;
-  }
-
-  const txCount = txList.length;
-
-  const recentTxs = txList.slice(0, 5).map((tx) => {
-    const isIncoming = tx.to?.toLowerCase() === address.toLowerCase();
-    return {
-      hash: tx.hash,
-      time: new Date(parseInt(tx.timeStamp) * 1000).toISOString(),
-      value: weiToEth(tx.value),
-      direction: isIncoming ? 'in' : 'out',
-    };
-  });
+  const recentTxs = (data.transfers ?? []).slice(0, 5).map((tx) => ({
+    hash: tx.transactionHash,
+    time: new Date(tx.timestamp * 1000).toISOString(),
+    value: Math.abs(tx.value ?? 0),
+    direction: tx.to?.toLowerCase() === address.toLowerCase() ? 'in' : 'out',
+  }));
 
   const riskFlags: string[] = [];
   if (txCount > 1000) riskFlags.push('고빈도 거래');
   if (balance > 10000) riskFlags.push('대규모 잔고');
-
   const smallTxs = recentTxs.filter((tx) => tx.value < 0.01);
   if (smallTxs.length >= 4) riskFlags.push('스머핑 의심');
 
@@ -152,7 +142,7 @@ async function fetchEth(address: string) {
     chain: 'eth',
     address,
     balance,
-    balanceUsd: null,
+    balanceUsd,
     totalReceived,
     totalSent,
     txCount,

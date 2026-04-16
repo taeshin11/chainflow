@@ -63,6 +63,7 @@ interface SocialEntry {
   person: string; role: string; flag: string; tag: string;
   title: string; summary: string; source: string; url: string;
   publishedAt: string; sentiment: string; impact: string;
+  istweet?: boolean;
 }
 function SocialTab() {
   const [data, setData] = useState<SocialEntry[]>([]);
@@ -153,8 +154,13 @@ function SocialTab() {
               <p className="text-xs text-cf-text-secondary line-clamp-2">{entry.summary}</p>
             )}
             <div className="flex items-center gap-2 mt-2 text-xs text-cf-text-secondary">
-              <Newspaper className="w-3 h-3" />
-              <span>{entry.source}</span>
+              {entry.istweet
+                ? <MessageSquare className="w-3 h-3 text-sky-500" />
+                : <Newspaper className="w-3 h-3" />
+              }
+              <span className={entry.istweet ? 'text-sky-600 font-medium' : ''}>
+                {entry.istweet ? `X · ${entry.source}` : entry.source}
+              </span>
               <span>·</span>
               <span>{new Date(entry.publishedAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
               <ExternalLink className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
