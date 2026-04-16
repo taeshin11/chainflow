@@ -161,10 +161,11 @@ function weeksAgo(dateStr: string): string {
   const start = new Date(dateStr);
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) return `${diffDays}일 전 시작`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전 시작`;
+  const dateLabel = `${start.getFullYear()}년 ${start.getMonth() + 1}월`;
+  if (diffDays < 7) return `${diffDays}일 전 시작 (${dateLabel})`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전 시작 (${dateLabel})`;
   const months = Math.floor(diffDays / 30);
-  return `${months}개월 전 시작`;
+  return `${months}개월 전 시작 (${dateLabel})`;
 }
 
 const signalBadge: Record<string, { label: string; cls: string }> = {
