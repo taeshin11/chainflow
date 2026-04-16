@@ -432,6 +432,199 @@ type Timeframe = '1w' | '4w' | '13w';
 const TF_LABELS: Record<Timeframe, string> = { '1w': '1주', '4w': '4주', '13w': '3개월' };
 const TF_RET_KEY: Record<Timeframe, 'ret1w' | 'ret4w' | 'ret13w'> = { '1w': 'ret1w', '4w': 'ret4w', '13w': 'ret13w' };
 
+// ── Flow Analysis Panel (EXAONE 자금흐름 원인 분석) ──────────────────────────
+interface FlowCause {
+  country: string; ret: string; direction: string;
+  causes: string[]; risk: string;
+}
+interface RotationCause { from: string; to: string; reason: string; }
+interface FlowAnalysis {
+  summary: string; mainTheme: string;
+  countries: FlowCause[]; rotations: RotationCause[];
+  keyWatchpoints: string[];
+}
+
+function FlowAnalysisPanel({ tf }: { tf: Timeframe }) {
+  const [analysis, setAnalysis] = useState<FlowAnalysis | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const [genTime, setGenTime] = useState<string | null>(null);
+
+  const load = () => {
+    setLoading(true);
+    setError(false);
+    fetch(`/api/flow-analysis?tf=${tf}`)
+      .then(r => r.json())
+      .then(d => {
+        setAnalysis(d.analysis ?? null);
+        setGenTime(d.generatedAt ?? null);
+        setLoaded(true);
+        if (!d.analysis) setError(true);
+      })
+      .catch(() => { setError(true); setLoaded(true); })
+      .finally(() => setLoading(false));
+  };
+
+  // Reset when timeframe changes
+  useEffect(() => { setLoaded(false); setAnalysis(null); setError(false); }, [tf]);
+
+  if (!loaded && !loading) {
+    return (
+      <div className="cf-card p-4 border-dashed border-cf-primary/30 bg-cf-primary/3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-cf-primary/10 flex items-center justify-center text-base flex-shrink-0">🤖</div>
+            <div>
+              <p className="text-sm font-bold text-cf-text-primary">AI 자금흐름 원인 분석</p>
+              <p className="text-xs text-cf-text-secondary">EXAONE이 각 국가의 자금흐름 원인과 로테이션 이유를 분석합니다</p>
+            </div>
+          </div>
+          <button
+            onClick={load}
+            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 bg-cf-primary text-white rounded-xl text-xs font-bold hover:bg-cf-primary/90 transition-colors shadow-sm"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            원인 분석 시작
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return (
+    <div className="cf-card p-6 flex items-center justify-center gap-3 text-cf-text-secondary">
+      <Loader2 className="w-5 h-5 animate-spin text-cf-primary" />
+      <div>
+        <p className="text-sm font-medium">EXAONE이 자금흐름 원인 분석 중...</p>
+        <p className="text-xs text-cf-text-secondary/70 mt-0.5">국가별 ETF 수익률과 글로벌 이벤트 데이터를 분석하고 있어요</p>
+      </div>
+    </div>
+  );
+
+  if (error || !analysis) return (
+    <div className="cf-card p-4 text-center">
+      <p className="text-xs text-cf-text-secondary mb-2">분석을 불러오지 못했습니다. AI 서버 연결을 확인해주세요.</p>
+      <button onClick={load} className="text-xs text-cf-primary hover:underline">다시 시도</button>
+    </div>
+  );
+
+  return (
+    <div className="cf-card overflow-hidden">
+      {/* Header */}
+      <div className="p-4 pb-3 border-b border-cf-border bg-gradient-to-r from-cf-primary/5 to-transparent">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-cf-primary/10 flex items-center justify-center text-sm flex-shrink-0">🤖</div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-cf-text-primary">AI 자금흐름 원인 분석</span>
+                <span className="text-[10px] bg-cf-primary/10 text-cf-primary px-2 py-0.5 rounded-full font-semibold">EXAONE</span>
+              </div>
+              {genTime && (
+                <p className="text-[10px] text-cf-text-secondary mt-0.5">
+                  {new Date(genTime).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 생성 · 4시간 캐시
+                </p>
+              )}
+            </div>
+          </div>
+          <button onClick={load} className="flex-shrink-0 flex items-center gap-1 text-[11px] text-cf-text-secondary hover:text-cf-primary transition-colors">
+            <RefreshCw className="w-3.5 h-3.5" /> 새로고침
+          </button>
+        </div>
+        {/* Main theme badge */}
+        {analysis.mainTheme && (
+          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+            <span className="text-amber-500">⚡</span>
+            <span className="text-xs font-bold text-amber-700">현재 핵심 테마: {analysis.mainTheme}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Summary */}
+        <div className="p-3 rounded-xl bg-blue-50 border border-blue-100">
+          <p className="text-xs font-bold text-blue-700 mb-1">📋 전체 요약</p>
+          <p className="text-xs text-blue-700 leading-relaxed">{analysis.summary}</p>
+        </div>
+
+        {/* Country causes */}
+        {analysis.countries && analysis.countries.length > 0 && (
+          <div>
+            <p className="text-xs font-bold text-cf-text-primary mb-2 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-cf-primary" /> 국가별 원인 분석
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {analysis.countries.map((c, i) => (
+                <div key={i} className={`p-3 rounded-xl border text-xs ${
+                  c.direction === 'inflow' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`font-bold ${c.direction === 'inflow' ? 'text-green-700' : 'text-red-700'}`}>
+                      {c.direction === 'inflow' ? '↑' : '↓'} {c.country}
+                    </span>
+                    <span className={`font-bold tabular-nums ${c.direction === 'inflow' ? 'text-green-600' : 'text-red-600'}`}>{c.ret}</span>
+                  </div>
+                  <ul className="space-y-0.5 mb-1.5">
+                    {c.causes?.map((cause, j) => (
+                      <li key={j} className={`flex items-start gap-1 ${c.direction === 'inflow' ? 'text-green-700' : 'text-red-700'}`}>
+                        <span className="flex-shrink-0 mt-0.5">•</span>
+                        <span className="leading-snug">{cause}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {c.risk && (
+                    <div className="flex items-start gap-1 text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1">
+                      <span className="flex-shrink-0">⚠</span>
+                      <span className="leading-snug">{c.risk}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Rotation causes */}
+        {analysis.rotations && analysis.rotations.length > 0 && (
+          <div>
+            <p className="text-xs font-bold text-cf-text-primary mb-2 flex items-center gap-1.5">
+              <ArrowRight className="w-3.5 h-3.5 text-cf-primary" /> 로테이션 원인
+            </p>
+            <div className="space-y-1.5">
+              {analysis.rotations.map((r, i) => (
+                <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-violet-50 border border-violet-100 text-xs">
+                  <div className="flex items-center gap-1 flex-shrink-0 font-bold text-violet-700 min-w-[100px]">
+                    <span>{r.from}</span>
+                    <ArrowRight className="w-3 h-3" />
+                    <span>{r.to}</span>
+                  </div>
+                  <span className="text-violet-700 leading-snug">{r.reason}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Key watchpoints */}
+        {analysis.keyWatchpoints && analysis.keyWatchpoints.length > 0 && (
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <p className="text-xs font-bold text-slate-700 mb-2">👀 지금 주목해야 할 포인트</p>
+            <ul className="space-y-1">
+              {analysis.keyWatchpoints.map((pt, i) => (
+                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
+                  <span className="font-bold text-slate-400 flex-shrink-0">{i + 1}.</span>
+                  <span className="leading-snug">{pt}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CapitalFlowsTab() {
   const [data, setData] = useState<FlowData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -718,10 +911,201 @@ function CapitalFlowsTab() {
         </div>
       </div>
 
+      {/* AI 자금흐름 원인 분석 */}
+      <FlowAnalysisPanel tf={tf} />
+
       <p className="text-xs text-cf-text-secondary text-center">
         Yahoo Finance (15분 지연) · ETF 기반 자산군별 수익률 분석 · 4시간 캐시
         {data.updatedAt && ` · ${new Date(data.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트`}
       </p>
+    </div>
+  );
+}
+
+// ── FedWatch ──────────────────────────────────────────────────────────────────
+interface FomcMeeting {
+  date: string; label: string;
+  targetLow: number; targetHigh: number;
+  probHike: number; probHold: number; probCut25: number; probCut50: number; probCut75: number;
+  impliedRate: number; cumulativeCuts: number;
+}
+interface FedWatchData {
+  currentTargetLow: number; currentTargetHigh: number; currentRateMid: number;
+  meetings: FomcMeeting[];
+  yearEndImpliedRate: number; totalImpliedCuts: number;
+  updatedAt: string; source: string;
+}
+
+function FedWatchSection() {
+  const [data, setData] = useState<FedWatchData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/fedwatch')
+      .then(r => r.json())
+      .then(d => setData(d))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="cf-card p-4 flex items-center gap-2 text-cf-text-secondary">
+      <Loader2 className="w-4 h-4 animate-spin" />
+      <span className="text-xs">FedWatch 로딩중...</span>
+    </div>
+  );
+  if (!data) return null;
+
+  const today = new Date();
+
+  return (
+    <div className="cf-card p-4">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg">🏛️</span>
+            <h3 className="text-sm font-bold text-cf-text-primary">CME FedWatch — FOMC 금리 전망</h3>
+          </div>
+          <p className="text-xs text-cf-text-secondary">각 회의별 시장이 예상하는 금리 결정 확률</p>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-cf-text-secondary">현재 기준금리</span>
+            <span className="text-base font-extrabold text-cf-text-primary tabular-nums">
+              {data.currentTargetLow}–{data.currentTargetHigh}%
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-cf-text-secondary">연말 예상</span>
+            <span className="text-sm font-bold text-blue-600 tabular-nums">{data.yearEndImpliedRate.toFixed(2)}%</span>
+            <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded-full font-semibold">
+              -{data.totalImpliedCuts}bp 인하
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Meeting probability bars */}
+      <div className="space-y-3">
+        {data.meetings.map((m) => {
+          const isPast = new Date(m.date) < today;
+          const isNext = !isPast && data.meetings.findIndex(x => new Date(x.date) >= today) === data.meetings.indexOf(m);
+          const dominantCut = m.probCut25 + m.probCut50 + m.probCut75;
+
+          return (
+            <div key={m.date} className={`rounded-xl border p-3 ${isNext ? 'border-cf-primary/40 bg-cf-primary/5' : 'border-cf-border bg-white'} ${isPast ? 'opacity-50' : ''}`}>
+              <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
+                <div className="flex items-center gap-2">
+                  {isNext && <span className="text-[9px] font-bold bg-cf-primary text-white px-1.5 py-0.5 rounded-full">NEXT</span>}
+                  <span className="text-xs font-bold text-cf-text-primary">{m.label}</span>
+                  <span className="text-[10px] text-cf-text-secondary">{m.date}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-cf-text-secondary">예상금리</span>
+                  <span className="text-xs font-bold tabular-nums text-cf-text-primary">{m.impliedRate.toFixed(2)}%</span>
+                  {m.cumulativeCuts > 0 && (
+                    <span className="text-[10px] text-blue-600 font-semibold">-{m.cumulativeCuts}bp</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Probability bars */}
+              <div className="space-y-1">
+                {/* Hold */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-gray-500 w-16 flex-shrink-0">동결</span>
+                  <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gray-400 rounded-full transition-all"
+                      style={{ width: `${m.probHold}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-600 w-10 text-right tabular-nums">{m.probHold.toFixed(1)}%</span>
+                </div>
+                {/* Cut 25bp */}
+                {m.probCut25 > 0.5 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-blue-600 w-16 flex-shrink-0">-25bp</span>
+                    <div className="flex-1 h-4 bg-blue-50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-blue-400 rounded-full transition-all"
+                        style={{ width: `${m.probCut25}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 w-10 text-right tabular-nums">{m.probCut25.toFixed(1)}%</span>
+                  </div>
+                )}
+                {/* Cut 50bp */}
+                {m.probCut50 > 0.5 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-indigo-600 w-16 flex-shrink-0">-50bp</span>
+                    <div className="flex-1 h-4 bg-indigo-50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-indigo-400 rounded-full transition-all"
+                        style={{ width: `${m.probCut50}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-indigo-600 w-10 text-right tabular-nums">{m.probCut50.toFixed(1)}%</span>
+                  </div>
+                )}
+                {/* Cut 75bp+ */}
+                {m.probCut75 > 0.5 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-purple-600 w-16 flex-shrink-0">-75bp+</span>
+                    <div className="flex-1 h-4 bg-purple-50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-purple-400 rounded-full transition-all"
+                        style={{ width: `${m.probCut75}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-purple-600 w-10 text-right tabular-nums">{m.probCut75.toFixed(1)}%</span>
+                  </div>
+                )}
+                {/* Hike */}
+                {m.probHike > 0.5 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-red-600 w-16 flex-shrink-0">+25bp</span>
+                    <div className="flex-1 h-4 bg-red-50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-red-400 rounded-full transition-all"
+                        style={{ width: `${m.probHike}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-red-600 w-10 text-right tabular-nums">{m.probHike.toFixed(1)}%</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Summary label */}
+              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  dominantCut > 60 ? 'bg-blue-100 text-blue-700' :
+                  m.probHold > 60 ? 'bg-gray-100 text-gray-600' :
+                  'bg-amber-50 text-amber-700'
+                }`}>
+                  {dominantCut > 60 ? `인하 우세 (${dominantCut.toFixed(0)}%)` :
+                   m.probHold > 60 ? `동결 우세 (${m.probHold.toFixed(0)}%)` :
+                   '혼재'}
+                </span>
+                {m.targetLow !== data.currentTargetLow && (
+                  <span className="text-[10px] text-cf-text-secondary">
+                    → {m.targetLow}–{m.targetHigh}% 예상
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-3 flex items-center justify-between">
+        <p className="text-[10px] text-cf-text-secondary">
+          💡 확률은 Fed Funds 선물 가격 기반 시장 컨센서스 (CME FedWatch 스타일)
+        </p>
+        <span className="text-[10px] text-gray-400">기준: {data.updatedAt}</span>
+      </div>
     </div>
   );
 }
@@ -919,6 +1303,9 @@ function MacroIndicatorsTab() {
         </div>
       )}
 
+      {/* FedWatch */}
+      <FedWatchSection />
+
       {/* Section header */}
       <div className="flex items-center gap-2 px-1">
         <Activity className="w-4 h-4 text-cf-primary" />
@@ -991,9 +1378,16 @@ function MacroIndicatorsTab() {
                       💡 쉬운 설명 {isLayman ? '접기' : '보기'}
                     </button>
                   )}
-                  {ind.nextRelease && (
-                    <span className="ml-auto text-[10px] text-gray-400">다음 발표: {ind.nextRelease}</span>
-                  )}
+                  <div className="ml-auto flex flex-col items-end gap-0.5">
+                    {ind.releaseDate && (
+                      <span className="text-[10px] font-semibold text-cf-text-secondary">
+                        📅 발표일: <span className="text-cf-text-primary">{ind.releaseDate}</span>
+                      </span>
+                    )}
+                    {ind.nextRelease && (
+                      <span className="text-[10px] text-gray-400">다음 발표: {ind.nextRelease}</span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Layman explanation */}
@@ -1046,8 +1440,430 @@ function MacroIndicatorsTab() {
   );
 }
 
+// ── Credit Balance Tab ────────────────────────────────────────────────────────
+interface CreditHistPoint { period: string; balance: number; gdpRatio: number; }
+interface CountryCreditData {
+  id: string; country: string; flag: string;
+  currentBalance: number; currentBalanceLocal: string;
+  gdp: number; gdpRatio: number;
+  changeYoY: number; changeQoQ: number;
+  historical: CreditHistPoint[];
+  peakBalance: number; peakPeriod: string;
+  troughBalance: number; troughPeriod: string;
+  histPercentile: number;
+  riskLevel: 'low' | 'medium' | 'high' | 'extreme';
+  riskReason: string; source: string; sourceUrl: string;
+  lastUpdated: string; laymanSummary: string;
+}
+interface GlobalSnapshot {
+  totalBalance: number; globalGdpRatio: number;
+  riskCounts: Record<string, number>;
+  mostLeveraged: CountryCreditData[];
+  fastestGrowing: CountryCreditData[];
+}
+
+const RISK_COLORS = {
+  low:     { bar: 'bg-emerald-400', text: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', label: '안전', dot: 'bg-emerald-400' },
+  medium:  { bar: 'bg-amber-400',   text: 'text-amber-700',   bg: 'bg-amber-50 border-amber-200',     label: '주의', dot: 'bg-amber-400' },
+  high:    { bar: 'bg-orange-500',  text: 'text-orange-700',  bg: 'bg-orange-50 border-orange-200',   label: '경계', dot: 'bg-orange-500' },
+  extreme: { bar: 'bg-red-600',     text: 'text-red-700',     bg: 'bg-red-50 border-red-200',         label: '위험', dot: 'bg-red-600' },
+};
+
+function MiniSparkline({ data, color = 'bg-blue-400' }: { data: number[]; color?: string }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  return (
+    <div className="flex items-end gap-px h-8 w-20">
+      {data.map((v, i) => (
+        <div
+          key={i}
+          className={`flex-1 rounded-t-sm ${color} opacity-80 transition-all`}
+          style={{ height: `${Math.max(((v - min) / range) * 100, 8)}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GdpRatioGauge({ ratio, peak, trough, percentile }: { ratio: number; peak: number; trough: number; percentile: number }) {
+  const range = peak - trough || 1;
+  const posPct = Math.min(((ratio - trough) / range) * 100, 100);
+  const riskColor = percentile >= 90 ? 'bg-red-500' : percentile >= 70 ? 'bg-orange-400' : percentile >= 40 ? 'bg-amber-400' : 'bg-emerald-400';
+  return (
+    <div className="mt-2">
+      <div className="flex items-center justify-between text-[10px] text-cf-text-secondary mb-1">
+        <span>최저 {trough.toFixed(1)}%</span>
+        <span className="font-bold text-cf-text-primary">현재 {ratio.toFixed(2)}%</span>
+        <span>최고 {peak.toFixed(1)}%</span>
+      </div>
+      <div className="relative h-3 rounded-full bg-gray-100 overflow-hidden">
+        {/* Gradient track */}
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-200 via-amber-200 to-red-300 opacity-40 rounded-full" />
+        {/* Position marker */}
+        <div
+          className={`absolute top-0 h-full w-2 rounded-full ${riskColor} shadow-sm transition-all`}
+          style={{ left: `calc(${posPct}% - 4px)` }}
+        />
+      </div>
+      <div className="flex justify-between text-[9px] text-gray-400 mt-0.5">
+        <span>안전</span><span>주의</span><span>경계</span><span>위험</span>
+      </div>
+    </div>
+  );
+}
+
+function CreditBalanceTab() {
+  const [countries, setCountries] = useState<CountryCreditData[]>([]);
+  const [usLongHistory, setUsLongHistory] = useState<CountryCreditData | null>(null);
+  const [globalSnapshot, setGlobalSnapshot] = useState<GlobalSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string>('us');
+  const [viewMode, setViewMode] = useState<'balance' | 'gdpRatio'>('gdpRatio');
+  const [showLayman, setShowLayman] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/credit-balance')
+      .then(r => r.json())
+      .then(d => {
+        setCountries(d.countries ?? []);
+        setUsLongHistory(d.usLongHistory ?? null);
+        setGlobalSnapshot(d.globalSnapshot ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="flex items-center justify-center gap-2 py-16 text-cf-text-secondary">
+      <Loader2 className="w-5 h-5 animate-spin" />
+      <span className="text-sm">신용잔고 데이터 로딩중...</span>
+    </div>
+  );
+
+  const activeCountry = countries.find(c => c.id === selected) ?? countries[0];
+  if (!activeCountry) return null;
+
+  const rc = RISK_COLORS[activeCountry.riskLevel];
+  const histValues = activeCountry.historical.map(h => viewMode === 'balance' ? h.balance : h.gdpRatio);
+  const maxHist = Math.max(...histValues, 0.1);
+
+  // GDP ratio historical trough/peak for gauge
+  const gdpRatioHistory = activeCountry.historical.map(h => h.gdpRatio);
+  const gdpRatioPeak = Math.max(...gdpRatioHistory);
+  const gdpRatioTrough = Math.min(...gdpRatioHistory);
+
+  return (
+    <div className="space-y-5">
+      {/* Intro */}
+      <div className="cf-card p-4 bg-gradient-to-r from-slate-50 to-indigo-50 border-indigo-100">
+        <div className="flex items-start gap-3">
+          <div className="text-2xl leading-none">📉</div>
+          <div>
+            <h3 className="text-sm font-bold text-cf-text-primary mb-1">국가별 신용잔고 — 시장 레버리지 지도</h3>
+            <p className="text-xs text-cf-text-secondary leading-relaxed">
+              투자자들이 주식을 사기 위해 빌린 돈의 총합이에요. <span className="font-semibold text-indigo-600">GDP 대비 비율과 역대 비교</span>로
+              현재 시장이 얼마나 과열됐는지, 조정 리스크가 얼마나 큰지 볼 수 있어요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Global snapshot */}
+      {globalSnapshot && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="cf-card p-3 text-center">
+            <div className="text-lg font-extrabold text-cf-text-primary tabular-nums">${globalSnapshot.totalBalance.toFixed(0)}B</div>
+            <div className="text-[10px] text-cf-text-secondary mt-0.5">글로벌 신용잔고 합산</div>
+          </div>
+          <div className="cf-card p-3 text-center">
+            <div className="text-lg font-extrabold text-amber-600 tabular-nums">{globalSnapshot.globalGdpRatio.toFixed(2)}%</div>
+            <div className="text-[10px] text-cf-text-secondary mt-0.5">합산 GDP 대비</div>
+          </div>
+          <div className="cf-card p-3 text-center">
+            <div className="text-lg font-extrabold text-orange-600 tabular-nums">
+              {(globalSnapshot.riskCounts['high'] ?? 0) + (globalSnapshot.riskCounts['extreme'] ?? 0)}
+            </div>
+            <div className="text-[10px] text-cf-text-secondary mt-0.5">경계/위험 국가 수</div>
+          </div>
+          <div className="cf-card p-3 text-center">
+            <div className="text-base font-extrabold text-red-600 truncate">
+              {globalSnapshot.fastestGrowing[0]?.flag} {globalSnapshot.fastestGrowing[0]?.country}
+            </div>
+            <div className="text-[10px] text-cf-text-secondary mt-0.5">가장 빠른 증가</div>
+            <div className="text-[11px] font-bold text-red-500">+{globalSnapshot.fastestGrowing[0]?.changeYoY.toFixed(1)}% YoY</div>
+          </div>
+        </div>
+      )}
+
+      {/* Country selector + view toggle */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap gap-1.5">
+          {countries.map(c => {
+            const rc2 = RISK_COLORS[c.riskLevel];
+            return (
+              <button
+                key={c.id}
+                onClick={() => setSelected(c.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                  selected === c.id
+                    ? `${rc2.bg} ${rc2.text} shadow-sm`
+                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <span>{c.flag}</span>
+                <span>{c.country}</span>
+                <span className={`w-1.5 h-1.5 rounded-full ${rc2.dot}`} />
+              </button>
+            );
+          })}
+        </div>
+        <div className="ml-auto flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+          <button onClick={() => setViewMode('gdpRatio')} className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${viewMode === 'gdpRatio' ? 'bg-white shadow-sm text-cf-text-primary' : 'text-gray-500'}`}>GDP 비율</button>
+          <button onClick={() => setViewMode('balance')} className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${viewMode === 'balance' ? 'bg-white shadow-sm text-cf-text-primary' : 'text-gray-500'}`}>금액(USD)</button>
+        </div>
+      </div>
+
+      {/* Country detail */}
+      <div className="cf-card p-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">{activeCountry.flag}</span>
+              <span className="text-lg font-extrabold text-cf-text-primary">{activeCountry.country}</span>
+              <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${rc.bg} ${rc.text}`}>
+                {rc.label} (역대 {activeCountry.histPercentile}th)
+              </span>
+            </div>
+            <p className="text-xs text-cf-text-secondary">{activeCountry.source} · {activeCountry.lastUpdated}</p>
+          </div>
+          <button
+            onClick={() => setShowLayman(p => !p)}
+            className={`flex-shrink-0 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${showLayman ? 'bg-blue-100 border-blue-300 text-blue-700' : 'bg-blue-50 border-blue-100 text-blue-600'}`}
+          >
+            💡 쉬운 설명
+          </button>
+        </div>
+
+        {showLayman && (
+          <div className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 leading-relaxed">
+            {activeCountry.laymanSummary}
+          </div>
+        )}
+
+        {/* Key numbers */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="text-[10px] text-cf-text-secondary mb-1">현재 신용잔고</div>
+            <div className="text-base font-extrabold text-cf-text-primary">{activeCountry.currentBalanceLocal}</div>
+            <div className="text-[10px] text-gray-400">${activeCountry.currentBalance.toFixed(1)}B USD</div>
+          </div>
+          <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="text-[10px] text-cf-text-secondary mb-1">GDP 대비</div>
+            <div className={`text-base font-extrabold tabular-nums ${rc.text}`}>{activeCountry.gdpRatio.toFixed(2)}%</div>
+            <GdpRatioGauge
+              ratio={activeCountry.gdpRatio}
+              peak={gdpRatioPeak}
+              trough={gdpRatioTrough}
+              percentile={activeCountry.histPercentile}
+            />
+          </div>
+          <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="text-[10px] text-cf-text-secondary mb-1">전년 대비 (YoY)</div>
+            <div className={`text-base font-extrabold tabular-nums ${activeCountry.changeYoY >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+              {activeCountry.changeYoY >= 0 ? '+' : ''}{activeCountry.changeYoY.toFixed(1)}%
+            </div>
+            <div className="text-[10px] text-gray-400">전분기: {activeCountry.changeQoQ >= 0 ? '+' : ''}{activeCountry.changeQoQ.toFixed(1)}%</div>
+          </div>
+          <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="text-[10px] text-cf-text-secondary mb-1">역대 최고</div>
+            <div className="text-sm font-extrabold text-cf-text-primary">
+              {viewMode === 'gdpRatio' ? `${gdpRatioPeak.toFixed(2)}%` : `$${activeCountry.peakBalance}B`}
+            </div>
+            <div className="text-[10px] text-gray-400">{activeCountry.peakPeriod}</div>
+          </div>
+        </div>
+
+        {/* Historical bar chart */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-cf-text-primary">
+              {viewMode === 'gdpRatio' ? 'GDP 대비 신용잔고 (%)' : '신용잔고 절대 금액 (USD Billions)'}
+            </span>
+            <span className="text-[10px] text-cf-text-secondary">역대 비교</span>
+          </div>
+          <div className="flex items-end gap-1 h-32">
+            {activeCountry.historical.map((pt, i) => {
+              const val = viewMode === 'balance' ? pt.balance : pt.gdpRatio;
+              const heightPct = (val / maxHist) * 100;
+              const isCurrentOrRecent = i === activeCountry.historical.length - 1;
+              const isPeak = val === maxHist;
+              return (
+                <div key={pt.period} className="flex flex-col items-center gap-0.5 flex-1 min-w-0 group relative">
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                    <div className="bg-slate-800 text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                      <div className="font-bold">{pt.period}</div>
+                      <div>{viewMode === 'gdpRatio' ? `${val.toFixed(2)}% (GDP비)` : `$${val}B`}</div>
+                    </div>
+                    <div className="w-1.5 h-1.5 bg-slate-800 rotate-45 -mt-0.5" />
+                  </div>
+                  <div
+                    className={`w-full rounded-t transition-all ${
+                      isPeak ? 'bg-red-400' :
+                      isCurrentOrRecent ? rc.bar :
+                      'bg-blue-300'
+                    } ${isPeak ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
+                    style={{ height: `${Math.max(heightPct, 4)}%` }}
+                  />
+                  <span className={`text-[8px] truncate max-w-full text-center ${isCurrentOrRecent ? 'font-bold text-cf-text-primary' : 'text-gray-400'}`}>
+                    {pt.period.replace('-Q1', '').replace('-Q2', '').replace('-Q3', '').replace('-Q4', '')}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex gap-3 mt-2 text-[10px]">
+            <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-sm bg-red-400" /><span className="text-cf-text-secondary">역대 최고</span></div>
+            <div className="flex items-center gap-1"><div className={`w-2.5 h-2.5 rounded-sm ${rc.bar}`} /><span className="text-cf-text-secondary">현재</span></div>
+            <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-sm bg-blue-300" /><span className="text-cf-text-secondary">과거</span></div>
+          </div>
+        </div>
+
+        {/* Risk reason */}
+        <div className={`p-3 rounded-xl border text-xs leading-relaxed ${rc.bg} ${rc.text}`}>
+          <span className="font-bold">리스크 분석: </span>{activeCountry.riskReason}
+        </div>
+      </div>
+
+      {/* US long-term history (닷컴버블~현재) */}
+      {usLongHistory && (
+        <div className="cf-card p-4">
+          <h3 className="text-sm font-bold text-cf-text-primary mb-1 flex items-center gap-2">
+            🇺🇸 미국 신용잔고 장기 역사 — 닷컴버블부터 현재까지
+          </h3>
+          <p className="text-xs text-cf-text-secondary mb-3">
+            역대 시장 버블·붕괴와 신용잔고의 관계. 현재 위치를 역사적 맥락에서 봐요.
+          </p>
+          <div className="flex items-end gap-1 h-28">
+            {usLongHistory.historical.map((pt, i) => {
+              const val = pt.gdpRatio;
+              const maxV = Math.max(...usLongHistory.historical.map(h => h.gdpRatio));
+              const heightPct = (val / maxV) * 100;
+              const isCurrent = i === usLongHistory.historical.length - 1;
+              const isPeak = val === maxV; // 2021
+              const isCrash = pt.period === '2002' || pt.period === '2009';
+              return (
+                <div key={pt.period} className="flex flex-col items-center gap-0.5 flex-1 min-w-0 group relative">
+                  <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                    <div className="bg-slate-800 text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                      <div className="font-bold">{pt.period}</div>
+                      <div>GDP비 {val.toFixed(1)}% · ${pt.balance}B</div>
+                    </div>
+                    <div className="w-1.5 h-1.5 bg-slate-800 rotate-45 -mt-0.5" />
+                  </div>
+                  <div
+                    className={`w-full rounded-t transition-all ${
+                      isPeak ? 'bg-red-500' :
+                      isCrash ? 'bg-blue-300' :
+                      isCurrent ? 'bg-amber-400' :
+                      'bg-slate-300'
+                    }`}
+                    style={{ height: `${Math.max(heightPct, 4)}%` }}
+                  />
+                  <span className={`text-[8px] truncate max-w-full ${isCurrent ? 'font-bold text-cf-text-primary' : 'text-gray-400'}`}>
+                    {pt.period}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+            {[
+              { period: '2000-2002', color: 'bg-red-50 border-red-100 text-red-700', label: '닷컴버블', desc: 'GDP비 2.7% → 1.3% 급락. 나스닥 -78% 동반.' },
+              { period: '2007-2009', color: 'bg-orange-50 border-orange-100 text-orange-700', label: '금융위기', desc: 'GDP비 2.6% → 1.6%. S&P500 -57% 동반.' },
+              { period: '2021-2022', color: 'bg-amber-50 border-amber-100 text-amber-700', label: '팬데믹 버블', desc: 'GDP비 4.1%(최고) → 2.5%. 연준 긴축에 급락.' },
+            ].map(e => (
+              <div key={e.period} className={`p-2.5 rounded-lg border text-xs leading-relaxed ${e.color}`}>
+                <div className="font-bold mb-0.5">{e.period} {e.label}</div>
+                {e.desc}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Country comparison table */}
+      <div className="cf-card overflow-hidden">
+        <div className="p-4 pb-2">
+          <h3 className="text-sm font-bold text-cf-text-primary">국가별 비교 요약</h3>
+          <p className="text-xs text-cf-text-secondary">GDP 대비 신용잔고 비율 기준 정렬</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-cf-border bg-gray-50/50">
+                <th className="text-left px-4 py-2 font-semibold text-cf-text-secondary">국가</th>
+                <th className="text-right px-3 py-2 font-semibold text-cf-text-secondary">신용잔고</th>
+                <th className="text-right px-3 py-2 font-semibold text-cf-text-secondary">GDP비</th>
+                <th className="text-right px-3 py-2 font-semibold text-cf-text-secondary">YoY</th>
+                <th className="text-center px-3 py-2 font-semibold text-cf-text-secondary">역대위치</th>
+                <th className="text-center px-3 py-2 font-semibold text-cf-text-secondary">추세</th>
+                <th className="text-center px-3 py-2 font-semibold text-cf-text-secondary">리스크</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...countries].sort((a, b) => b.gdpRatio - a.gdpRatio).map((c, i) => {
+                const rc2 = RISK_COLORS[c.riskLevel];
+                const spark = c.historical.slice(-6).map(h => h.gdpRatio);
+                return (
+                  <tr
+                    key={c.id}
+                    className={`border-b border-cf-border/50 transition-colors cursor-pointer hover:bg-gray-50/50 ${selected === c.id ? 'bg-cf-primary/5' : ''}`}
+                    onClick={() => setSelected(c.id)}
+                  >
+                    <td className="px-4 py-2.5 font-medium text-cf-text-primary">
+                      <span className="mr-1.5">{c.flag}</span>{c.country}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono tabular-nums text-cf-text-primary">{c.currentBalanceLocal}</td>
+                    <td className={`px-3 py-2.5 text-right font-bold tabular-nums ${rc2.text}`}>{c.gdpRatio.toFixed(2)}%</td>
+                    <td className={`px-3 py-2.5 text-right font-bold tabular-nums ${c.changeYoY >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                      {c.changeYoY >= 0 ? '+' : ''}{c.changeYoY.toFixed(1)}%
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center justify-center gap-1">
+                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full ${rc2.bar} rounded-full`} style={{ width: `${c.histPercentile}%` }} />
+                        </div>
+                        <span className="text-[10px] tabular-nums text-cf-text-secondary">{c.histPercentile}th</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex justify-center">
+                        <MiniSparkline data={spark} color={c.changeYoY >= 0 ? 'bg-red-400' : 'bg-blue-400'} />
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${rc2.bg} ${rc2.text}`}>{rc2.label}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-4 py-2 text-[10px] text-cf-text-secondary border-t border-cf-border">
+          데이터: FINRA, KRX, TSE, CSRC, ESMA, NSE/BSE · 단위: USD Billions (환율 환산) · 분기별 업데이트
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const TABS = ['capital', 'macro', 'flows', 'fear-greed', 'narratives'] as const;
+const TABS = ['capital', 'macro', 'flows', 'fear-greed', 'credit', 'narratives'] as const;
 type Tab = typeof TABS[number];
 
 interface LiveFGData {
@@ -1083,6 +1899,7 @@ export default function IntelligencePage() {
     'macro':       { label: '매크로 지표',     icon: <TrendingUp className="w-4 h-4" /> },
     'flows':       { label: '머니 흐름',       icon: <Activity className="w-4 h-4" /> },
     'fear-greed':  { label: 'Fear & Greed',   icon: <BarChart3 className="w-4 h-4" /> },
+    'credit':      { label: '신용잔고',        icon: <TrendingDown className="w-4 h-4" /> },
     'narratives':  { label: '매크로 테마',     icon: <Brain className="w-4 h-4" /> },
   };
 
@@ -1210,6 +2027,9 @@ export default function IntelligencePage() {
         )}
 
         {/* Tab: Macro Themes */}
+        {/* Tab: 신용잔고 */}
+        {activeTab === 'credit' && <CreditBalanceTab />}
+
         {activeTab === 'narratives' && (
           <div>
             <p className="text-sm text-cf-text-secondary mb-6">
