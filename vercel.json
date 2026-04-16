@@ -1,11 +1,11 @@
 {
   "crons": [
-    { "path": "/api/cron/update-all",     "schedule": "0 0 * * *"  },
-    { "path": "/api/cron/daily-brief",    "schedule": "5 0 * * *"  },
-    { "path": "/api/cron/update-all",     "schedule": "30 7 * * *" },
-    { "path": "/api/cron/daily-brief",    "schedule": "35 7 * * *" },
-    { "path": "/api/cron/update-all",     "schedule": "0 13 * * *" },
-    { "path": "/api/cron/daily-brief",    "schedule": "5 13 * * *" },
-    { "path": "/api/cron/update-signals", "schedule": "0 2 * * *"  }
+    { "path": "/api/cron/update-all",     "schedule": "50 22 * * *" },
+    { "path": "/api/cron/daily-brief",    "schedule": "55 22 * * *" },
+    { "path": "/api/cron/update-all",     "schedule": "50 6 * * *"  },
+    { "path": "/api/cron/daily-brief",    "schedule": "55 6 * * *"  },
+    { "path": "/api/cron/update-all",     "schedule": "20 12 * * *" },
+    { "path": "/api/cron/daily-brief",    "schedule": "25 12 * * *" },
+    { "path": "/api/cron/update-signals", "schedule": "0 2 * * *"   }
   ]
 }
