@@ -90,7 +90,7 @@ function HeroSearch() {
     <div className="relative w-full max-w-md mt-6">
       <p className="text-xs font-semibold text-cf-text-secondary uppercase tracking-wider mb-2 flex items-center gap-1.5">
         <Search className="w-3.5 h-3.5" />
-        기업 직접 검색 — 430개 기업
+        기업 직접 검색 — {searchCompanies.length}개 기업
       </p>
       <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-cf-border shadow-md focus-within:border-cf-primary focus-within:shadow-lg transition-all">
         <Search className="w-4 h-4 text-cf-primary flex-shrink-0" />

@@ -167,10 +167,48 @@ const GROUP_LABELS: Record<string, string> = {
   equity: '주식', bonds: '채권', alts: '대안자산', commodities: '원자재', currency: '통화',
 };
 
-function detectRotation(
-  results: Array<{ id: string; label: string; flag: string; group: string; ticker: string; ret4w: number; ret13w: number; ret1w: number }>,
+type RotationEntry = {
+  from: string; to: string; magnitude: number;
+  weeksAgo: number; startDate: string; momentum: 'accelerating' | 'holding' | 'fading';
+};
+
+type AssetResult = { id: string; label: string; flag: string; group: string; ticker: string; ret1w: number; ret4w: number; ret13w: number };
+
+function buildRotations(
+  results: AssetResult[],
   priceMap: Record<string, number[]>,
-) {
+  retKey: 'ret1w' | 'ret4w' | 'ret13w',
+  minSpread: number,
+): RotationEntry[] {
+  const groupPerf: Record<string, number[]> = {};
+  for (const r of results) {
+    if (!groupPerf[r.group]) groupPerf[r.group] = [];
+    groupPerf[r.group].push(r[retKey]);
+  }
+  const groupAvg = Object.entries(groupPerf).map(([group, vals]) => ({
+    group,
+    avg: parseFloat((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)),
+  })).sort((a, b) => b.avg - a.avg);
+
+  const rotations: RotationEntry[] = [];
+  for (let i = 0; i < groupAvg.length; i++) {
+    for (let j = i + 1; j < groupAvg.length; j++) {
+      const spread = groupAvg[i].avg - groupAvg[j].avg;
+      if (spread > minSpread) {
+        const timing = estimateRotationStart(priceMap, groupAvg[i].group, groupAvg[j].group, ASSETS);
+        rotations.push({
+          from: GROUP_LABELS[groupAvg[j].group] ?? groupAvg[j].group,
+          to: GROUP_LABELS[groupAvg[i].group] ?? groupAvg[i].group,
+          magnitude: parseFloat(spread.toFixed(1)),
+          ...timing,
+        });
+      }
+    }
+  }
+  return rotations.sort((a, b) => b.magnitude - a.magnitude).slice(0, 5);
+}
+
+function detectRotation(results: AssetResult[], priceMap: Record<string, number[]>) {
   const sorted4w = [...results].sort((a, b) => b.ret4w - a.ret4w);
   const topInflows = sorted4w.slice(0, 5);
   const topOutflows = sorted4w.slice(-5).reverse();
@@ -185,30 +223,14 @@ function detectRotation(
     avg4w: parseFloat((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)),
   })).sort((a, b) => b.avg4w - a.avg4w);
 
-  const rotations: Array<{
-    from: string; to: string; magnitude: number; label: string;
-    weeksAgo: number; startDate: string; momentum: 'accelerating' | 'holding' | 'fading';
-  }> = [];
-
-  for (let i = 0; i < groupAvg.length; i++) {
-    for (let j = i + 1; j < groupAvg.length; j++) {
-      const high = groupAvg[i];
-      const low = groupAvg[j];
-      const spread = high.avg4w - low.avg4w;
-      if (spread > 1.5) {
-        const timing = estimateRotationStart(priceMap, high.group, low.group, ASSETS);
-        rotations.push({
-          from: GROUP_LABELS[low.group] ?? low.group,
-          to: GROUP_LABELS[high.group] ?? high.group,
-          magnitude: parseFloat(spread.toFixed(1)),
-          label: `${GROUP_LABELS[low.group]} → ${GROUP_LABELS[high.group]}`,
-          ...timing,
-        });
-      }
-    }
-  }
-  rotations.sort((a, b) => b.magnitude - a.magnitude);
-  return { topInflows, topOutflows, groupAvg, rotations: rotations.slice(0, 4) };
+  return {
+    topInflows,
+    topOutflows,
+    groupAvg,
+    rotations1w:  buildRotations(results, priceMap, 'ret1w',  0.5),
+    rotations4w:  buildRotations(results, priceMap, 'ret4w',  1.5),
+    rotations13w: buildRotations(results, priceMap, 'ret13w', 3.0),
+  };
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────

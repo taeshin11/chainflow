@@ -383,7 +383,18 @@ Answer concisely (3–5 paragraphs). Be specific — name tickers, mechanisms, a
 
 // ── Capital Flows Component ──────────────────────────────────────────────────
 interface AssetReturn { id: string; label: string; flag: string; group: string; ticker: string; ret1w: number; ret4w: number; ret13w: number; }
-interface FlowData { assets: AssetReturn[]; flow: { topInflows: AssetReturn[]; topOutflows: AssetReturn[]; groupAvg: {group:string;avg4w:number}[]; rotations: {from:string;to:string;magnitude:number;label:string}[]; }; goldVsDollar: {goldRet4w:number;dollarRet4w:number;signal:string}; updatedAt: string; }
+type RotEntry = { from:string; to:string; magnitude:number; weeksAgo?:number; startDate?:string; momentum?:string };
+interface FlowData {
+  assets: AssetReturn[];
+  flow: {
+    topInflows: AssetReturn[]; topOutflows: AssetReturn[];
+    groupAvg: {group:string;avg4w:number}[];
+    rotations1w: RotEntry[]; rotations4w: RotEntry[]; rotations13w: RotEntry[];
+  };
+  goldVsDollar: {goldRet4w:number;dollarRet4w:number;signal:string};
+  dataSource?: string;
+  updatedAt: string;
+}
 
 const GROUP_LABELS: Record<string, string> = { equity: '주식', bonds: '채권', alts: '대안자산', commodities: '원자재', currency: '통화' };
 const GROUP_COLORS: Record<string, string> = { equity: 'bg-blue-500', bonds: 'bg-amber-500', alts: 'bg-yellow-400', commodities: 'bg-orange-500', currency: 'bg-purple-500' };
@@ -407,9 +418,14 @@ function ReturnBar({ val, max }: { val: number; max: number }) {
   );
 }
 
+type Timeframe = '1w' | '4w' | '13w';
+const TF_LABELS: Record<Timeframe, string> = { '1w': '1주', '4w': '4주', '13w': '3개월' };
+const TF_RET_KEY: Record<Timeframe, 'ret1w' | 'ret4w' | 'ret13w'> = { '1w': 'ret1w', '4w': 'ret4w', '13w': 'ret13w' };
+
 function CapitalFlowsTab() {
   const [data, setData] = useState<FlowData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tf, setTf] = useState<Timeframe>('4w');
 
   useEffect(() => {
     fetch('/api/capital-flows')
@@ -427,19 +443,35 @@ function CapitalFlowsTab() {
   );
   if (!data) return <p className="text-center text-cf-text-secondary py-8 text-sm">데이터를 불러올 수 없습니다</p>;
 
-  const maxAbs = Math.max(...data.assets.map((a) => Math.abs(a.ret4w)), 1);
+  const retKey = TF_RET_KEY[tf];
+  const maxAbs = Math.max(...data.assets.map((a) => Math.abs(a[retKey])), 1);
+  const activeRotations = tf === '1w' ? data.flow.rotations1w : tf === '13w' ? data.flow.rotations13w : data.flow.rotations4w;
 
   return (
     <div className="space-y-6">
+      {/* Timeframe toggle */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-cf-text-secondary font-medium">기준:</span>
+        <div className="flex gap-1 p-0.5 bg-gray-100 rounded-lg">
+          {(['1w', '4w', '13w'] as Timeframe[]).map((t) => (
+            <button key={t} onClick={() => setTf(t)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${tf === t ? 'bg-white text-cf-primary shadow-sm' : 'text-cf-text-secondary hover:text-cf-text-primary'}`}>
+              {TF_LABELS[t]}
+            </button>
+          ))}
+        </div>
+        {data.dataSource && <span className="ml-auto text-[11px] text-cf-text-secondary">{data.dataSource}</span>}
+      </div>
+
       {/* 주요 로테이션 */}
-      {data.flow.rotations.length > 0 && (
+      {activeRotations.length > 0 && (
         <div className="cf-card p-4">
           <h3 className="text-sm font-bold text-cf-text-primary mb-3 flex items-center gap-2">
             <GitMerge className="w-4 h-4 text-cf-primary" />
-            현재 자금 로테이션 (4주 기준)
+            자금 로테이션 ({TF_LABELS[tf]} 기준)
           </h3>
           <div className="space-y-3">
-            {data.flow.rotations.map((r: {from:string;to:string;magnitude:number;weeksAgo?:number;startDate?:string;momentum?:string}, i: number) => {
+            {activeRotations.map((r, i) => {
               const momentumBadge = r.momentum === 'accelerating'
                 ? { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700' }
                 : r.momentum === 'fading'
@@ -659,12 +691,12 @@ export default function IntelligencePage() {
 
       <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab
                   ? 'bg-white text-cf-text-primary shadow-sm'
                   : 'text-cf-text-secondary hover:text-cf-text-primary'
