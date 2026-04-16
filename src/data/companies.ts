@@ -3,6 +3,7 @@ import { companiesBatch2 } from './companies-batch2';
 import { companiesBatch3 } from './companies-batch3';
 import { companiesBatch4 } from './companies-batch4';
 import { companiesBatch5 } from './companies-batch5';
+import { companiesBatch6 } from './companies-batch6';
 
 export interface Product {
   name: string;
@@ -4016,4 +4017,5 @@ export const allCompanies: Company[] = [
   ...companiesBatch3,
   ...companiesBatch4,
   ...companiesBatch5,
+  ...companiesBatch6,
 ];

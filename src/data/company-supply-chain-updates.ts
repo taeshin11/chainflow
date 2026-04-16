@@ -462,4 +462,124 @@ export const companySupplyChainUpdates: Record<string, SupplyChainUpdate[]> = {
       impact: 'high',
     },
   ],
+
+  FSLR: [
+    {
+      date: '2026-04',
+      type: 'opportunity',
+      title: 'IRA 국내 제조 보너스 유지 — 대규모 수주 확대',
+      detail: 'IRA Section 45X 세액공제 지속으로 FSLR 모듈 당 $0.17 제조 크레딧 확보. 국내산 우선 조달 조건 프로젝트 수주 급증, 수주잔고 $21B 돌파.',
+      impact: 'high',
+    },
+    {
+      date: '2026-03',
+      type: 'expansion',
+      title: '오하이오 Series 7 팹 생산능력 1GW 추가 증설',
+      detail: '오하이오 페리스버그 팹 증설 완료로 연간 생산능력 12GW로 확대. 인도 팹(2GW) 2026년 말 가동 예정.',
+      impact: 'high',
+    },
+    {
+      date: '2026-02',
+      type: 'risk',
+      title: '카드뮴 텔루라이드 원자재 공급 리스크 부상',
+      detail: '텔루르 세계 공급의 75%가 중국산. 미·중 무역 마찰 심화로 CdTe 원료 수입 제한 가능성 우려 제기.',
+      impact: 'medium',
+    },
+  ],
+
+  ALB_batch6: [
+    {
+      date: '2026-04',
+      type: 'disruption',
+      title: '리튬 가격 $10/kg 하회 — 수익성 악화',
+      detail: '탄산리튬 현물가 지속 하락으로 2026Q1 에너지 스토리지 부문 EBITDA 마진 -3%p 감소. 킹스마운틴 광산 착공 일정 재검토.',
+      impact: 'high',
+    },
+    {
+      date: '2026-03',
+      type: 'expansion',
+      title: '미국 킹스마운틴 스포듀민 광산 개발 재개',
+      detail: '노스캐롤라이나 킹스마운틴 하드록 리튬 광산 개발 재개 결정. 2028년 생산 목표로 $1.3B 투자 계획 승인.',
+      impact: 'medium',
+    },
+    {
+      date: '2026-02',
+      type: 'risk',
+      title: '중국산 배터리 업체 수직 계열화 — 리튬 외부 구매 축소',
+      detail: 'CATL·BYD 자체 리튬 광산 보유 확대로 외부 구매 감소. 한국·일본 배터리 업체 의존도 높아지는 구조적 변화.',
+      impact: 'medium',
+    },
+  ],
+
+  FCX: [
+    {
+      date: '2026-04',
+      type: 'opportunity',
+      title: 'AI 데이터센터·전력망 구리 수요 급증 — 가격 반등',
+      detail: '미국 전력망 현대화 및 AI 데이터센터 구리 배선 수요로 구리 LME 가격 $10,500/톤 돌파. FCX Grasberg 추가 채굴 허가 신청.',
+      impact: 'high',
+    },
+    {
+      date: '2026-03',
+      type: 'expansion',
+      title: '인도네시아 Grasberg 광산 지하 채굴 램프업',
+      detail: 'Grasberg 지하 DMLZ·GBC 광구 풀 생산 돌입. 2026년 구리 생산 목표 39만 톤으로 +8% YoY 상향.',
+      impact: 'high',
+    },
+    {
+      date: '2026-02',
+      type: 'risk',
+      title: '인도네시아 광산 수출 면허 갱신 협상 진행 중',
+      detail: '인도네시아 정부 FCX 현지 정련 의무 비율 상향 요구. 수출 면허 조건 강화 협상 장기화 시 단기 출하 차질 우려.',
+      impact: 'medium',
+    },
+  ],
+
+  SMCI: [
+    {
+      date: '2026-04',
+      type: 'disruption',
+      title: '회계 재작성·감사 지연 — 투자자 신뢰 회복 과제',
+      detail: '외부 감사인 Ernst & Young 사임 후 BDO로 교체. 2025 회계연도 재무제표 재작성 완료 및 나스닥 상장 유지 확인. 감독 리스크 프리미엄 지속.',
+      impact: 'high',
+    },
+    {
+      date: '2026-03',
+      type: 'expansion',
+      title: 'NVIDIA Blackwell GB200 NVL72 랙 독점 공급 확대',
+      detail: 'SMCI 직접 액체냉각(DLC) 랙 시스템에 NVIDIA GB200 NVL72 탑재 버전 양산 개시. 마이크로소프트·CoreWeave 초도 물량 $3.2B 수주.',
+      impact: 'high',
+    },
+    {
+      date: '2026-02',
+      type: 'risk',
+      title: 'Dell·HPE 경쟁 심화 — AI 서버 마진 압박',
+      detail: 'Dell PowerEdge AI 및 HPE ProLiant 가격 인하 공세로 SMCI 평균 판매단가 2026Q1 -4% 하락. 고마진 DLC 특화 제품 비중 확대 전략으로 대응.',
+      impact: 'medium',
+    },
+  ],
+
+  ISRG: [
+    {
+      date: '2026-04',
+      type: 'expansion',
+      title: 'da Vinci 5 시스템 설치 가속 — 글로벌 9,500대 돌파',
+      detail: '2026Q1 신규 da Vinci 5 설치 대수 412대로 분기 최고치. 총 설치 기반 9,500대 돌파로 소모품 매출 기반 확대.',
+      impact: 'high',
+    },
+    {
+      date: '2026-03',
+      type: 'opportunity',
+      title: 'CMS 로봇 수술 별도 수가 신설 — 미국 수요 촉진',
+      detail: '미국 CMS가 로봇 보조 수술(da Vinci 포함)에 별도 기술료 가산 수가 도입. 병원 투자 회수 기간 단축으로 신규 시스템 구매 가속 예상.',
+      impact: 'high',
+    },
+    {
+      date: '2026-02',
+      type: 'risk',
+      title: 'Medtronic Hugo·J&J Ottava 경쟁 확대 우려',
+      detail: 'Medtronic Hugo CE 마크 취득 후 유럽 공략 본격화. J&J Ottava 미국 FDA 심사 진입. 연성 조직 수술 시장 점유율 방어 비용 증가 전망.',
+      impact: 'medium',
+    },
+  ],
 };

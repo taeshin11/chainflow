@@ -476,4 +476,146 @@ export const cascadePatterns: CascadePattern[] = [
       },
     ],
   },
+
+  // ============================================================
+  // ENERGY TRANSITION
+  // ============================================================
+  {
+    id: "energy-fslr-ira-cascade",
+    sector: "ev-battery",
+    sectorName: "Energy Transition",
+    leaderTicker: "FSLR",
+    leaderName: "First Solar",
+    description:
+      "First Solar's share price reacts sharply to IRA policy developments and utility-scale solar contract wins. As the only large-scale domestic thin-film manufacturer, FSLR leads a cascade through residential solar (ENPH, SEDG, RUN) and then into battery storage and lithium supply (ALB, SQM).",
+    sequence: [
+      {
+        ticker: "FSLR",
+        companyName: "First Solar",
+        typicalDelay: "0 (trigger)",
+        role: "leader",
+        reason: "First Solar is the primary IRA beneficiary in solar manufacturing — 45X production tax credits apply directly to its US-based thin-film modules, making FSLR the clearest policy read-through in clean energy.",
+      },
+      {
+        ticker: "ENPH",
+        companyName: "Enphase Energy",
+        typicalDelay: "0-1 trading days",
+        role: "first_follower",
+        reason: "Enphase microinverters attach to rooftop solar installations; IRA residential clean energy credits drive demand for both modules and Enphase's power electronics.",
+      },
+      {
+        ticker: "SEDG",
+        companyName: "SolarEdge Technologies",
+        typicalDelay: "0-1 trading days",
+        role: "first_follower",
+        reason: "SolarEdge's DC-optimized inverter systems serve the same residential and commercial solar installers; policy tailwinds read through identically to ENPH.",
+      },
+      {
+        ticker: "RUN",
+        companyName: "Sunrun",
+        typicalDelay: "1-3 trading days",
+        role: "mid_cap",
+        reason: "Sunrun is the largest US residential solar installer; strong IRA incentives reduce customer acquisition costs and boost lease economics.",
+      },
+      {
+        ticker: "ALB",
+        companyName: "Albemarle",
+        typicalDelay: "3-7 trading days",
+        role: "late_mover",
+        reason: "Accelerating solar deployment drives battery storage co-installations, increasing lithium demand expectations; Albemarle reprices with a week-plus lag.",
+      },
+      {
+        ticker: "SQM",
+        companyName: "Sociedad Quimica y Minera",
+        typicalDelay: "3-7 trading days",
+        role: "late_mover",
+        reason: "SQM is the world's second-largest lithium producer; energy storage demand signals reach Chilean miners after the full solar policy cascade has played out.",
+      },
+    ],
+    historicalOccurrences: [
+      {
+        date: "2022-08-16",
+        trigger: "Inflation Reduction Act signed into law — $369B in climate/energy spending including 30% ITC, 45X manufacturing credits",
+        leaderMove: "FSLR +39.6% in the week of passage",
+        cascadeResult: "ENPH +26%, SEDG +22%, RUN +18% in the same week. ALB +12%, SQM +10% over two weeks as battery storage buildout assumptions were revised sharply higher.",
+      },
+      {
+        date: "2024-01-12",
+        trigger: "Treasury Dept issued final guidance on 45X domestic content adders — FSLR modules confirmed to qualify for maximum bonus credits",
+        leaderMove: "FSLR +8.4% on guidance day",
+        cascadeResult: "ENPH +5%, SEDG +4% as broader US solar demand outlook improved. RUN +6% on installer margin expectations. ALB +3% over the following week.",
+      },
+    ],
+  },
+
+  // ============================================================
+  // AI INFRASTRUCTURE
+  // ============================================================
+  {
+    id: "ai-msft-azure-infra-cascade",
+    sector: "ai-cloud",
+    sectorName: "AI Infrastructure",
+    leaderTicker: "MSFT",
+    leaderName: "Microsoft",
+    description:
+      "Microsoft Azure AI capacity announcements trigger a multi-layer infrastructure cascade. Azure capex guidance directly validates GPU demand (NVDA), which flows to semiconductor equipment makers (AMAT, LRCX) needed to produce AI chips, and finally reaches memory suppliers (MU, SK Hynix) who provide HBM for AI accelerators.",
+    sequence: [
+      {
+        ticker: "MSFT",
+        companyName: "Microsoft",
+        typicalDelay: "0 (trigger)",
+        role: "leader",
+        reason: "Microsoft's Azure AI capacity expansion announcements signal the scale and pace of enterprise AI infrastructure buildout — the single most credible demand signal for the entire AI hardware supply chain.",
+      },
+      {
+        ticker: "NVDA",
+        companyName: "NVIDIA",
+        typicalDelay: "0-1 trading days",
+        role: "first_follower",
+        reason: "NVIDIA is the primary GPU supplier for Azure AI clusters; every new Azure AI capacity commitment directly translates to GPU purchase orders.",
+      },
+      {
+        ticker: "AMAT",
+        companyName: "Applied Materials",
+        typicalDelay: "2-4 trading days",
+        role: "mid_cap",
+        reason: "Applied Materials supplies deposition and etch equipment to TSMC and Samsung for GPU wafer production; sustained Azure demand growth justifies AMAT's next capex cycle.",
+      },
+      {
+        ticker: "LRCX",
+        companyName: "Lam Research",
+        typicalDelay: "2-4 trading days",
+        role: "mid_cap",
+        reason: "Lam's etch tools are essential for HBM and advanced logic fab starts; rising AI accelerator volumes drive equipment reorder cycles.",
+      },
+      {
+        ticker: "MU",
+        companyName: "Micron",
+        typicalDelay: "3-6 trading days",
+        role: "late_mover",
+        reason: "Micron's HBM3e production is capacity-constrained; Azure cluster expansion signals new HBM allocation commitments and validates Micron's aggressive HBM capex spend.",
+      },
+      {
+        ticker: "000660.KS",
+        companyName: "SK Hynix",
+        typicalDelay: "3-6 trading days",
+        role: "late_mover",
+        reason: "SK Hynix is NVIDIA's lead HBM supplier; Microsoft-driven GPU demand cascades to HBM order visibility, supporting SK Hynix's premium memory margins.",
+      },
+    ],
+    historicalOccurrences: [
+      {
+        date: "2023-11-20",
+        trigger: "Microsoft extended OpenAI partnership with multi-year Azure exclusivity commitment, pledging $10B+ in additional cloud AI infrastructure",
+        leaderMove: "MSFT +3.2% on announcement day",
+        cascadeResult: "NVDA +5.8% next session as GPU order backlog expectations expanded. AMAT +4%, LRCX +3.5% within 4 days. MU +6% on HBM demand validation over the week.",
+      },
+      {
+        date: "2025-01-21",
+        trigger: "Microsoft joined OpenAI Stargate joint venture announcement — $500B US AI infrastructure commitment with MSFT as primary cloud provider",
+        leaderMove: "MSFT +4.8%",
+        cascadeResult: "NVDA +6.4% same day. AMAT +5%, LRCX +4.5% over 3 days as fab utilization and equipment order outlook improved sharply. SK Hynix +7%, MU +5% on HBM supply agreement expectations.",
+      },
+    ],
+  },
 ];
