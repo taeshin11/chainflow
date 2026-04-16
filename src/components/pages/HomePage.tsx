@@ -41,8 +41,6 @@ import EmailCTA from '@/components/EmailCTA';
 import { useRouter } from '@/i18n/routing';
 import { allCompanies } from '@/data/companies';
 import { companyNamesI18n } from '@/data/company-names-i18n';
-import { useUser, SignInButton } from '@clerk/nextjs';
-// SignInButton is re-exported from @clerk/nextjs in v7
 
 const searchCompanies = allCompanies.map((c) => ({
   name: c.name,
@@ -206,14 +204,12 @@ interface DailyBrief {
 }
 
 function AIDailyBrief() {
-  const { isSignedIn, isLoaded } = useUser();
   const [tf, setTf] = useState<Timeframe>('4w');
   const [brief, setBrief] = useState<DailyBrief | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    if (!isSignedIn) return;
     setLoading(true);
     setBrief(null);
     fetch(`/api/daily-brief?tf=${tf}`)
@@ -221,7 +217,7 @@ function AIDailyBrief() {
       .then((data: DailyBrief) => setBrief(data))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [tf, isSignedIn]);
+  }, [tf]);
 
   const tfLabel = { '1w': '1주', '4w': '4주', '13w': '13주' } as const;
   const tfBtns: Timeframe[] = ['1w', '4w', '13w'];
@@ -271,36 +267,8 @@ function AIDailyBrief() {
           </div>
         </div>
 
-        {/* Auth gate */}
-        {isLoaded && !isSignedIn && (
-          <div className="relative">
-            {/* Blurred preview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 select-none pointer-events-none" style={{ filter: 'blur(4px)' }}>
-              {(['시장 동향', '자금 흐름', '주목 기업'] as const).map((title, i) => (
-                <div key={i} className={`rounded-xl border p-4 ${['border-blue-200 bg-blue-50', 'border-violet-200 bg-violet-50', 'border-emerald-200 bg-emerald-50'][i]}`}>
-                  <p className={`text-xs font-bold uppercase mb-2 ${['text-blue-700', 'text-violet-700', 'text-emerald-700'][i]}`}>{title}</p>
-                  <div className="space-y-1.5">
-                    <div className="h-2.5 bg-slate-300 rounded w-full" />
-                    <div className="h-2.5 bg-slate-300 rounded w-4/5" />
-                    <div className="h-2.5 bg-slate-300 rounded w-3/4" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* CTA overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/60 rounded-xl backdrop-blur-[2px]">
-              <p className="text-white text-sm font-semibold text-center">AI 일일 브리핑은 로그인 후 확인 가능합니다</p>
-              <SignInButton mode="modal">
-                <button className="px-5 py-2 bg-amber-400 text-slate-900 rounded-lg text-sm font-bold hover:bg-amber-300 transition-colors">
-                  무료 로그인 / 회원가입
-                </button>
-              </SignInButton>
-            </div>
-          </div>
-        )}
-
         {/* Loading skeleton */}
-        {isSignedIn && loading && (
+        {loading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className="rounded-xl bg-slate-800/60 animate-pulse h-28" />
@@ -309,7 +277,7 @@ function AIDailyBrief() {
         )}
 
         {/* Brief cards */}
-        {isSignedIn && !loading && brief && (
+        {!loading && brief && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {sections.map((key, i) => {
