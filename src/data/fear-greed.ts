@@ -228,6 +228,8 @@ export interface MoneyFlowSector {
   magnitude: number; // 1–5
   topMovers: Array<{ ticker: string; action: string }>;
   reason: string;
+  sinceDate: string;        // ISO date when this flow started
+  signal: 'accelerating' | 'holding' | 'fading'; // current momentum
 }
 
 export const moneyFlowSectors: MoneyFlowSector[] = [
@@ -238,6 +240,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 5,
     topMovers: [{ ticker: 'LMT', action: '↑' }, { ticker: 'NOC', action: '↑' }, { ticker: 'RTX', action: '↑' }],
     reason: 'NATO budget acceleration + Middle East conflict premium',
+    sinceDate: '2025-10-01',
+    signal: 'accelerating',
   },
   {
     sector: 'Gold / Precious Metals',
@@ -246,6 +250,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 5,
     topMovers: [{ ticker: 'GLD', action: '↑' }, { ticker: 'NEM', action: '↑' }, { ticker: 'GOLD', action: '↑' }],
     reason: 'Central bank accumulation + dollar debasement hedge',
+    sinceDate: '2025-08-15',
+    signal: 'accelerating',
   },
   {
     sector: 'Energy Infrastructure',
@@ -254,6 +260,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 4,
     topMovers: [{ ticker: 'KMI', action: '↑' }, { ticker: 'WMB', action: '↑' }, { ticker: 'ET', action: '↑' }],
     reason: 'AI data center power demand + LNG export build-out',
+    sinceDate: '2026-01-20',
+    signal: 'holding',
   },
   {
     sector: 'Critical Minerals',
@@ -262,6 +270,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 4,
     topMovers: [{ ticker: 'ALB', action: '↑' }, { ticker: 'MP', action: '↑' }, { ticker: 'FCX', action: '↑' }],
     reason: 'Sovereign reshoring mandates — quiet institutional accumulation',
+    sinceDate: '2026-02-10',
+    signal: 'holding',
   },
   {
     sector: 'Financials (Big Banks)',
@@ -270,6 +280,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 3,
     topMovers: [{ ticker: 'JPM', action: '↑' }, { ticker: 'GS', action: '↑' }, { ticker: 'BLK', action: '↑' }],
     reason: 'Cantillon-positioned for next easing cycle. Dark pool accumulation.',
+    sinceDate: '2026-03-05',
+    signal: 'fading',
   },
   {
     sector: 'Consumer Discretionary',
@@ -278,6 +290,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 4,
     topMovers: [{ ticker: 'AMZN', action: '↓' }, { ticker: 'NKE', action: '↓' }, { ticker: 'TGT', action: '↓' }],
     reason: 'Tariff cost pass-through + consumer confidence deterioration',
+    sinceDate: '2026-02-28',
+    signal: 'accelerating',
   },
   {
     sector: 'Commercial Real Estate',
@@ -286,6 +300,8 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 5,
     topMovers: [{ ticker: 'VNO', action: '↓' }, { ticker: 'SLG', action: '↓' }, { ticker: 'BXP', action: '↓' }],
     reason: 'Office vacancy rates elevated. Rate sensitivity extreme.',
+    sinceDate: '2025-06-01',
+    signal: 'holding',
   },
   {
     sector: 'Biotech (Speculative)',
@@ -294,5 +310,7 @@ export const moneyFlowSectors: MoneyFlowSector[] = [
     magnitude: 3,
     topMovers: [{ ticker: 'MRNA', action: '↓' }, { ticker: 'BNTX', action: '↓' }],
     reason: 'Risk-off rotation. Clinical trial pipeline uncertainty.',
+    sinceDate: '2026-03-20',
+    signal: 'fading',
   },
 ];

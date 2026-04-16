@@ -157,20 +157,46 @@ function FearGreedCard({ entry }: { entry: FearGreedEntry }) {
 }
 
 // ── Money Flow ────────────────────────────────────────────────────────────────
+function weeksAgo(dateStr: string): string {
+  const start = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 7) return `${diffDays}일 전 시작`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전 시작`;
+  const months = Math.floor(diffDays / 30);
+  return `${months}개월 전 시작`;
+}
+
+const signalBadge: Record<string, { label: string; cls: string }> = {
+  accelerating: { label: '▲ 가속중', cls: 'bg-amber-100 text-amber-700 border border-amber-200' },
+  holding:      { label: '→ 유지중', cls: 'bg-slate-100 text-slate-600 border border-slate-200' },
+  fading:       { label: '▼ 약화중', cls: 'bg-gray-100 text-gray-500 border border-gray-200' },
+};
+
 function MoneyFlowRow({ flow }: { flow: MoneyFlowSector }) {
   const isInflow = flow.direction === 'inflow';
+  const sig = signalBadge[flow.signal];
   return (
     <div className={`rounded-xl border p-4 ${isInflow ? 'border-green-200 bg-green-50/40' : 'border-red-200 bg-red-50/40'}`}>
       <div className="flex items-start justify-between gap-3 mb-2">
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isInflow ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {isInflow ? '▲ INFLOW' : '▼ OUTFLOW'}
             </span>
             <span className="text-sm font-bold text-cf-text-primary">{flow.sector}</span>
             <span className="text-xs text-cf-text-secondary">({flow.sectorKo})</span>
           </div>
-          <p className="text-xs text-cf-text-secondary leading-relaxed">{flow.reason}</p>
+          <p className="text-xs text-cf-text-secondary leading-relaxed mb-2">{flow.reason}</p>
+          {/* Timing row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] text-cf-text-secondary flex items-center gap-1">
+              🕐 {weeksAgo(flow.sinceDate)}
+            </span>
+            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${sig.cls}`}>
+              {sig.label}
+            </span>
+          </div>
         </div>
         {/* Magnitude bars */}
         <div className="flex gap-0.5 flex-shrink-0 mt-0.5">
