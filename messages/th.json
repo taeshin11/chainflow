@@ -22,7 +22,10 @@
     "companySearchFull": "ชื่อบริษัทหรือสัญลักษณ์ (เช่น NVIDIA, NVDA)",
     "noResults": "ไม่พบผลลัพธ์",
     "totalCompanies": "{count} บริษัทที่ค้นหาได้",
-    "insider": "Flow เรียลไทม์"
+    "insider": "Flow เรียลไทม์",
+    "heatmap": "ฮีทแมป",
+    "screener": "สกรีนเนอร์",
+    "short": "ชอร์ต"
   },
   "hero": {
     "title": "ค้นพบความเสี่ยงที่ซ่อนอยู่ในห่วงโซ่อุปทาน",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "ภาพรวม",
+      "institutions": "สถาบัน",
+      "insiders": "อินไซเดอร์",
+      "ownership": "13F"
+    },
+    "week1": "1สัปดาห์",
+    "month1": "1เดือน",
+    "instHeld": "% สถาบัน",
+    "shortPct": "% ชอร์ต",
+    "shortRatio": "วันชอร์ต",
+    "volumeRatio": "อัตราปริมาณ",
+    "marketCap": "มูลค่าตลาด",
+    "insiderHeld": "% อินไซเดอร์",
+    "factors": "ปัจจัย",
+    "volumeTrend": "แนวโน้มปริมาณ (20วัน)",
+    "liveHolders": "ผู้ถือหุ้นสถาบัน",
+    "insiderNote": "การซื้อขายอินไซเดอร์",
+    "ownershipNote": "การถือครอง 13F รายไตรมาส",
+    "noData": "ไม่มีข้อมูล",
+    "noInsiders": "ไม่มีรายการ",
+    "no13F": "ไม่มีข้อมูล 13F",
+    "buy": "ซื้อ",
+    "sell": "ขาย",
+    "newPos": "ใหม่",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "คงไว้",
+    "source": "แหล่ง",
+    "cached": "แคช",
+    "loading": "กำลังโหลด...",
+    "retry": "ลองใหม่"
   }
 }

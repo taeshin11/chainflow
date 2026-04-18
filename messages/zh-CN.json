@@ -22,7 +22,10 @@
     "companySearchFull": "公司名称或股票代码（例：NVIDIA, NVDA）",
     "noResults": "无搜索结果",
     "totalCompanies": "可搜索 {count} 家公司",
-    "insider": "实时资金流"
+    "insider": "实时资金流",
+    "heatmap": "热力图",
+    "screener": "筛选器",
+    "short": "做空"
   },
   "hero": {
     "title": "发现隐藏的供应链风险",
@@ -699,5 +702,39 @@
       "size": "合约数",
       "premium": "权利金"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "供需概览",
+      "institutions": "机构持仓",
+      "insiders": "内部人交易",
+      "ownership": "13F持仓"
+    },
+    "week1": "1周",
+    "month1": "1个月",
+    "instHeld": "机构持仓比例",
+    "shortPct": "做空比例",
+    "shortRatio": "做空天数",
+    "volumeRatio": "成交量比率",
+    "marketCap": "市値",
+    "insiderHeld": "内部人持仓",
+    "factors": "供需因素",
+    "volumeTrend": "成交量趋势 (20日)",
+    "liveHolders": "机构持仓情况",
+    "insiderNote": "内部人交易记录 (Form 4)",
+    "ownershipNote": "13F季度持仓 (SEC EDGAR)",
+    "noData": "无数据",
+    "noInsiders": "无内部人交易",
+    "no13F": "无13F数据",
+    "buy": "买入",
+    "sell": "卖出",
+    "newPos": "新建",
+    "increased": "↑ 增加",
+    "reduced": "↓ 减少",
+    "maintained": "维持",
+    "source": "来源",
+    "cached": "已缓存",
+    "loading": "加载供需数据中...",
+    "retry": "重试"
   }
 }

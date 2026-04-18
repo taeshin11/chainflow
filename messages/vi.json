@@ -22,7 +22,10 @@
     "companySearchFull": "Tên công ty hoặc mã cổ phiếu (ví dụ: NVIDIA, NVDA)",
     "noResults": "Không có kết quả",
     "totalCompanies": "{count} công ty có thể tìm kiếm",
-    "insider": "Dòng tiền trực tiếp"
+    "insider": "Dòng tiền trực tiếp",
+    "heatmap": "Bản đồ nhiệt",
+    "screener": "Bộ lọc",
+    "short": "Bán khống"
   },
   "hero": {
     "title": "Phát hiện rủi ro chuỗi cung ứng tiềm ẩn",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Tổng quan",
+      "institutions": "Tổ chức",
+      "insiders": "Nội bộ",
+      "ownership": "13F"
+    },
+    "week1": "1T",
+    "month1": "1Th",
+    "instHeld": "% Tổ chức",
+    "shortPct": "% Bán khống",
+    "shortRatio": "Ngày khống",
+    "volumeRatio": "Tỷ lệ KL",
+    "marketCap": "Vốn hóa",
+    "insiderHeld": "% Nội bộ",
+    "factors": "Yếu tố",
+    "volumeTrend": "Xu hướng KL (20N)",
+    "liveHolders": "Cổ đông tổ chức",
+    "insiderNote": "Giao dịch nội bộ (Form 4)",
+    "ownershipNote": "Sở hữu 13F hàng quý",
+    "noData": "Không có dữ liệu",
+    "noInsiders": "Không có GD nội bộ",
+    "no13F": "Không có dữ liệu 13F",
+    "buy": "MUA",
+    "sell": "BÁN",
+    "newPos": "MỚI",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "GIỮ",
+    "source": "Nguồn",
+    "cached": "Cache",
+    "loading": "Đang tải...",
+    "retry": "Thử lại"
   }
 }

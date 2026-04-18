@@ -22,7 +22,10 @@
     "companySearchFull": "Şirket adı veya ticker (örn: NVIDIA, NVDA)",
     "noResults": "Sonuç yok",
     "totalCompanies": "{count} şirket aranabilir",
-    "insider": "Canlı Akış"
+    "insider": "Canlı Akış",
+    "heatmap": "Isı Haritası",
+    "screener": "Tarayıcı",
+    "short": "Açığa Satış"
   },
   "hero": {
     "title": "Gizli Tedarik Zinciri Risklerini Keşfedin",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Genel Bakış",
+      "institutions": "Kurumlar",
+      "insiders": "İçeriden Öğrenenler",
+      "ownership": "13F"
+    },
+    "week1": "1H",
+    "month1": "1A",
+    "instHeld": "Kurumsal %",
+    "shortPct": "Açık Satış %",
+    "shortRatio": "Açık Gün",
+    "volumeRatio": "Hacim Oranı",
+    "marketCap": "Piyasa Değeri",
+    "insiderHeld": "İçeriden %",
+    "factors": "Faktörler",
+    "volumeTrend": "Hacim Trendi (20G)",
+    "liveHolders": "Kurumsal hissedarlar",
+    "insiderNote": "İçeriden işlemler (Form 4)",
+    "ownershipNote": "13F Çeyreklik pozisyonlar",
+    "noData": "Veri yok",
+    "noInsiders": "İşlem yok",
+    "no13F": "13F verisi yok",
+    "buy": "AL",
+    "sell": "SAT",
+    "newPos": "YENİ",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "TUT",
+    "source": "Kaynak",
+    "cached": "Önbelleğek",
+    "loading": "Yükleniyor...",
+    "retry": "Tekrar dene"
   }
 }

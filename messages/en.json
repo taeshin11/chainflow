@@ -22,7 +22,10 @@
     "companySearchFull": "Company name or ticker (e.g. NVIDIA, NVDA)",
     "noResults": "No results",
     "totalCompanies": "{count} companies searchable",
-    "insider": "Real-time Flow"
+    "insider": "Real-time Flow",
+    "heatmap": "Heatmap",
+    "screener": "Screener",
+    "short": "Short"
   },
   "hero": {
     "title": "Uncover Hidden Supply Chain Risks",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Overview",
+      "institutions": "Institutions",
+      "insiders": "Insiders",
+      "ownership": "13F Holdings"
+    },
+    "week1": "1W",
+    "month1": "1M",
+    "instHeld": "Inst. Ownership",
+    "shortPct": "Short %",
+    "shortRatio": "Short Days",
+    "volumeRatio": "Vol Ratio",
+    "marketCap": "Market Cap",
+    "insiderHeld": "Insider %",
+    "factors": "Key Factors",
+    "volumeTrend": "Volume Trend (20D)",
+    "liveHolders": "Top institutional holders (Yahoo Finance)",
+    "insiderNote": "Insider transactions (Form 4 via Yahoo Finance)",
+    "ownershipNote": "13F quarterly holdings (SEC EDGAR)",
+    "noData": "No data available",
+    "noInsiders": "No insider transactions found",
+    "no13F": "No 13F data available",
+    "buy": "BUY",
+    "sell": "SELL",
+    "newPos": "NEW",
+    "increased": "↑ ADD",
+    "reduced": "↓ CUT",
+    "maintained": "HOLD",
+    "source": "Source",
+    "cached": "Cached",
+    "loading": "Loading supply data...",
+    "retry": "Retry"
   }
 }

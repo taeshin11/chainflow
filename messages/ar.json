@@ -22,7 +22,10 @@
     "companySearchFull": "اسم الشركة أو الرمز (مثال: NVIDIA, NVDA)",
     "noResults": "لا توجد نتائج",
     "totalCompanies": "{count} شركة متاحة للبحث",
-    "insider": "التدفق الفوري"
+    "insider": "التدفق الفوري",
+    "heatmap": "خريطة حرارية",
+    "screener": "فلتر",
+    "short": "بيع على المكشوف"
   },
   "hero": {
     "title": "اكتشف مخاطر سلسلة التوريد الخفية",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "نظرة عامة",
+      "institutions": "المؤسسات",
+      "insiders": "المطلعون",
+      "ownership": "13F"
+    },
+    "week1": "أسبوع",
+    "month1": "شهر",
+    "instHeld": "% مؤسسي",
+    "shortPct": "% بيع قصير",
+    "shortRatio": "أيام قصيرة",
+    "volumeRatio": "نسبة الحجم",
+    "marketCap": "رأس المال",
+    "insiderHeld": "% داخلي",
+    "factors": "العوامل",
+    "volumeTrend": "اتجاه الحجم",
+    "liveHolders": "المساهمون المؤسسيون",
+    "insiderNote": "معاملات المطلعين",
+    "ownershipNote": "حيازات 13F",
+    "noData": "لا بيانات",
+    "noInsiders": "لا معاملات",
+    "no13F": "لا بيانات 13F",
+    "buy": "شراء",
+    "sell": "بيع",
+    "newPos": "جديد",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "محافظة",
+    "source": "المصدر",
+    "cached": "مخزن",
+    "loading": "جارٍ التحميل...",
+    "retry": "إعادة المحاولة"
   }
 }

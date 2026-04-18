@@ -22,7 +22,10 @@
     "companySearchFull": "Nome ou ticker (ex: NVIDIA, NVDA)",
     "noResults": "Sem resultados",
     "totalCompanies": "{count} empresas disponíveis",
-    "insider": "Fluxo ao vivo"
+    "insider": "Fluxo ao vivo",
+    "heatmap": "Mapa de calor",
+    "screener": "Screener",
+    "short": "Short"
   },
   "hero": {
     "title": "Descubra Riscos Ocultos na Cadeia de Suprimentos",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Visão Geral",
+      "institutions": "Instituições",
+      "insiders": "Insiders",
+      "ownership": "13F"
+    },
+    "week1": "1S",
+    "month1": "1M",
+    "instHeld": "% Inst.",
+    "shortPct": "% Curto",
+    "shortRatio": "Dias Curto",
+    "volumeRatio": "Ratio Vol.",
+    "marketCap": "Cap. Mercado",
+    "insiderHeld": "% Insider",
+    "factors": "Fatores",
+    "volumeTrend": "Tendência Vol. (20D)",
+    "liveHolders": "Detentores institucionais",
+    "insiderNote": "Transações internas (Form 4)",
+    "ownershipNote": "Participações 13F",
+    "noData": "Sem dados",
+    "noInsiders": "Sem transações",
+    "no13F": "Sem dados 13F",
+    "buy": "COMPRA",
+    "sell": "VENDA",
+    "newPos": "NOVO",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "MANT",
+    "source": "Fonte",
+    "cached": "Cache",
+    "loading": "Carregando...",
+    "retry": "Tentar novamente"
   }
 }

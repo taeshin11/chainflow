@@ -22,7 +22,10 @@
     "companySearchFull": "公司名稱或股票代碼（例：NVIDIA, NVDA）",
     "noResults": "無搜尋結果",
     "totalCompanies": "可搜尋 {count} 家公司",
-    "insider": "即時資金流"
+    "insider": "即時資金流",
+    "heatmap": "熱力圖",
+    "screener": "篩選器",
+    "short": "做空"
   },
   "hero": {
     "title": "發掘隱藏的供應鏈風險",
@@ -699,5 +702,39 @@
       "size": "合約數",
       "premium": "權利金"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "供需概覽",
+      "institutions": "機構持倉",
+      "insiders": "內部人交易",
+      "ownership": "13F持倉"
+    },
+    "week1": "1週",
+    "month1": "1個月",
+    "instHeld": "機構持倉比例",
+    "shortPct": "做空比例",
+    "shortRatio": "做空天數",
+    "volumeRatio": "成交量比率",
+    "marketCap": "市値",
+    "insiderHeld": "內部人持倉",
+    "factors": "供需因素",
+    "volumeTrend": "成交量趨勢 (20日)",
+    "liveHolders": "機構持倉情況",
+    "insiderNote": "內部人交易記錄 (Form 4)",
+    "ownershipNote": "13F季度持倉 (SEC EDGAR)",
+    "noData": "無數據",
+    "noInsiders": "無內部人交易",
+    "no13F": "無13F數據",
+    "buy": "買入",
+    "sell": "賣出",
+    "newPos": "新建",
+    "increased": "↑ 增加",
+    "reduced": "↓ 減少",
+    "maintained": "維持",
+    "source": "來源",
+    "cached": "已緩存",
+    "loading": "載入供需數據中...",
+    "retry": "重試"
   }
 }

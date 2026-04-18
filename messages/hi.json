@@ -22,7 +22,10 @@
     "companySearchFull": "कंपनी का नाम या टिकर (उदा: NVIDIA, NVDA)",
     "noResults": "कोई परिणाम नहीं",
     "totalCompanies": "{count} कंपनियां उपलब्ध",
-    "insider": "रियल-टाइम फ्लो"
+    "insider": "रियल-टाइम फ्लो",
+    "heatmap": "हीटमैप",
+    "screener": "स्क्रीनर",
+    "short": "शॉर्ट"
   },
   "hero": {
     "title": "छिपे हुए सप्लाई चेन जोखिम उजागर करें",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "अवलोकन",
+      "institutions": "संस्थान",
+      "insiders": "इनसाइडर",
+      "ownership": "13F"
+    },
+    "week1": "1 सप्ताह",
+    "month1": "1 माह",
+    "instHeld": "संस्थागत %",
+    "shortPct": "शॉर्ट %",
+    "shortRatio": "शॉर्ट दिन",
+    "volumeRatio": "वॉल्यूम अनुपात",
+    "marketCap": "बाजार पूंजी",
+    "insiderHeld": "इनसाइडर %",
+    "factors": "कारक",
+    "volumeTrend": "वॉल्यूम ट्रेंड",
+    "liveHolders": "संस्थागत धारक",
+    "insiderNote": "इनसाइडर लेनदेन",
+    "ownershipNote": "13F तिमाही होल्डिंग",
+    "noData": "डेटा नहीं",
+    "noInsiders": "कोई इनसाइडर नहीं",
+    "no13F": "13F डेटा नहीं",
+    "buy": "خريد",
+    "sell": "बेच",
+    "newPos": "नया",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "बनाए रखें",
+    "source": "स्रोत",
+    "cached": "कैश्ड",
+    "loading": "लोड हो रहा है...",
+    "retry": "पुनः प्रयास"
   }
 }

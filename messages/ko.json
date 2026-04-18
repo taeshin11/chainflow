@@ -22,7 +22,10 @@
     "companySearchFull": "기업명 또는 티커 검색 (예: NVIDIA, NVDA)",
     "noResults": "검색 결과 없음",
     "totalCompanies": "전체 {count}개 기업 검색 가능",
-    "insider": "실시간 수급"
+    "insider": "실시간 수급",
+    "heatmap": "히트맵",
+    "screener": "스크리너",
+    "short": "공매도"
   },
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",
@@ -707,5 +710,39 @@
       "size": "계약수",
       "premium": "프리미엄"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "수급 개요",
+      "institutions": "기관 보유",
+      "insiders": "내부자 거래",
+      "ownership": "13F 지분"
+    },
+    "week1": "1주",
+    "month1": "1개월",
+    "instHeld": "기관 보유율",
+    "shortPct": "공매도 비율",
+    "shortRatio": "공매도 일수",
+    "volumeRatio": "거래량 비율",
+    "marketCap": "시가요액",
+    "insiderHeld": "내부자 보유율",
+    "factors": "수급 요인",
+    "volumeTrend": "거래량 추이 (20일)",
+    "liveHolders": "기관 보유 현황 (Yahoo Finance)",
+    "insiderNote": "내부자 거래 내역 (Form 4, Yahoo Finance)",
+    "ownershipNote": "13F 분기별 지분 현황 (SEC EDGAR)",
+    "noData": "데이터 없음",
+    "noInsiders": "내부자 거래 내역 없음",
+    "no13F": "13F 데이터 없음",
+    "buy": "매수",
+    "sell": "매도",
+    "newPos": "신규",
+    "increased": "↑ 증가",
+    "reduced": "↓ 감소",
+    "maintained": "유지",
+    "source": "출체",
+    "cached": "캐시됨",
+    "loading": "수급 데이터 로딩 중...",
+    "retry": "다시 시도"
   }
 }

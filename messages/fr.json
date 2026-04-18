@@ -22,7 +22,10 @@
     "companySearchFull": "Nom ou ticker (ex: NVIDIA, NVDA)",
     "noResults": "Aucun résultat",
     "totalCompanies": "{count} entreprises disponibles",
-    "insider": "Flux en direct"
+    "insider": "Flux en direct",
+    "heatmap": "Carte thermique",
+    "screener": "Screener",
+    "short": "Short"
   },
   "hero": {
     "title": "Révélez les risques cachés de la chaîne d'approvisionnement",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Aperçu",
+      "institutions": "Institutions",
+      "insiders": "Initiés",
+      "ownership": "13F"
+    },
+    "week1": "1S",
+    "month1": "1M",
+    "instHeld": "% Inst.",
+    "shortPct": "% Court",
+    "shortRatio": "Jours Court",
+    "volumeRatio": "Ratio Vol.",
+    "marketCap": "Capitalisation",
+    "insiderHeld": "% Initié",
+    "factors": "Facteurs",
+    "volumeTrend": "Tendance Vol. (20J)",
+    "liveHolders": "Détenteurs institutionnels",
+    "insiderNote": "Transactions initiés (Form 4)",
+    "ownershipNote": "Détentions 13F",
+    "noData": "Pas de données",
+    "noInsiders": "Pas de transactions",
+    "no13F": "Pas de données 13F",
+    "buy": "ACHAT",
+    "sell": "VENTE",
+    "newPos": "NOUV",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "MAINT",
+    "source": "Source",
+    "cached": "Cache",
+    "loading": "Chargement...",
+    "retry": "Réessayer"
   }
 }

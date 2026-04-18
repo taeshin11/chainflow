@@ -22,7 +22,10 @@
     "companySearchFull": "Unternehmensname oder Ticker (z.B. NVIDIA, NVDA)",
     "noResults": "Keine Ergebnisse",
     "totalCompanies": "{count} Unternehmen durchsuchbar",
-    "insider": "Echtzeit-Flow"
+    "insider": "Echtzeit-Flow",
+    "heatmap": "Heatmap",
+    "screener": "Screener",
+    "short": "Short"
   },
   "hero": {
     "title": "Verborgene Lieferkettenrisiken aufdecken",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Überblick",
+      "institutions": "Institutionen",
+      "insiders": "Insider",
+      "ownership": "13F"
+    },
+    "week1": "1W",
+    "month1": "1M",
+    "instHeld": "Inst. Anteil",
+    "shortPct": "Leerv. %",
+    "shortRatio": "Leerv. Tage",
+    "volumeRatio": "Vol. Ratio",
+    "marketCap": "Marktkapital.",
+    "insiderHeld": "Insider %",
+    "factors": "Faktoren",
+    "volumeTrend": "Volumen (20T)",
+    "liveHolders": "Institutionelle Inhaber",
+    "insiderNote": "Insider-Transaktionen (Form 4)",
+    "ownershipNote": "13F Quartalsbestände",
+    "noData": "Keine Daten",
+    "noInsiders": "Keine Insider-Transaktion",
+    "no13F": "Keine 13F Daten",
+    "buy": "KAUF",
+    "sell": "VERK",
+    "newPos": "NEU",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "HALT",
+    "source": "Quelle",
+    "cached": "Cache",
+    "loading": "Laden...",
+    "retry": "Retry"
   }
 }

@@ -22,7 +22,10 @@
     "companySearchFull": "Nama perusahaan atau kode (contoh: NVIDIA, NVDA)",
     "noResults": "Tidak ada hasil",
     "totalCompanies": "{count} perusahaan tersedia",
-    "insider": "Aliran Real-time"
+    "insider": "Aliran Real-time",
+    "heatmap": "Peta Panas",
+    "screener": "Screener",
+    "short": "Short"
   },
   "hero": {
     "title": "Temukan Risiko Rantai Pasok Tersembunyi",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Ikhtisar",
+      "institutions": "Institusi",
+      "insiders": "Insider",
+      "ownership": "13F"
+    },
+    "week1": "1M",
+    "month1": "1Bln",
+    "instHeld": "% Institusi",
+    "shortPct": "% Short",
+    "shortRatio": "Hari Short",
+    "volumeRatio": "Rasio Volume",
+    "marketCap": "Kap. Pasar",
+    "insiderHeld": "% Insider",
+    "factors": "Faktor",
+    "volumeTrend": "Tren Volume (20H)",
+    "liveHolders": "Pemegang institusional",
+    "insiderNote": "Transaksi insider (Form 4)",
+    "ownershipNote": "Kepemilikan 13F triwulanan",
+    "noData": "Tidak ada data",
+    "noInsiders": "Tidak ada transaksi",
+    "no13F": "Tidak ada data 13F",
+    "buy": "BELI",
+    "sell": "JUAL",
+    "newPos": "BARU",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "TAHAN",
+    "source": "Sumber",
+    "cached": "Cache",
+    "loading": "Memuat...",
+    "retry": "Coba lagi"
   }
 }

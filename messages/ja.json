@@ -22,7 +22,10 @@
     "companySearchFull": "企業名またはティッカー検索 (例: NVIDIA, NVDA)",
     "noResults": "検索結果なし",
     "totalCompanies": "{count}社を検索可能",
-    "insider": "リアルタイム資金"
+    "insider": "リアルタイム資金",
+    "heatmap": "ヒートマップ",
+    "screener": "スクリーナー",
+    "short": "ショート"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",
@@ -699,5 +702,39 @@
       "size": "契約数",
       "premium": "プレミアム"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "需給概要",
+      "institutions": "機関保有",
+      "insiders": "インサイダー取引",
+      "ownership": "13F保有"
+    },
+    "week1": "1週",
+    "month1": "1ヶ月",
+    "instHeld": "機関保有率",
+    "shortPct": "空売り比率",
+    "shortRatio": "空売り日数",
+    "volumeRatio": "出来高比率",
+    "marketCap": "時価総額",
+    "insiderHeld": "インサイダー保有率",
+    "factors": "需給要因",
+    "volumeTrend": "出来高推移 (20日)",
+    "liveHolders": "機関投資家保有状況",
+    "insiderNote": "インサイダー取引履歴 (Form 4)",
+    "ownershipNote": "13F四半期保有状況 (SEC EDGAR)",
+    "noData": "データなし",
+    "noInsiders": "インサイダー取引なし",
+    "no13F": "13Fデータなし",
+    "buy": "買",
+    "sell": "売",
+    "newPos": "新規",
+    "increased": "↑ 増加",
+    "reduced": "↓ 減少",
+    "maintained": "維持",
+    "source": "出典",
+    "cached": "キャッシュ",
+    "loading": "需給データ読込中...",
+    "retry": "再試行"
   }
 }

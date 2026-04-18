@@ -22,7 +22,10 @@
     "companySearchFull": "Название компании или тикер (напр. NVIDIA, NVDA)",
     "noResults": "Нет результатов",
     "totalCompanies": "{count} компаний доступно",
-    "insider": "Потоки в реальном времени"
+    "insider": "Потоки в реальном времени",
+    "heatmap": "Тепловая карта",
+    "screener": "Скринер",
+    "short": "Шорт"
   },
   "hero": {
     "title": "Обнаружьте скрытые риски цепочки поставок",
@@ -699,5 +702,39 @@
       "size": "Size",
       "premium": "Premium"
     }
+  },
+  "supply": {
+    "tab": {
+      "overview": "Обзор",
+      "institutions": "Институты",
+      "insiders": "Инсайдеры",
+      "ownership": "13F"
+    },
+    "week1": "1Н",
+    "month1": "1М",
+    "instHeld": "% Институт.",
+    "shortPct": "% Шорт",
+    "shortRatio": "Дней шорт",
+    "volumeRatio": "Коэф. объёма",
+    "marketCap": "Капитализация",
+    "insiderHeld": "% Инсайдер",
+    "factors": "Факторы",
+    "volumeTrend": "Тренд объёма (20Д)",
+    "liveHolders": "Институциональные держатели",
+    "insiderNote": "Сделки инсайдеров (Form 4)",
+    "ownershipNote": "Квартальные позиции 13F",
+    "noData": "Нет данных",
+    "noInsiders": "Нет сделок",
+    "no13F": "Нет данных 13F",
+    "buy": "КУПИТЬ",
+    "sell": "ПРОДАТЬ",
+    "newPos": "НОВЫЙ",
+    "increased": "↑",
+    "reduced": "↓",
+    "maintained": "ДЕРЖАТЬ",
+    "source": "Источник",
+    "cached": "Кэш",
+    "loading": "Загрузка...",
+    "retry": "Повтор"
   }
 }
