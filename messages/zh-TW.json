@@ -473,7 +473,13 @@
     "faq": "常見問題",
     "privacyPolicy": "隱私權政策",
     "termsOfService": "服務條款",
-    "about": "關於"
+    "about": "關於",
+    "donationTitle": "Flowvium 無廣告免費提供",
+    "donationDesc": "Bloomberg Terminal 每月 $2,000,這裡免費。一杯咖啡價格的贊助對伺服器維護是巨大的幫助。",
+    "donationGoalTitle": "🎯 每月達到 $200 將開啟即時資金流分析",
+    "donationGoalDesc": "計劃整合: Polygon 即時報價 + Unusual Whales 機構選擇權流 + 暗池成交。目前使用 Yahoo 免費版(15分鐘延遲) · 請支持 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "開戶人: 金太信"
   },
   "emailCta": {
     "title": "取得每週供應鏈洞察",

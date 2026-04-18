@@ -473,7 +473,13 @@
     "faq": "คำถามที่พบบ่อย",
     "privacyPolicy": "นโยบายความเป็นส่วนตัว",
     "termsOfService": "ข้อกำหนดการให้บริการ",
-    "about": "เกี่ยวกับเรา"
+    "about": "เกี่ยวกับเรา",
+    "donationTitle": "Flowvium ไม่มีโฆษณาและให้บริการฟรี",
+    "donationDesc": "Bloomberg Terminal ราคา $2,000/เดือน — ที่นี่ฟรี เงินบริจาคเท่ากาแฟหนึ่งแก้วช่วยค่าเซิร์ฟเวอร์ได้มาก",
+    "donationGoalTitle": "🎯 ถึง $200/เดือน เปิดการวิเคราะห์ flow แบบเรียลไทม์",
+    "donationGoalDesc": "แผน: ราคา Polygon เรียลไทม์ + options flow สถาบันจาก Unusual Whales + dark pool prints ตอนนี้ใช้ Yahoo ฟรี (ล่าช้า 15 นาที) · ช่วยหน่อยครับ 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "เจ้าของบัญชี: Kim Taeshin"
   },
   "emailCta": {
     "title": "รับข้อมูลเชิงลึกซัพพลายเชนรายสัปดาห์",

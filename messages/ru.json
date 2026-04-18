@@ -473,7 +473,13 @@
     "faq": "ЧаВо",
     "privacyPolicy": "Политика конфиденциальности",
     "termsOfService": "Условия использования",
-    "about": "О нас"
+    "about": "О нас",
+    "donationTitle": "Flowvium бесплатен и без рекламы",
+    "donationDesc": "Bloomberg Terminal стоит $2000/мес — здесь бесплатно. Пожертвование стоимостью с чашку кофе очень поможет с серверными расходами.",
+    "donationGoalTitle": "🎯 При $200/мес открываем анализ потоков в реальном времени",
+    "donationGoalDesc": "Планируется: котировки Polygon в реальном времени + институциональные опционы Unusual Whales + принты dark pool. Сейчас Yahoo бесплатно (15 мин задержка) · Помогите 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "Владелец счёта: Ким Тхэщин"
   },
   "emailCta": {
     "title": "Еженедельные инсайты по цепочкам",

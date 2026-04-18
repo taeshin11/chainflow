@@ -473,7 +473,13 @@
     "faq": "अक्सर पूछे जाने वाले प्रश्न",
     "privacyPolicy": "गोपनीयता नीति",
     "termsOfService": "सेवा की शर्तें",
-    "about": "हमारे बारे में"
+    "about": "हमारे बारे में",
+    "donationTitle": "Flowvium विज्ञापन-मुक्त और मुफ़्त है",
+    "donationDesc": "Bloomberg Terminal $2,000/माह है — यहाँ मुफ़्त है। एक कॉफ़ी की कीमत का दान सर्वर खर्चों में मदद करता है।",
+    "donationGoalTitle": "🎯 $200/माह मिलने पर रियल-टाइम फ्लो विश्लेषण खुलेगा",
+    "donationGoalDesc": "नियोजित: Polygon रियल-टाइम कोट्स + Unusual Whales संस्थागत ऑप्शन फ्लो + डार्क पूल प्रिंट्स। अभी Yahoo फ्री (15 मिनट विलंब) · कृपया मदद करें 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "खाताधारक: किम ताइशिन"
   },
   "emailCta": {
     "title": "साप्ताहिक आपूर्ति श्रृंखला इनसाइट प्राप्त करें",

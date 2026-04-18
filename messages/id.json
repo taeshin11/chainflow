@@ -473,7 +473,13 @@
     "faq": "FAQ",
     "privacyPolicy": "Kebijakan Privasi",
     "termsOfService": "Ketentuan Layanan",
-    "about": "Tentang"
+    "about": "Tentang",
+    "donationTitle": "Flowvium gratis tanpa iklan",
+    "donationDesc": "Bloomberg Terminal $2.000/bulan — di sini gratis. Donasi seharga kopi membantu biaya server.",
+    "donationGoalTitle": "🎯 Mencapai $200/bulan membuka analisis aliran real-time",
+    "donationGoalDesc": "Direncanakan: harga real-time Polygon + flow opsi institusional Unusual Whales + print dark pool. Saat ini Yahoo gratis (15 menit tertunda) · Mohon bantuan 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "Pemilik rekening: Kim Taeshin"
   },
   "emailCta": {
     "title": "Dapatkan Wawasan Rantai Pasok Mingguan",

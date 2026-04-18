@@ -473,7 +473,13 @@
     "faq": "FAQ",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "about": "About"
+    "about": "About",
+    "donationTitle": "Flowvium is ad-free and completely free",
+    "donationDesc": "Bloomberg Terminal costs $2,000/mo — here it's free. A coffee-priced donation helps cover server costs.",
+    "donationGoalTitle": "🎯 Hit $200/mo and real-time flow analysis unlocks",
+    "donationGoalDesc": "Planned: Polygon real-time quotes + Unusual Whales institutional options flow + dark-pool prints. Currently on Yahoo free tier (15-min delay) · Please help 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "Account holder: Kim Taeshin"
   },
   "emailCta": {
     "title": "Get Weekly Supply Chain Insights",

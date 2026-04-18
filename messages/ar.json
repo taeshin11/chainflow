@@ -473,7 +473,13 @@
     "faq": "الأسئلة الشائعة",
     "privacyPolicy": "سياسة الخصوصية",
     "termsOfService": "شروط الخدمة",
-    "about": "حول"
+    "about": "حول",
+    "donationTitle": "Flowvium مجاني وبدون إعلانات",
+    "donationDesc": "يكلف Bloomberg Terminal 2,000 دولار شهرياً — هنا مجاني. تبرع بسعر فنجان قهوة يساعد في تغطية تكاليف الخادم.",
+    "donationGoalTitle": "🎯 عند الوصول إلى 200 دولار شهرياً نفتح تحليل التدفقات الفوري",
+    "donationGoalDesc": "مخطط: أسعار Polygon الفورية + تدفق خيارات Unusual Whales المؤسسية + طبعات dark pool. حالياً على Yahoo المجاني (15 دقيقة تأخير) · ساعدونا 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "صاحب الحساب: كيم تايشين"
   },
   "emailCta": {
     "title": "احصل على رؤى أسبوعية",

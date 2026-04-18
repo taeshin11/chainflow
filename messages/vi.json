@@ -473,7 +473,13 @@
     "faq": "Câu hỏi thường gặp",
     "privacyPolicy": "Chính sách bảo mật",
     "termsOfService": "Điều khoản dịch vụ",
-    "about": "Về chúng tôi"
+    "about": "Về chúng tôi",
+    "donationTitle": "Flowvium miễn phí và không có quảng cáo",
+    "donationDesc": "Bloomberg Terminal $2,000/tháng — ở đây miễn phí. Một ly cà phê giúp trang trải chi phí máy chủ.",
+    "donationGoalTitle": "🎯 Đạt $200/tháng sẽ mở phân tích dòng tiền thời gian thực",
+    "donationGoalDesc": "Dự kiến: giá Polygon thời gian thực + flow quyền chọn tổ chức Unusual Whales + dark-pool prints. Hiện đang dùng Yahoo miễn phí (trễ 15 phút) · Xin hỗ trợ 🙏",
+    "donationBankLabel": "🇰🇷 Kakao Bank",
+    "donationAccountHolder": "Chủ tài khoản: Kim Taeshin"
   },
   "emailCta": {
     "title": "Nhận thông tin chuỗi cung ứng hàng tuần",

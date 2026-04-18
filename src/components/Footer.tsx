@@ -153,29 +153,21 @@ export default function Footer() {
           <div className="rounded-2xl bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 border border-amber-200 px-5 py-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xl leading-none select-none">☕</span>
-              <p className="text-sm font-bold text-amber-900">Flowvium은 광고 없이 무료로 제공됩니다</p>
+              <p className="text-sm font-bold text-amber-900">{t('donationTitle')}</p>
             </div>
-            <p className="text-xs text-amber-700 leading-relaxed mb-4">
-              Bloomberg Terminal이 월 $2,000인데 여기선 공짜예요. 서버 비용에 보탬이 된다면 커피 한 잔 가격의 후원이 큰 힘이 됩니다.
+            <p className="text-xs text-amber-700 leading-relaxed mb-3">
+              {t('donationDesc')}
             </p>
+            <div className="rounded-xl bg-white/70 border border-amber-300 px-4 py-3 mb-4">
+              <p className="text-xs font-bold text-amber-900 mb-1">{t('donationGoalTitle')}</p>
+              <p className="text-[11px] text-amber-700 leading-relaxed">{t('donationGoalDesc')}</p>
+            </div>
             <div className="flex flex-wrap gap-3">
-              {/* 한국 */}
               <div className="bg-white border border-amber-200 rounded-xl px-4 py-3 text-center shadow-sm">
-                <div className="text-[10px] text-amber-600 font-bold mb-1 uppercase tracking-wide">🇰🇷 카카오뱅크</div>
+                <div className="text-[10px] text-amber-600 font-bold mb-1 uppercase tracking-wide">{t('donationBankLabel')}</div>
                 <div className="font-mono text-sm font-extrabold text-amber-900 tracking-widest">3333-17-2320727</div>
-                <div className="text-[11px] text-amber-700 mt-0.5">예금주: 김태신</div>
+                <div className="text-[11px] text-amber-700 mt-0.5">{t('donationAccountHolder')}</div>
               </div>
-              {/* 해외 — Buy Me a Coffee */}
-              <a
-                href="https://buymeacoffee.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#FFDD00] border border-yellow-300 rounded-xl px-4 py-3 text-center shadow-sm hover:brightness-95 transition-all flex flex-col items-center justify-center min-w-[140px]"
-              >
-                <div className="text-[10px] text-yellow-900 font-bold mb-1 uppercase tracking-wide">🌍 International</div>
-                <div className="text-sm font-extrabold text-yellow-900">Buy Me a Coffee</div>
-                <div className="text-[11px] text-yellow-800 mt-0.5">Card · PayPal · Crypto</div>
-              </a>
             </div>
           </div>
         </div>
