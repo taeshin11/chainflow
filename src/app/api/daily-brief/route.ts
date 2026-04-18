@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import {
   createRedis, cacheKey, callAI, buildPrompt, parseAIResponse, fallbackBrief,
+  gatherTabContext,
   type Timeframe,
 } from '@/lib/daily-brief';
+
+// Increase Vercel function timeout — required on Pro plan (60s), no-op on Hobby (10s)
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,31 +21,20 @@ export async function GET(request: Request) {
     } catch { /* non-fatal */ }
   }
 
-  // Always use the stable production domain for internal API fetches.
-  // VERCEL_URL changes per deployment (preview URLs) — not reliable for self-calls.
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-    'https://flowvium.vercel.app';
+  // Pull live data from every tab (heatmap, short, capital, fg, fed, macro,
+  // credit, cascade, 13F signals). Feeds both the AI prompt and the
+  // data-driven fallback so every section of the report reflects the
+  // current site state.
+  const ctx = await gatherTabContext(redis);
 
-  let capitalData: unknown = null;
-  let macroData: unknown = null;
-  try {
-    const [cr, mr] = await Promise.allSettled([
-      fetch(`${baseUrl}/api/capital-flows`, { signal: AbortSignal.timeout(20000) }),
-      fetch(`${baseUrl}/api/macro-indicators`, { signal: AbortSignal.timeout(12000) }),
-    ]);
-    if (cr.status === 'fulfilled' && cr.value.ok) capitalData = await cr.value.json();
-    if (mr.status === 'fulfilled' && mr.value.ok) macroData = await mr.value.json();
-  } catch { /* proceed */ }
-
-  const prompt = buildPrompt(tf, capitalData, macroData);
+  const prompt = buildPrompt(tf, ctx);
   let brief = null;
   try {
-    const raw = await callAI(prompt);
-    if (raw) brief = parseAIResponse(raw, tf);
+    const { text, source } = await callAI(prompt);
+    if (text) brief = parseAIResponse(text, tf, source);
   } catch { /* fallback */ }
 
-  if (!brief) brief = fallbackBrief(tf, capitalData, macroData);
+  if (!brief) brief = fallbackBrief(tf, ctx);
 
   if (redis) {
     try { await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 }); } catch { /* non-fatal */ }

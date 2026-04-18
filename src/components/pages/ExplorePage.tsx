@@ -298,9 +298,16 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   useEffect(() => {
     if (graphRef.current) {
       const isMobile = containerWidth < 768;
-      graphRef.current.d3Force('charge')?.strength(isMobile ? -600 : -1500);
-      graphRef.current.d3Force('link')?.distance(isMobile ? 200 : 450);
-      graphRef.current.d3Force('center')?.strength(0.15);
+      graphRef.current.d3Force('charge')?.strength(isMobile ? -2000 : -5500);
+      graphRef.current.d3Force('link')?.distance(isMobile ? 400 : 900);
+      graphRef.current.d3Force('center')?.strength(0.02);
+      // Collision prevention — hard minimum separation via async d3-force import
+      import('d3-force').then(({ forceCollide }) => {
+        if (graphRef.current) {
+          graphRef.current.d3Force('collide', forceCollide(isMobile ? 40 : 60).strength(0.95));
+          graphRef.current.d3ReheatSimulation?.();
+        }
+      }).catch(() => { /* non-fatal */ });
       // Auto-fit after a short delay
       setTimeout(() => {
         if (graphRef.current) graphRef.current.zoomToFit(600, 40);
@@ -605,7 +612,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                   {c.name}
                 </p>
                 <p className="text-xs text-cf-text-secondary">
-                  {c.ticker} &middot; {c.revenue.total}
+                  {c.ticker} &middot; {marketCapLabels[c.marketCap] ?? c.marketCap}
                 </p>
               </div>
             </Link>

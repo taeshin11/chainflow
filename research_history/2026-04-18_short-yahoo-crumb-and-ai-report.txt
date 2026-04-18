@@ -1,0 +1,95 @@
+Date: 2026-04-18
+Scope: Short page data recovery + AI report multi-tab integration + Explore UX fix
+
+─────────────────────────────────────────────────────────────
+PROBLEM 1 — /short page all blanks
+─────────────────────────────────────────────────────────────
+Symptom: Short % Float / Days to Cover / MoM 변화 columns all showed "-" for
+every ticker. Squeeze score defaulted to 20 for all (institutional action only).
+
+Root cause: Yahoo Finance quoteSummary endpoint started enforcing
+crumb+cookie auth in 2024. Unauthenticated requests return:
+  HTTP 401
+  {"finance":{"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+The old fetchYFShortData() had no crumb flow → every call returned base nulls.
+
+Fix: Implemented Yahoo auth flow in src/lib/yahoo-finance.ts
+  1) GET https://fc.yahoo.com          → capture A3 Set-Cookie
+  2) GET /v1/test/getcrumb (w/ cookie) → receive crumb string
+  3) GET /v10/finance/quoteSummary?modules=…&crumb=… (w/ cookie)
+
+Details:
+  - In-memory cache of {cookie, crumb, fetchedAt} per lambda instance, 55-min TTL
+  - On 401/403, invalidate cache and retry ONCE with fresh creds
+  - parseCookiesFromResponse handles both Node/getSetCookie() and fallback
+    split-on-comma-before-cookie-name
+
+Live verification (local curl):
+  $ curl https://fc.yahoo.com                 → Set-Cookie: A3=…
+  $ curl .../getcrumb -H "Cookie: A3=…"       → "JiPtHd1rtoY"
+  $ curl quoteSummary?…&crumb=JiPtHd1rtoY     → full stats JSON for NVDA
+
+─────────────────────────────────────────────────────────────
+PROBLEM 2 — AI report (ReportPage /report) ignored most tabs
+─────────────────────────────────────────────────────────────
+Before:  buildPrompt(tf) only used institutionalSignals + newsGapData +
+         companySupplyChainUpdates. capitalData/macroData parameters existed
+         but route.ts never passed them. Fallback likewise ran on stale input.
+
+After:  Introduced gatherTabContext(redis) in src/lib/daily-brief.ts that
+        pulls live Redis data from every tab into a single TabContext:
+          - heatmap   → flowvium:heatmap:v5:US:{hour}
+          - short     → flowvium:short-interest:v1
+          - capital   → flowvium:capital-flows:v4:{twelve|yahoo|none}
+          - fearGreed → flowvium:fg:v3:SPY
+          - fedWatch  → flowvium:fedwatch:v1:{hour}
+          - macro     → flowvium:macro-indicators:v4:{kst} (v3 fallback)
+          - credit    → flowvium:credit-balance:v2:{today}
+          - cascade   → flowvium:news-cascade:v1:list:{today} + article:{id}
+          - signals   → flowvium:13f-signals:v1 (fallback to static)
+
+buildPrompt(tf, ctx) now emits a structured prompt with labelled sections:
+   [Heatmap] [CapitalFlows] [Fear&Greed] [FedWatch] [Macro] [Credit]
+   [Cascade] [Signals-Buys] [Signals-Cuts] [NewsGap-Stakes]
+   [NewsGap-Top] [Supply]
+plus explicit mapping rules telling the LLM which tabs feed which output
+section (market / capital / company / signals / outlook / riskLevel).
+
+fallbackBrief(tf, ctx) uses the same context so report still renders
+real numbers even when Gemini/vLLM are unreachable. Market section now
+includes heatmap sector leaders + assets + F&G + next-FOMC odds. Capital
+section uses country flows + yield curve inversion + NYSE margin MoM.
+Company section blends 13F accumulators + squeeze candidates + gap leaders.
+Signals section blends 13F stake deltas + cascade headline + supply-chain
+high-impact event.
+
+Wired into both entry points:
+  - src/app/api/daily-brief/route.ts       (user request path)
+  - src/app/api/cron/daily-brief/route.ts  (06:00 KST regen)
+
+cacheKey bumped v3 → v4 to force-regenerate once deployed.
+
+─────────────────────────────────────────────────────────────
+PROBLEM 3 — /explore company card showed revenue as size
+─────────────────────────────────────────────────────────────
+User feedback (screenshot): "Small (<$2B)" market-cap filter above cards
+that display "Visa · $35.9B", "Coinbase · $6.6B" etc. — the $XB numbers
+were revenue.total, not market cap, creating a unit mismatch with the
+filter band labels.
+
+Fix: src/components/pages/ExplorePage.tsx:615 — replaced
+  {c.ticker} · {c.revenue.total}
+with
+  {c.ticker} · {marketCapLabels[c.marketCap] ?? c.marketCap}
+So cards now read e.g. "V · Mega ($200B+)", aligning with the filter units.
+
+Known follow-up (not in this change): some marketCap enum values in
+src/data/companies.ts / companies-batch6.ts are stale (e.g. COIN marked
+'mid' but actually ~$80B). Data-cleanup pass warranted separately.
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- tsc --noEmit: exit 0
+- next build: completed all routes
+- Local crumb-auth test with NVDA: full stats JSON returned

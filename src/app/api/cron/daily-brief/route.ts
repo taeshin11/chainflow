@@ -5,8 +5,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createRedis, cacheKey, callAI, buildPrompt, parseAIResponse, fallbackBrief,
+  gatherTabContext,
   type Timeframe,
 } from '@/lib/daily-brief';
+
+export const maxDuration = 60;
 
 const TIMEFRAMES: Timeframe[] = ['1w', '4w', '13w'];
 
@@ -17,31 +20,19 @@ export async function GET(req: NextRequest) {
   }
 
   const start = Date.now();
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
-
-  let capitalData: unknown = null;
-  let macroData: unknown = null;
-  try {
-    const [cr, mr] = await Promise.allSettled([
-      fetch(`${baseUrl}/api/capital-flows`, { signal: AbortSignal.timeout(25000) }),
-      fetch(`${baseUrl}/api/macro-indicators`, { signal: AbortSignal.timeout(15000) }),
-    ]);
-    if (cr.status === 'fulfilled' && cr.value.ok) capitalData = await cr.value.json();
-    if (mr.status === 'fulfilled' && mr.value.ok) macroData = await mr.value.json();
-  } catch { /* proceed */ }
-
   const redis = createRedis();
   const results: Record<string, string> = {};
+
+  // Gather all-tab context once and reuse across timeframes
+  const ctx = await gatherTabContext(redis);
 
   for (const tf of TIMEFRAMES) {
     try {
       if (redis) { try { await redis.del(cacheKey(tf)); } catch { /* ignore */ } }
-      const raw = await callAI(buildPrompt(tf, capitalData, macroData));
-      const brief = (raw && parseAIResponse(raw, tf)) ?? fallbackBrief(tf);
+      const { text, source } = await callAI(buildPrompt(tf, ctx));
+      const brief = (text && parseAIResponse(text, tf, source)) ?? fallbackBrief(tf, ctx);
       if (redis) await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 });
-      results[tf] = 'ok';
+      results[tf] = `ok (${source})`;
     } catch (e) {
       results[tf] = `error: ${e instanceof Error ? e.message : String(e)}`;
     }
