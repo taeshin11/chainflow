@@ -69,14 +69,18 @@ export async function GET(req: Request) {
   const startTime = Date.now();
 
   // ── 1단계: 독립적인 데이터 소스 병렬 갱신 ────────────────────────────────
-  const [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR] = await Promise.all([
+  const [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, insiderR, ownerR, optR, koreaR] = await Promise.all([
     warm(base, '/api/macro-indicators', 'macro-indicators'),
     warm(base, '/api/fedwatch', 'fedwatch'),
     warm(base, '/api/capital-flows', 'capital-flows'),
-    warm(base, '/api/fear-greed?force=1', 'fear-greed'),   // force 갱신
+    warm(base, '/api/fear-greed?force=1', 'fear-greed'),
     warm(base, '/api/credit-balance', 'credit-balance'),
-    warm(base, '/api/short-interest', 'short-interest', 45000),  // Yahoo crumb, ~28 tickers
-    warm(base, '/api/market-caps', 'market-caps', 50000),         // Yahoo batch, all tickers
+    warm(base, '/api/short-interest', 'short-interest', 45000),
+    warm(base, '/api/market-caps', 'market-caps', 50000),
+    warm(base, '/api/insider-trades', 'insider-trades', 55000),   // EDGAR Form 4 (~40 filings)
+    warm(base, '/api/ownership-alerts', 'ownership-alerts', 55000), // EDGAR 13D/13G
+    warm(base, '/api/options-flow', 'options-flow', 15000),        // Unusual Whales (no-op without key)
+    warm(base, '/api/korea-flow', 'korea-flow', 20000),            // KRX 외인·기관
   ]);
 
   // ── 2단계: capital-flows 의존 분석 ─────────────────────────────────────
@@ -100,7 +104,7 @@ export async function GET(req: Request) {
   // ── 5단계: news-cascade (느림 — fire & forget) ─────────────────────────
   fetch(`${base}/api/news-cascade`, { signal: AbortSignal.timeout(60000) }).catch(() => {});
 
-  const results = [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, flowR, brief1wR, brief4wR, brief13wR];
+  const results = [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, insiderR, ownerR, optR, koreaR, flowR, brief1wR, brief4wR, brief13wR];
   const failedCount = results.filter(r => !r.ok).length;
 
   return NextResponse.json({

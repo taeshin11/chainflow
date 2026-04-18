@@ -21,7 +21,8 @@
     "companySearchShort": "企業を検索...",
     "companySearchFull": "企業名またはティッカー検索 (例: NVIDIA, NVDA)",
     "noResults": "検索結果なし",
-    "totalCompanies": "{count}社を検索可能"
+    "totalCompanies": "{count}社を検索可能",
+    "insider": "リアルタイム資金"
   },
   "hero": {
     "title": "隠れたサプライチェーンリスクを発見",
@@ -654,5 +655,49 @@
     "week1": "1週",
     "week4": "4週",
     "week13": "13週"
+  },
+  "insider": {
+    "title": "リアルタイム資金フロー · 内部者取引",
+    "subtitle": "SEC Form 4 + 13D/13G + オプションフロー + 韓国外国人・機関 — Bloomberg級リアルタイム追跡",
+    "loading": "データ取得中...",
+    "refresh": "更新",
+    "empty": "データなし",
+    "buy": "買",
+    "sell": "売",
+    "tabInsider": "内部者取引 (Form 4)",
+    "tabOwnership": "持分通知 (13D/G)",
+    "tabOptions": "オプションフロー",
+    "tabKorea": "韓国資金フロー",
+    "explainerTitle": "Bloombergもリアルタイム13Fは出せません — 法定45日遅延",
+    "explainerBody": "代わりにForm 4 (D+2) 内部者取引、Schedule 13D/13G (5%超保有)、オプションunusual flow、韓国KRX外国人・機関売買を組み合わせれば、機関の動きをリアルタイムで追跡できます。",
+    "optionsLockedTitle": "オプションフローは有料API必要",
+    "optionsLockedBody": "Unusual Whales 月$48。UNUSUAL_WHALES_KEY環境変数を設定すれば有効化。現在未設定、他のタブは無料SEC EDGARで動作します。",
+    "koreaAsOf": "{date} 時点",
+    "tickers": "銘柄",
+    "foreignTopBuy": "外国人 純買い上位",
+    "foreignTopSell": "外国人 純売り上位",
+    "instTopBuy": "機関 純買い上位",
+    "instTopSell": "機関 純売り上位",
+    "sources": "出典: SEC EDGAR, Unusual Whales, KRX情報システム · 15~30分キャッシュ",
+    "th": {
+      "filed": "開示時刻",
+      "ticker": "ティッカー",
+      "issuer": "発行体",
+      "insider": "内部者",
+      "role": "役職",
+      "action": "方向",
+      "shares": "数量",
+      "price": "単価",
+      "value": "金額",
+      "filer": "報告者",
+      "formType": "様式",
+      "percent": "持分率",
+      "sharesOwned": "保有株",
+      "time": "時刻",
+      "sentiment": "センチ",
+      "contract": "権利行使·満期",
+      "size": "契約数",
+      "premium": "プレミアム"
+    }
   }
 }

@@ -21,7 +21,8 @@
     "companySearchShort": "기업 검색...",
     "companySearchFull": "기업명 또는 티커 검색 (예: NVIDIA, NVDA)",
     "noResults": "검색 결과 없음",
-    "totalCompanies": "전체 {count}개 기업 검색 가능"
+    "totalCompanies": "전체 {count}개 기업 검색 가능",
+    "insider": "실시간 수급"
   },
   "hero": {
     "title": "숨겨진 공급망 리스크를 발견하세요",
@@ -662,5 +663,49 @@
     "week1": "1주",
     "week4": "4주",
     "week13": "13주"
+  },
+  "insider": {
+    "title": "실시간 수급 · 내부자 매매",
+    "subtitle": "SEC Form 4 + 13D/13G + 옵션 flow + 한국 외인·기관 — Bloomberg급 실시간 자금 추적",
+    "loading": "데이터 수신 중...",
+    "refresh": "새로고침",
+    "empty": "데이터 없음",
+    "buy": "매수",
+    "sell": "매도",
+    "tabInsider": "내부자 매매 (Form 4)",
+    "tabOwnership": "지분 알림 (13D/G)",
+    "tabOptions": "옵션 flow",
+    "tabKorea": "한국 수급",
+    "explainerTitle": "블룸버그는 실시간 13F를 못 줍니다 — 법적 45일 지연",
+    "explainerBody": "대신 Form 4(D+2) 내부자 매매, Schedule 13D/13G(5%+ 지분 돌파), 옵션 unusual flow, 한국 KRX 외인·기관 수급을 엮으면 실시간 기관 움직임 추적이 가능합니다. 이 페이지가 그걸 모아서 보여줍니다.",
+    "optionsLockedTitle": "옵션 flow는 유료 API 필요",
+    "optionsLockedBody": "Unusual Whales 월 $48. 환경 변수 UNUSUAL_WHALES_KEY 설정 시 자동 활성. 현재 미설정 상태이며, 다른 탭은 전부 무료 SEC EDGAR 기반으로 작동합니다.",
+    "koreaAsOf": "{date} 기준",
+    "tickers": "종목",
+    "foreignTopBuy": "외국인 순매수 상위",
+    "foreignTopSell": "외국인 순매도 상위",
+    "instTopBuy": "기관 순매수 상위",
+    "instTopSell": "기관 순매도 상위",
+    "sources": "출처: SEC EDGAR (Form 4·13D/13G), Unusual Whales (옵션), KRX 정보데이터시스템 · 15~30분 캐시",
+    "th": {
+      "filed": "공시시각",
+      "ticker": "티커",
+      "issuer": "기업",
+      "insider": "내부자",
+      "role": "직책",
+      "action": "방향",
+      "shares": "수량",
+      "price": "단가",
+      "value": "금액",
+      "filer": "지분보유자",
+      "formType": "양식",
+      "percent": "지분%",
+      "sharesOwned": "보유주",
+      "time": "시각",
+      "sentiment": "방향",
+      "contract": "종목·만기",
+      "size": "계약수",
+      "premium": "프리미엄"
+    }
   }
 }

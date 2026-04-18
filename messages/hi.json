@@ -21,7 +21,8 @@
     "companySearchShort": "कंपनी खोजें...",
     "companySearchFull": "कंपनी का नाम या टिकर (उदा: NVIDIA, NVDA)",
     "noResults": "कोई परिणाम नहीं",
-    "totalCompanies": "{count} कंपनियां उपलब्ध"
+    "totalCompanies": "{count} कंपनियां उपलब्ध",
+    "insider": "रियल-टाइम फ्लो"
   },
   "hero": {
     "title": "छिपे हुए सप्लाई चेन जोखिम उजागर करें",
@@ -654,5 +655,49 @@
     "week1": "1सप्.",
     "week4": "4सप्.",
     "week13": "13सप्."
+  },
+  "insider": {
+    "title": "Real-time Flow · Insider Activity",
+    "subtitle": "SEC Form 4 + 13D/13G + options flow + Korean institutional — Bloomberg-grade real-time capital tracking",
+    "loading": "Loading data...",
+    "refresh": "Refresh",
+    "empty": "No data",
+    "buy": "Buy",
+    "sell": "Sell",
+    "tabInsider": "Insider Trades (Form 4)",
+    "tabOwnership": "Ownership (13D/G)",
+    "tabOptions": "Options Flow",
+    "tabKorea": "Korea Flow",
+    "explainerTitle": "Bloomberg can't give real-time 13F either — 45-day legal lag",
+    "explainerBody": "But combining Form 4 (D+2) insider trades, Schedule 13D/13G (5%+ crossings), options unusual flow, and KRX foreign/institutional net-buys, you get live institutional signals. This page stitches them together.",
+    "optionsLockedTitle": "Options flow requires paid API",
+    "optionsLockedBody": "Unusual Whales $48/mo. Set UNUSUAL_WHALES_KEY env to enable. Currently disabled — every other tab runs on free SEC EDGAR data.",
+    "koreaAsOf": "as of {date}",
+    "tickers": "tickers",
+    "foreignTopBuy": "Foreign Top Net Buy",
+    "foreignTopSell": "Foreign Top Net Sell",
+    "instTopBuy": "Institutional Top Net Buy",
+    "instTopSell": "Institutional Top Net Sell",
+    "sources": "Sources: SEC EDGAR (Form 4, 13D/13G), Unusual Whales (options), KRX Data System · 15-30min cache",
+    "th": {
+      "filed": "Filed",
+      "ticker": "Ticker",
+      "issuer": "Issuer",
+      "insider": "Insider",
+      "role": "Role",
+      "action": "Side",
+      "shares": "Shares",
+      "price": "Price",
+      "value": "Value",
+      "filer": "Filer",
+      "formType": "Form",
+      "percent": "% Owned",
+      "sharesOwned": "Shares Owned",
+      "time": "Time",
+      "sentiment": "Sentiment",
+      "contract": "Strike · Expiry",
+      "size": "Size",
+      "premium": "Premium"
+    }
   }
 }

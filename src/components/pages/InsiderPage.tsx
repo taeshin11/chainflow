@@ -1,0 +1,391 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { Loader2, RefreshCw, TrendingUp, TrendingDown, ExternalLink, Users, AlertTriangle, Zap, Globe } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+import type { InsiderTransaction, OwnershipAlert } from '@/lib/edgar-insider';
+import type { OptionsFlowAlert } from '@/lib/unusual-whales';
+
+type Tab = 'insider' | 'ownership' | 'options' | 'korea';
+
+interface KoreaFlowPayload {
+  updatedAt: string;
+  tradingDay: string;
+  topForeignBuy: KoreaRow[];
+  topForeignSell: KoreaRow[];
+  topInstBuy: KoreaRow[];
+  topInstSell: KoreaRow[];
+  totalTickers: number;
+}
+interface KoreaRow {
+  ticker: string;
+  name: string;
+  market: 'KOSPI' | 'KOSDAQ';
+  foreignerNetBuy: number | null;
+  institutionNetBuy: number | null;
+  individualNetBuy: number | null;
+  closePrice: number | null;
+  changePct: number | null;
+}
+
+function fmtUsd(v: number | null): string {
+  if (v == null) return '-';
+  if (v >= 1_000_000_000) return `$${(v / 1e9).toFixed(2)}B`;
+  if (v >= 1_000_000) return `$${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1_000) return `$${(v / 1e3).toFixed(0)}K`;
+  return `$${v.toFixed(0)}`;
+}
+
+function fmtKrw(v: number | null): string {
+  if (v == null || v === 0) return '-';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '+';
+  if (abs >= 1_000_000_000_000) return `${sign}${(abs / 1e12).toFixed(2)}조`;
+  if (abs >= 100_000_000) return `${sign}${(abs / 1e8).toFixed(1)}억`;
+  if (abs >= 10_000) return `${sign}${(abs / 1e4).toFixed(0)}만`;
+  return `${sign}${abs}`;
+}
+
+function fmtTime(iso: string): string {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${mm}/${dd} ${hh}:${min}`;
+}
+
+function insiderRoleLabel(t: InsiderTransaction): string {
+  if (t.officerTitle) return t.officerTitle;
+  if (t.isOfficer) return 'Officer';
+  if (t.isDirector) return 'Director';
+  if (t.isTenPercentOwner) return '10%+ Holder';
+  return 'Insider';
+}
+
+export default function InsiderPage() {
+  const t = useTranslations('insider');
+  const [tab, setTab] = useState<Tab>('insider');
+
+  // Data state per tab
+  const [insider, setInsider] = useState<InsiderTransaction[]>([]);
+  const [ownership, setOwnership] = useState<OwnershipAlert[]>([]);
+  const [options, setOptions] = useState<OptionsFlowAlert[]>([]);
+  const [optionsConfigured, setOptionsConfigured] = useState<boolean>(true);
+  const [korea, setKorea] = useState<KoreaFlowPayload | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async (force = false) => {
+    if (force) setRefreshing(true); else setLoading(true);
+    const q = force ? '?refresh=1' : '';
+    try {
+      const [iRes, oRes, xRes, kRes] = await Promise.allSettled([
+        fetch(`/api/insider-trades${q}`).then(r => r.json()),
+        fetch(`/api/ownership-alerts${q}`).then(r => r.json()),
+        fetch(`/api/options-flow${q}`).then(r => r.json()),
+        fetch(`/api/korea-flow${q}`).then(r => r.json()),
+      ]);
+      if (iRes.status === 'fulfilled') setInsider(iRes.value.items ?? []);
+      if (oRes.status === 'fulfilled') setOwnership(oRes.value.items ?? []);
+      if (xRes.status === 'fulfilled') {
+        setOptions(xRes.value.items ?? []);
+        setOptionsConfigured(xRes.value.configured !== false);
+      }
+      if (kRes.status === 'fulfilled') setKorea(kRes.value ?? null);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const TABS: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
+    { id: 'insider',   label: t('tabInsider'),   icon: <Users className="w-4 h-4" />,          count: insider.length },
+    { id: 'ownership', label: t('tabOwnership'), icon: <AlertTriangle className="w-4 h-4" />,  count: ownership.length },
+    { id: 'options',   label: t('tabOptions'),   icon: <Zap className="w-4 h-4" />,             count: options.length },
+    { id: 'korea',     label: t('tabKorea'),     icon: <Globe className="w-4 h-4" />,           count: korea ? (korea.topForeignBuy.length + korea.topForeignSell.length) : 0 },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] gap-3 text-cf-text-secondary">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        <span>{t('loading')}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-cf-text-primary flex items-center gap-2">
+            <Zap className="w-6 h-6 text-amber-400" />
+            {t('title')}
+          </h1>
+          <p className="text-sm text-cf-text-secondary mt-1">{t('subtitle')}</p>
+        </div>
+        <button
+          onClick={() => load(true)}
+          disabled={refreshing}
+          className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors disabled:opacity-40"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {t('refresh')}
+        </button>
+      </div>
+
+      {/* Explainer */}
+      <div className="cf-card p-4 mb-4 bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10">
+        <p className="text-xs font-bold text-cf-text-primary mb-1.5">💡 {t('explainerTitle')}</p>
+        <p className="text-[11px] text-cf-text-secondary leading-relaxed">{t('explainerBody')}</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-4 overflow-x-auto pb-1 border-b border-white/5">
+        {TABS.map(x => (
+          <button
+            key={x.id}
+            onClick={() => setTab(x.id)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              tab === x.id
+                ? 'bg-cf-accent/10 text-cf-accent border-b-2 border-cf-accent'
+                : 'text-cf-text-secondary hover:text-cf-text-primary'
+            }`}
+          >
+            {x.icon}
+            {x.label}
+            {x.count > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${tab === x.id ? 'bg-cf-accent/20' : 'bg-white/10'}`}>
+                {x.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {tab === 'insider' && (
+        <div className="cf-card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-white/5">
+              <tr className="text-[10px] text-cf-text-secondary">
+                <th className="px-3 py-2 text-left">{t('th.filed')}</th>
+                <th className="px-3 py-2 text-left">{t('th.ticker')}</th>
+                <th className="px-3 py-2 text-left">{t('th.insider')}</th>
+                <th className="px-3 py-2 text-left">{t('th.role')}</th>
+                <th className="px-3 py-2 text-left">{t('th.action')}</th>
+                <th className="px-3 py-2 text-right">{t('th.shares')}</th>
+                <th className="px-3 py-2 text-right">{t('th.price')}</th>
+                <th className="px-3 py-2 text-right">{t('th.value')}</th>
+                <th className="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {insider.map(ix => (
+                <tr key={ix.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(ix.filedAt)}</td>
+                  <td className="px-3 py-2.5">
+                    {ix.ticker ? (
+                      <Link href={`/company/${ix.ticker}` as Parameters<typeof Link>[0]['href']} className="font-bold text-cf-accent hover:underline">
+                        {ix.ticker}
+                      </Link>
+                    ) : <span className="text-[11px] text-cf-text-secondary truncate max-w-[100px] inline-block">{ix.issuerName}</span>}
+                  </td>
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-primary max-w-[160px] truncate">{ix.insiderName}</td>
+                  <td className="px-3 py-2.5 text-[10px] text-cf-text-secondary">{insiderRoleLabel(ix)}</td>
+                  <td className="px-3 py-2.5">
+                    {ix.direction === 'buy' ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">
+                        <TrendingUp className="w-3 h-3" /> {t('buy')}
+                      </span>
+                    ) : ix.direction === 'sell' ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 text-red-400">
+                        <TrendingDown className="w-3 h-3" /> {t('sell')}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-cf-text-secondary/50">{ix.transactionCode}</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right">{ix.shares?.toLocaleString() ?? '-'}</td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right">{ix.pricePerShare != null ? `$${ix.pricePerShare.toFixed(2)}` : '-'}</td>
+                  <td className={`px-3 py-2.5 font-mono text-sm font-bold text-right ${ix.direction === 'buy' ? 'text-emerald-400' : ix.direction === 'sell' ? 'text-red-400' : ''}`}>
+                    {fmtUsd(ix.transactionValueUsd)}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <a href={ix.filingUrl} target="_blank" rel="noopener noreferrer" className="text-cf-text-secondary/60 hover:text-cf-accent">
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {insider.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+        </div>
+      )}
+
+      {tab === 'ownership' && (
+        <div className="cf-card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-white/5">
+              <tr className="text-[10px] text-cf-text-secondary">
+                <th className="px-3 py-2 text-left">{t('th.filed')}</th>
+                <th className="px-3 py-2 text-left">{t('th.ticker')}</th>
+                <th className="px-3 py-2 text-left">{t('th.issuer')}</th>
+                <th className="px-3 py-2 text-left">{t('th.filer')}</th>
+                <th className="px-3 py-2 text-left">{t('th.formType')}</th>
+                <th className="px-3 py-2 text-right">{t('th.percent')}</th>
+                <th className="px-3 py-2 text-right">{t('th.sharesOwned')}</th>
+                <th className="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {ownership.map(a => (
+                <tr key={a.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(a.filedAt)}</td>
+                  <td className="px-3 py-2.5">
+                    {a.ticker ? (
+                      <Link href={`/company/${a.ticker}` as Parameters<typeof Link>[0]['href']} className="font-bold text-cf-accent hover:underline">
+                        {a.ticker}
+                      </Link>
+                    ) : <span className="text-[10px] text-cf-text-secondary/40">-</span>}
+                  </td>
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-primary max-w-[180px] truncate">{a.issuerName}</td>
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary max-w-[180px] truncate">{a.filerName || '-'}</td>
+                  <td className="px-3 py-2.5">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${a.formType.startsWith('13D') ? 'bg-red-500/10 text-red-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                      {a.formType}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-sm font-bold text-right text-cf-accent">
+                    {a.percentOwned != null ? `${a.percentOwned.toFixed(1)}%` : '-'}
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right text-cf-text-secondary">
+                    {a.sharesOwned != null ? a.sharesOwned.toLocaleString() : '-'}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <a href={a.filingUrl} target="_blank" rel="noopener noreferrer" className="text-cf-text-secondary/60 hover:text-cf-accent">
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {ownership.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+        </div>
+      )}
+
+      {tab === 'options' && !optionsConfigured && (
+        <div className="cf-card p-8 text-center">
+          <Zap className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+          <p className="text-sm font-bold text-cf-text-primary mb-2">{t('optionsLockedTitle')}</p>
+          <p className="text-xs text-cf-text-secondary leading-relaxed max-w-md mx-auto">{t('optionsLockedBody')}</p>
+        </div>
+      )}
+
+      {tab === 'options' && optionsConfigured && (
+        <div className="cf-card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-white/5">
+              <tr className="text-[10px] text-cf-text-secondary">
+                <th className="px-3 py-2 text-left">{t('th.time')}</th>
+                <th className="px-3 py-2 text-left">{t('th.ticker')}</th>
+                <th className="px-3 py-2 text-left">{t('th.sentiment')}</th>
+                <th className="px-3 py-2 text-left">{t('th.contract')}</th>
+                <th className="px-3 py-2 text-right">{t('th.size')}</th>
+                <th className="px-3 py-2 text-right">{t('th.premium')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {options.map(o => (
+                <tr key={o.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(o.timestamp)}</td>
+                  <td className="px-3 py-2.5 font-bold text-cf-accent">{o.ticker}</td>
+                  <td className="px-3 py-2.5">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      o.sentiment === 'bullish' ? 'bg-emerald-500/10 text-emerald-400' :
+                      o.sentiment === 'bearish' ? 'bg-red-500/10 text-red-400' :
+                      'bg-white/5 text-cf-text-secondary'
+                    }`}>
+                      {o.optionType.toUpperCase()} · {o.sentiment}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5 text-[11px] font-mono">
+                    ${o.strike} · {o.expiry ?? '-'}
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right">{o.size?.toLocaleString() ?? '-'}</td>
+                  <td className="px-3 py-2.5 font-mono text-sm font-bold text-right">{fmtUsd(o.premiumUsd)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {options.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+        </div>
+      )}
+
+      {tab === 'korea' && korea && (
+        <div className="space-y-4">
+          <div className="text-[11px] text-cf-text-secondary">
+            {t('koreaAsOf', { date: korea.tradingDay })} · {korea.totalTickers.toLocaleString()} {t('tickers')}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <KoreaTable title={`🟢 ${t('foreignTopBuy')}`} rows={korea.topForeignBuy} field="foreignerNetBuy" positive />
+            <KoreaTable title={`🔴 ${t('foreignTopSell')}`} rows={korea.topForeignSell} field="foreignerNetBuy" />
+            <KoreaTable title={`🟢 ${t('instTopBuy')}`} rows={korea.topInstBuy} field="institutionNetBuy" positive />
+            <KoreaTable title={`🔴 ${t('instTopSell')}`} rows={korea.topInstSell} field="institutionNetBuy" />
+          </div>
+        </div>
+      )}
+      {tab === 'korea' && !korea && (
+        <div className="cf-card p-8 text-center text-sm text-cf-text-secondary">{t('empty')}</div>
+      )}
+
+      <p className="text-[10px] text-cf-text-secondary/40 mt-4">{t('sources')}</p>
+    </div>
+  );
+}
+
+function KoreaTable({ title, rows, field, positive }: {
+  title: string;
+  rows: KoreaRow[];
+  field: 'foreignerNetBuy' | 'institutionNetBuy';
+  positive?: boolean;
+}) {
+  return (
+    <div className="cf-card overflow-hidden">
+      <p className="text-xs font-bold text-cf-text-primary px-3 py-2 border-b border-white/5">{title}</p>
+      <table className="w-full text-sm">
+        <tbody>
+          {rows.slice(0, 10).map(r => (
+            <tr key={r.ticker} className="border-b border-white/5 last:border-0">
+              <td className="px-3 py-2 text-[11px] font-mono text-cf-text-secondary">{r.ticker}</td>
+              <td className="px-3 py-2 text-[11px] font-semibold text-cf-text-primary truncate max-w-[140px]">{r.name}</td>
+              <td className="px-3 py-2 text-[10px] text-cf-text-secondary">{r.market}</td>
+              <td className="px-3 py-2 font-mono text-xs text-right">
+                {r.closePrice != null ? r.closePrice.toLocaleString() : '-'}
+              </td>
+              <td className={`px-3 py-2 font-mono text-xs text-right ${(r.changePct ?? 0) > 0 ? 'text-red-400' : (r.changePct ?? 0) < 0 ? 'text-blue-400' : 'text-cf-text-secondary'}`}>
+                {r.changePct != null ? `${r.changePct > 0 ? '+' : ''}${r.changePct.toFixed(2)}%` : '-'}
+              </td>
+              <td className={`px-3 py-2 font-mono text-xs font-bold text-right ${positive ? 'text-emerald-400' : 'text-red-400'}`}>
+                {fmtKrw(r[field])}
+              </td>
+            </tr>
+          ))}
+          {rows.length === 0 && (
+            <tr><td colSpan={6} className="px-3 py-4 text-center text-[11px] text-cf-text-secondary">-</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}

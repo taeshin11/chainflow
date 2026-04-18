@@ -1,0 +1,153 @@
+Date: 2026-04-19
+Scope: Bloomberg-grade real-time institutional flow stack (bypass 13F's 45-day lag)
+
+─────────────────────────────────────────────────────────────
+MOTIVATION
+─────────────────────────────────────────────────────────────
+User wants to replicate what Bloomberg does for "real-time 수급 추적".
+Reality: Bloomberg CANNOT show real-time 13F — the 45-day SEC deadline is
+legally binding. What Bloomberg DOES do is stitch together:
+  - Form 4 (insider trades, D+2)
+  - Schedule 13D/13G (5%+ ownership crossings, +10 days)
+  - Options unusual flow (real-time)
+  - Block trade tape (real-time)
+  - Korean/non-US exchanges that publish investor-type data real-time
+
+This commit builds that same stack using free EDGAR data + one optional
+paid API, and wires it into a new /insider page + AI report.
+
+─────────────────────────────────────────────────────────────
+NEW FILES
+─────────────────────────────────────────────────────────────
+src/lib/edgar-insider.ts
+  - parseAtomFeed(xml) — parse EDGAR getcurrent Atom entries
+  - fetchRecentForm4({ feedCount, includeOther, tickersOnly })
+      → crawls Form 4 RSS, resolves ownership.xml per filing, regex-parses
+        nonDerivativeTransaction blocks. Returns InsiderTransaction[] with
+        direction (buy/sell), insider role, shares, price, USD value.
+  - fetchRecentOwnershipAlerts({ minPercent, tickersOnly })
+      → crawls SC 13D/G/A feeds, downloads primary text, regex-extracts
+        filer, CUSIP, percent owned, shares owned. Default >=5% filter.
+  - resolveTickerFromIssuerName(name) — maps issuer name → ticker using
+    TICKER_TO_COMPANY from edgar-13f.ts
+  - Uses existing EDGAR_UA (FlowVium/1.0 taeshinkim11@gmail.com) and stays
+    under SEC's 10 req/s via paced fetch + 6-8 concurrency batches.
+
+src/lib/unusual-whales.ts
+  - fetchOptionsFlow(limit) — calls api.unusualwhales.com/api/option-trades/
+    flow-alerts if UNUSUAL_WHALES_KEY env is set; returns [] otherwise so
+    the rest of the site works unchanged. Derives sentiment from side+type
+    (ask-call = bullish, bid-call = bearish, etc.)
+
+src/app/api/insider-trades/route.ts
+  - GET /api/insider-trades[?ticker=XYZ][&refresh=1]
+  - Redis key flowvium:insider-trades:v1, 30 min TTL
+  - Excludes A/M/F/G codes by default (awards/option-exercise/tax-withholding/gifts)
+
+src/app/api/ownership-alerts/route.ts
+  - GET /api/ownership-alerts[?ticker=XYZ][&refresh=1]
+  - Redis key flowvium:ownership-alerts:v1, 2h TTL
+  - Default minPercent=5
+
+src/app/api/options-flow/route.ts
+  - GET /api/options-flow[?refresh=1] — returns {configured:false} when key absent
+  - Redis key flowvium:options-flow:v1, 10 min TTL
+
+src/app/api/korea-flow/route.ts
+  - GET /api/korea-flow[?refresh=1]
+  - Scrapes KRX data.krx.co.kr getJsonData.cmd (bld MDCSTAT02301) for KOSPI
+    and KOSDAQ investor-type net-buys. No API key; public data with 15-min
+    intraday lag.
+  - Redis key flowvium:korea-flow:v1, 15 min TTL
+  - Surfaces top 15 foreign/institutional net buys + net sells
+
+src/app/[locale]/insider/page.tsx
+src/components/pages/InsiderPage.tsx
+  - New /insider page with 4 tabs:
+      insider  (Form 4 — insider trades, real-time D+2)
+      ownership (13D/13G — 5%+ crossings)
+      options   (Unusual Whales — locked if key absent, informative gate)
+      korea     (KRX 외인/기관 — Korea-specific, always free)
+  - Each tab fetches its own API on mount; single 'refresh' button refetches all
+  - Korea tab shows 4 side-by-side tables (foreign buy/sell, inst buy/sell)
+
+─────────────────────────────────────────────────────────────
+MODIFIED FILES
+─────────────────────────────────────────────────────────────
+src/components/Navbar.tsx
+  - Added { href: '/insider', key: 'insider' } right after /report.
+
+messages/*.json (16 languages)
+  - Added nav.insider translation + entire insider.* section.
+  - Hand-translated for ko/en/ja/zh-CN/zh-TW; English fallback for the other 11
+    (translate pass can run later via the existing translate cron).
+
+src/lib/daily-brief.ts
+  - TabContext extended with insider/ownership/options/korea fields.
+  - gatherTabContext() now pulls 4 new Redis keys in the same Promise.all batch.
+  - Added summariseInsider/Ownership/OptionsFlow/Korea compact text helpers.
+  - Prompt now has explicit [Form4-Insider], [13D13G-Ownership], [OptionsFlow],
+    [Korea-Flow] sections with tab→output-section mapping rules.
+  - fallbackBrief: "company" section now includes top insider buys >$100K as a
+    real-time signal layer above 13F. "signals" section leads with 13D/G 5%
+    crossings + options sweeps + Korea top foreign buy + cascade headline.
+
+src/app/api/cron/update-all/route.ts
+  - Parallel warm step now hits /api/insider-trades, /ownership-alerts,
+    /options-flow, /korea-flow alongside macro/fed/capital/fg/credit/short/caps.
+
+vercel.json
+  - maxDuration:60 for insider-trades, ownership-alerts, market-caps routes
+    (EDGAR RSS + XML crawl can take 30-45s for ~40 filings).
+
+─────────────────────────────────────────────────────────────
+WHY EACH SOURCE
+─────────────────────────────────────────────────────────────
+Form 4
+  - Strongest single real-time signal: CEO/CFO open-market BUY (P code) of
+    their own company. Historically beats market.
+  - D+2 filing means we see the trade within 2 business days — 44 days faster
+    than the quarterly 13F.
+  - Filter: transactionValueUsd > $100K (noise cut).
+
+Schedule 13D / 13G
+  - Triggered when any entity crosses 5% ownership. Activist investors
+    (Icahn, Ackman, Loeb) are legally required to file within 10 days.
+  - 13D = active intent (board seat, M&A push); 13G = passive.
+  - These filings often predate a news cycle by weeks.
+
+Options Unusual Flow
+  - Biggest unusual options sweeps are the institutional tell. If a $5M+
+    call sweep hits NVDA the day before earnings, someone knows something.
+  - Only reliable paid API for retail is Unusual Whales ($48/mo).
+  - We left the integration in "awaiting key" state — zero cost until
+    UNUSUAL_WHALES_KEY is set.
+
+Korea Flow
+  - KRX publishes foreign vs institutional vs retail net-buy amounts
+    **intraday with only 15-min lag**. Unlike the US, there is no regulatory
+    delay for this aggregate data.
+  - 외국인 순매수 상위 종목은 한국 투자자에게 가장 중요한 실시간 신호.
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- Live curl test of EDGAR getcurrent Form 4 RSS: returned valid Atom feed
+  with 40+ entries; ownership.xml at Archives/edgar/data/... parsed
+  (Alphabet → Hennessy director sale, 105 shares @ $330.54).
+- tsc --noEmit: exit 0 (fixed one downlevelIteration issue in matchAll loop)
+- next build: all 4 new routes listed as dynamic (ƒ). 382 pages generated.
+
+─────────────────────────────────────────────────────────────
+FUTURE WORK (not in this commit)
+─────────────────────────────────────────────────────────────
+- Form N-PORT (mutual fund monthly holdings): needs a per-fund ingestion
+  pipeline (thousands of positions per filing). Architect it as a background
+  cron that snapshots top-20 funds monthly.
+- Block trades on US tape: Polygon Stocks Starter $29/mo provides delayed
+  trades feed; threshold on volume >10k shares.
+- i18n fill-pass: 11 languages currently using English fallback for the
+  insider section; run translate cron to finish.
+- Ticker filter UI on insider/ownership tabs.
+- Insider aggregation view: cluster by ticker to surface "5 officers at LRCX
+  all sold in the past week" style patterns.

@@ -21,7 +21,8 @@
     "companySearchShort": "搜尋公司...",
     "companySearchFull": "公司名稱或股票代碼（例：NVIDIA, NVDA）",
     "noResults": "無搜尋結果",
-    "totalCompanies": "可搜尋 {count} 家公司"
+    "totalCompanies": "可搜尋 {count} 家公司",
+    "insider": "即時資金流"
   },
   "hero": {
     "title": "發掘隱藏的供應鏈風險",
@@ -654,5 +655,49 @@
     "week1": "1週",
     "week4": "4週",
     "week13": "13週"
+  },
+  "insider": {
+    "title": "即時資金流 · 內部人交易",
+    "subtitle": "SEC Form 4 + 13D/13G + 選擇權流 + 韓國外資/機構 — Bloomberg 級即時追蹤",
+    "loading": "載入中...",
+    "refresh": "重新整理",
+    "empty": "無資料",
+    "buy": "買入",
+    "sell": "賣出",
+    "tabInsider": "內部人交易 (Form 4)",
+    "tabOwnership": "持股警報 (13D/G)",
+    "tabOptions": "選擇權流",
+    "tabKorea": "韓國資金",
+    "explainerTitle": "Bloomberg 也無法提供即時 13F — 法定 45 天延遲",
+    "explainerBody": "組合 Form 4(D+2)內部人交易、Schedule 13D/13G(5%+持股)、選擇權異常流、韓國 KRX 外資/機構淨買賣,即可即時追蹤機構動向。",
+    "optionsLockedTitle": "選擇權流需要付費 API",
+    "optionsLockedBody": "Unusual Whales 月費 $48。設定 UNUSUAL_WHALES_KEY 環境變數啟用。目前未設定,其他分頁均基於免費 SEC EDGAR 資料。",
+    "koreaAsOf": "{date} 資料",
+    "tickers": "檔",
+    "foreignTopBuy": "外資淨買進前十",
+    "foreignTopSell": "外資淨賣出前十",
+    "instTopBuy": "機構淨買進前十",
+    "instTopSell": "機構淨賣出前十",
+    "sources": "來源: SEC EDGAR, Unusual Whales, KRX · 15-30 分鐘快取",
+    "th": {
+      "filed": "公示時間",
+      "ticker": "代碼",
+      "issuer": "發行人",
+      "insider": "內部人",
+      "role": "職位",
+      "action": "方向",
+      "shares": "股數",
+      "price": "單價",
+      "value": "金額",
+      "filer": "申報人",
+      "formType": "表格",
+      "percent": "持股%",
+      "sharesOwned": "持股數",
+      "time": "時間",
+      "sentiment": "方向",
+      "contract": "履約·到期",
+      "size": "合約數",
+      "premium": "權利金"
+    }
   }
 }

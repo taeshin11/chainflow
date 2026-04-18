@@ -9,6 +9,10 @@ import { companyNamesI18n } from '@/data/company-names-i18n';
 
 const navLinks = [
   { href: '/report', key: 'report' },
+  { href: '/insider', key: 'insider' },
+  { href: '/heatmap', key: 'heatmap' },
+  { href: '/screener', key: 'screener' },
+  { href: '/short', key: 'short' },
   { href: '/explore', key: 'explore' },
   { href: '/cascade', key: 'cascade' },
   { href: '/signals', key: 'signals' },
@@ -190,7 +194,7 @@ export default function Navbar() {
             {/* Desktop: search bar (center) */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-cf-border bg-gray-50 hover:bg-white hover:border-cf-primary/30 transition-all duration-200 text-sm text-cf-text-secondary min-w-[220px]"
+              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-cf-border bg-gray-50 hover:bg-white hover:border-cf-primary/30 transition-all duration-200 text-sm text-cf-text-secondary min-w-[160px] flex-shrink-0"
             >
               <Search className="w-4 h-4" />
               <span className="flex-1 text-left">{t('companySearchShort')}</span>
@@ -198,14 +202,14 @@ export default function Navbar() {
             </button>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-0.5">
               {navLinks.map((link) => (
                 <Link
                   key={link.key}
                   href={link.href}
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-cf-text-secondary
+                  className="px-2 py-2 rounded-lg text-sm font-medium text-cf-text-secondary
                              hover:text-cf-text-primary hover:bg-cf-primary/5
-                             transition-all duration-200"
+                             transition-all duration-200 whitespace-nowrap"
                 >
                   {t(link.key)}
                 </Link>

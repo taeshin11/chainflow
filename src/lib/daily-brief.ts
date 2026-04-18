@@ -60,6 +60,11 @@ export interface TabContext {
   credit: unknown | null;         // NYSE margin / credit balance
   cascade: unknown[];             // News Cascade top articles today
   signals: InstitutionalSignal[]; // 13F (live if available, else static)
+  // ── Bloomberg-style real-time (beats 13F's 45-day lag) ──
+  insider: unknown[];             // Form 4 insider trades (D+2)
+  ownership: unknown[];           // 13D/13G 5%+ crossings (+10d)
+  options: unknown[];             // Unusual Whales options flow (requires key)
+  korea: unknown | null;          // KRX foreign/institutional real-time
 }
 
 async function safeGet<T = unknown>(redis: Redis, key: string): Promise<T | null> {
@@ -71,6 +76,7 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
     heatmap: null, short: null, capital: null, fearGreed: null,
     fedWatch: null, macro: null, credit: null, cascade: [],
     signals: institutionalSignals,
+    insider: [], ownership: [], options: [], korea: null,
   };
   if (!redis) return ctx;
 
@@ -81,6 +87,7 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
   const [
     heatmap, shortData, capFlows, capFlowsYahoo, capFlowsNone,
     fg, fed, macroV4, macroV3, credit, cascadeIds, liveSignals,
+    insider, ownership, options, korea,
   ] = await Promise.all([
     safeGet(redis, `flowvium:heatmap:v5:US:${hour}`),
     safeGet(redis, 'flowvium:short-interest:v1'),
@@ -97,6 +104,10 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
       catch { return [] as string[]; }
     })(),
     safeGet<InstitutionalSignal[]>(redis, 'flowvium:13f-signals:v1'),
+    safeGet<unknown[]>(redis, 'flowvium:insider-trades:v1'),
+    safeGet<unknown[]>(redis, 'flowvium:ownership-alerts:v1'),
+    safeGet<unknown[]>(redis, 'flowvium:options-flow:v1'),
+    safeGet(redis, 'flowvium:korea-flow:v1'),
   ]);
 
   ctx.heatmap = heatmap;
@@ -107,6 +118,10 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
   ctx.macro = macroV4 ?? macroV3;
   ctx.credit = credit;
   if (Array.isArray(liveSignals) && liveSignals.length > 0) ctx.signals = liveSignals;
+  if (Array.isArray(insider)) ctx.insider = insider;
+  if (Array.isArray(ownership)) ctx.ownership = ownership;
+  if (Array.isArray(options)) ctx.options = options;
+  ctx.korea = korea;
 
   if (cascadeIds && cascadeIds.length > 0) {
     const articles = await Promise.all(
@@ -285,6 +300,53 @@ function summariseNewsGap(): { stakes: string; gaps: string } {
   return { stakes, gaps };
 }
 
+function summariseInsider(items: unknown[]): string {
+  const arr = items as Array<Record<string, unknown>>;
+  if (!arr?.length) return '';
+  // Prioritize large open-market BUYS by officers (strongest signal)
+  const buys = arr
+    .filter(t => t.direction === 'buy' && (t.transactionValueUsd as number ?? 0) > 100_000)
+    .slice(0, 3)
+    .map(t => `${t.ticker ?? '?'}:${(t.insiderName as string ?? '').slice(0, 14)}(${t.officerTitle ?? 'insider'})$${Math.round((t.transactionValueUsd as number) / 1000)}K`)
+    .join(', ');
+  const sells = arr
+    .filter(t => t.direction === 'sell' && (t.transactionValueUsd as number ?? 0) > 1_000_000)
+    .slice(0, 2)
+    .map(t => `${t.ticker ?? '?'}↓$${Math.round((t.transactionValueUsd as number) / 1_000_000)}M`)
+    .join(', ');
+  return [buys && `buys=${buys}`, sells && `sells=${sells}`].filter(Boolean).join(' | ');
+}
+
+function summariseOwnership(items: unknown[]): string {
+  const arr = items as Array<Record<string, unknown>>;
+  if (!arr?.length) return '';
+  return arr.slice(0, 3)
+    .map(a => `${a.ticker ?? '?'}:${(a.filerName as string ?? '').slice(0, 18)}(${a.formType} ${a.percentOwned != null ? `${a.percentOwned}%` : ''})`)
+    .join(', ');
+}
+
+function summariseOptionsFlow(items: unknown[]): string {
+  const arr = items as Array<Record<string, unknown>>;
+  if (!arr?.length) return '';
+  // Biggest premium bullish/bearish sweeps
+  const sorted = [...arr].sort((a, b) => ((b.premiumUsd as number) ?? 0) - ((a.premiumUsd as number) ?? 0));
+  return sorted.slice(0, 3)
+    .map(o => `${o.ticker}(${o.sentiment}$${Math.round((o.premiumUsd as number) / 1000)}K)`)
+    .join(', ');
+}
+
+function summariseKorea(korea: unknown): string {
+  const k = korea as Record<string, unknown> | null;
+  if (!k) return '';
+  const topFB = (k.topForeignBuy as Array<Record<string, unknown>>) ?? [];
+  const topFS = (k.topForeignSell as Array<Record<string, unknown>>) ?? [];
+  const topIB = (k.topInstBuy as Array<Record<string, unknown>>) ?? [];
+  const fbStr = topFB.slice(0, 2).map(r => `${r.name}(+${Math.round(((r.foreignerNetBuy as number) ?? 0) / 1e8)}억)`).join(',');
+  const fsStr = topFS.slice(0, 2).map(r => `${r.name}(${Math.round(((r.foreignerNetBuy as number) ?? 0) / 1e8)}억)`).join(',');
+  const ibStr = topIB.slice(0, 2).map(r => `${r.name}(+${Math.round(((r.institutionNetBuy as number) ?? 0) / 1e8)}억)`).join(',');
+  return `외인매수:${fbStr} / 외인매도:${fsStr} / 기관매수:${ibStr}`;
+}
+
 function summariseSupply(): string {
   return Object.entries(companySupplyChainUpdates)
     .flatMap(([tk, ups]) => ups.filter(u => u.impact === 'high').slice(0, 1).map(u => `${tk}:${u.type}`))
@@ -307,6 +369,10 @@ export function buildPrompt(tf: Timeframe, ctx?: TabContext): string {
   const macro = ctx ? summariseMacro(ctx.macro) : '';
   const credit = ctx ? summariseCredit(ctx.credit) : '';
   const cascade = ctx ? summariseCascade(ctx.cascade) : '';
+  const insider = ctx ? summariseInsider(ctx.insider) : '';
+  const ownership = ctx ? summariseOwnership(ctx.ownership) : '';
+  const optionsFlow = ctx ? summariseOptionsFlow(ctx.options) : '';
+  const korea = ctx ? summariseKorea(ctx.korea) : '';
 
   return `Flowvium ${tfLabel} 리포트용 실시간 탭 데이터입니다. 각 탭을 종합해 한국어 JSON만 반환하세요.
 
@@ -317,18 +383,22 @@ export function buildPrompt(tf: Timeframe, ctx?: TabContext): string {
 [Macro] ${macro || 'n/a'}
 [Credit] ${credit || 'n/a'}
 [Cascade] ${cascade || 'n/a'}
-[Signals-Buys] ${buys || 'n/a'}
-[Signals-Cuts] ${cuts || 'n/a'}
+[13F-Buys] ${buys || 'n/a'}
+[13F-Cuts] ${cuts || 'n/a'}
 [NewsGap-Stakes] ${stakes || 'n/a'}
 [NewsGap-Top] ${gaps || 'n/a'}
 [Supply] ${supply || 'n/a'}
+[Form4-Insider] ${insider || 'n/a'}
+[13D13G-Ownership] ${ownership || 'n/a'}
+[OptionsFlow] ${optionsFlow || 'n/a'}
+[Korea-Flow] ${korea || 'n/a'}
 
 출력 규칙: JSON만, 마크다운 금지, bullets는 각 25자 이내의 구체 수치 포함 문장.
 섹션 매핑:
-- market: Heatmap+CapitalFlows+Fear&Greed+FedWatch에서 시장 전반 요약
-- capital: CapitalFlows countries+Macro+Credit에서 자금 이동·거시 신호
-- company: Signals-Buys/Cuts+Screener(squeeze)+NewsGap-Top에서 주목 종목
-- signals: NewsGap-Stakes+Cascade+Supply에서 강한 구조 신호
+- market: Heatmap+CapitalFlows+Fear&Greed+FedWatch에서 시장 전반
+- capital: CapitalFlows countries+Macro+Credit+Korea-Flow에서 자금 이동·거시
+- company: 13F-Buys+Form4-Insider(CEO 매수 강조)+13D13G+OptionsFlow+Short에서 주목 종목
+- signals: Form4 대형 매수/매도+13D13G 5%돌파+Cascade+Supply에서 강한 실시간 구조 신호
 - outlook: 위 전체를 종합한 한 줄 전망(리스크 포함)
 - riskLevel: low|medium|high (Fear&Greed·yieldCurve 기반)
 
@@ -443,58 +513,76 @@ export function fallbackBrief(tf: Timeframe, ctx?: TabContext): DailyBrief {
   } catch { /* ignore */ }
   if (capitalBullets.length === 0) capitalBullets.push(`${tfLabel} 자금 흐름 집계 중`);
 
-  // ── Company: signals + squeeze + newsgap ─────────────────────────────────
+  // ── Company: 13F + insider (real-time) + squeeze + newsgap ──────────────
   const companyBullets: string[] = [];
   try {
     const top = signals
       .filter(s => s.action === 'accumulating' || s.action === 'new_position')
-      .slice(0, 3)
+      .slice(0, 2)
       .map(s => `${s.institution} → ${s.ticker} (${s.estimatedValue})`);
     if (top.length > 0) companyBullets.push(...top);
+
+    // Real-time insider Form 4 buys — strongest signal
+    const insider = (ctx?.insider ?? []) as Array<Record<string, unknown>>;
+    const topInsider = insider
+      .filter(t => t.direction === 'buy' && (t.transactionValueUsd as number ?? 0) > 100_000)
+      .slice(0, 2)
+      .map(t => `${t.ticker ?? t.issuerName} 내부자(${t.officerTitle ?? '임원'}) $${Math.round((t.transactionValueUsd as number) / 1000)}K 매수`);
+    if (topInsider.length) companyBullets.push(...topInsider);
 
     const shortArr = Array.isArray(ctx?.short) ? ctx!.short as Array<Record<string, unknown>>
       : (ctx?.short as { entries?: Array<Record<string, unknown>> } | null)?.entries ?? [];
     const squeeze = shortArr
       .filter(s => (s.squeezeScore as number) >= 30)
-      .slice(0, 2)
-      .map(s => `${s.ticker} 스퀴즈 ${s.squeezeScore}점 (short ${(s.shortFloatPct as number) ?? '-'}%)`);
-    if (squeeze.length) companyBullets.push(...squeeze);
-
-    const topGap = [...newsGapData]
-      .sort((a, b) => b.gapScore - a.gapScore)
       .slice(0, 1)
-      .map(n => `${n.ticker} 뉴스갭 ${n.gapScore}점 — 침묵 매집 신호`);
-    if (topGap.length > 0) companyBullets.push(...topGap);
+      .map(s => `${s.ticker} 스퀴즈 ${s.squeezeScore}점`);
+    if (squeeze.length) companyBullets.push(...squeeze);
   } catch { /* ignore */ }
-  if (companyBullets.length === 0) companyBullets.push(`13F 매집 ${signals.length}건 분석 중`);
+  if (companyBullets.length === 0) companyBullets.push(`13F+Form4 매집 분석 중`);
 
-  // ── Signals: stakes + cascade + supply ───────────────────────────────────
+  // ── Signals: real-time 5% crossings + options flow + cascade ────────────
   const signalBullets: string[] = [];
   try {
-    const stakeChanges = newsGapData
-      .flatMap(n => n.ownershipData.filter(o => o.action === 'new' || o.action === 'increased').map(o => ({ ticker: n.ticker, ...o })))
-      .sort((a, b) => b.valueM - a.valueM)
+    // 13D/13G real-time 5%+ ownership crossings (most actionable signal)
+    const ownership = (ctx?.ownership ?? []) as Array<Record<string, unknown>>;
+    const xings = ownership
+      .filter(a => (a.percentOwned as number) != null)
       .slice(0, 2)
-      .map(s => {
-        const pct = s.pctOfShares;
-        const change = s.prevPct !== undefined ? `${s.prevPct.toFixed(1)}%→${pct.toFixed(1)}%` : `신규 ${pct.toFixed(1)}%`;
-        return `${s.ticker}: ${s.institution} ${change} ($${s.valueM}M)`;
-      });
-    if (stakeChanges.length > 0) signalBullets.push(...stakeChanges);
+      .map(a => `${a.ticker ?? a.issuerName} ${a.formType}: ${a.filerName} ${(a.percentOwned as number).toFixed(1)}%`);
+    if (xings.length) signalBullets.push(...xings);
 
+    // Options unusual flow top sweep
+    const options = (ctx?.options ?? []) as Array<Record<string, unknown>>;
+    if (options.length) {
+      const top = [...options].sort((a, b) => ((b.premiumUsd as number) ?? 0) - ((a.premiumUsd as number) ?? 0))[0];
+      if (top) signalBullets.push(`옵션 sweep: ${top.ticker} ${top.sentiment} $${Math.round((top.premiumUsd as number) / 1000)}K`);
+    }
+
+    // Korea flow top foreign buy
+    const korea = ctx?.korea as Record<string, unknown> | null;
+    const topFB = (korea?.topForeignBuy as Array<Record<string, unknown>>) ?? [];
+    if (topFB.length > 0) {
+      const t = topFB[0];
+      signalBullets.push(`🇰🇷 외인 ${t.name}: +${Math.round(((t.foreignerNetBuy as number) ?? 0) / 1e8)}억`);
+    }
+
+    // Cascade headline
     const arr = ctx?.cascade as Array<Record<string, unknown>> | undefined;
     if (arr?.length) {
       const top = arr[0];
       const sent = top.sentiment as string;
       signalBullets.push(`Cascade: ${sent === 'bullish' ? '호재' : sent === 'bearish' ? '악재' : '뉴스'} — ${(top.title as string).slice(0, 40)}`);
     }
-
-    const supply = Object.entries(companySupplyChainUpdates)
-      .flatMap(([tk, ups]) => ups.filter(u => u.impact === 'high').slice(0, 1).map(u => `${tk}: ${u.type}`))
-      .slice(0, 1);
-    if (supply.length) signalBullets.push(`Supply: ${supply.join(', ')}`);
   } catch { /* ignore */ }
-  if (signalBullets.length === 0) signalBullets.push(`13F 지분 변동 분석 중`);
+  if (signalBullets.length === 0) {
+    // Fallback to 13F stake changes when nothing real-time is available
+    const stakeChanges = newsGapData
+      .flatMap(n => n.ownershipData.filter(o => o.action === 'new' || o.action === 'increased').map(o => ({ ticker: n.ticker, ...o })))
+      .sort((a, b) => b.valueM - a.valueM)
+      .slice(0, 2)
+      .map(s => `${s.ticker}: ${s.institution} (${s.quarter})`);
+    signalBullets.push(...(stakeChanges.length ? stakeChanges : ['실시간 신호 수집 중']));
+  }
 
   // ── Risk ─────────────────────────────────────────────────────────────────
   let riskLevel: 'low' | 'medium' | 'high' = 'medium';
@@ -514,7 +602,7 @@ export function fallbackBrief(tf: Timeframe, ctx?: TabContext): DailyBrief {
     capital: { title: '자금 흐름 & 거시', content: `${tfLabel} 자금·거시`, bullets: capitalBullets },
     company: { title: '주목 종목', content: `${tfLabel} 매집·스퀴즈`, bullets: companyBullets },
     signals: { title: '구조 신호', content: `${tfLabel} 지분·Cascade·Supply`, bullets: signalBullets },
-    outlook: `${tfLabel} 전 탭(Heatmap·CapitalFlows·Signals·NewsGap·Short·Macro·Cascade) 종합. 리스크 ${riskLevel === 'high' ? '높음(공포·역전)' : riskLevel === 'low' ? '낮음(탐욕 과열)' : '중립'}.`,
+    outlook: `${tfLabel} 전 탭(Heatmap·CapitalFlows·13F+Form4·13D/G·옵션flow·한국수급·NewsGap·Short·Macro·Cascade) 종합. 리스크 ${riskLevel === 'high' ? '높음(공포·역전)' : riskLevel === 'low' ? '낮음(탐욕 과열)' : '중립'}.`,
     riskLevel,
     generatedAt: new Date().toISOString(),
     tf,
