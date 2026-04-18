@@ -673,8 +673,8 @@
     "tabKorea": "韓國資金",
     "explainerTitle": "Bloomberg 也無法提供即時 13F — 法定 45 天延遲",
     "explainerBody": "組合 Form 4(D+2)內部人交易、Schedule 13D/13G(5%+持股)、選擇權異常流、韓國 KRX 外資/機構淨買賣,即可即時追蹤機構動向。",
-    "optionsLockedTitle": "選擇權流需要付費 API",
-    "optionsLockedBody": "Unusual Whales 月費 $48。設定 UNUSUAL_WHALES_KEY 環境變數啟用。目前未設定,其他分頁均基於免費 SEC EDGAR 資料。",
+    "optionsLockedTitle": "💰 選擇權流屬於付費資料",
+    "optionsLockedBody": "需要 Unusual Whales API(月費 $48)。頁尾的月費 $200 贊助目標達成後開放此分頁。目前內部人交易、13D/G、韓國資金流全部基於免費資料。",
     "koreaAsOf": "{date} 資料",
     "tickers": "檔",
     "foreignTopBuy": "外資淨買進前十",
@@ -700,8 +700,19 @@
       "sentiment": "方向",
       "contract": "履約·到期",
       "size": "合約數",
-      "premium": "權利金"
-    }
+      "premium": "權利金",
+      "totalValue": "總持股額",
+      "fundCount": "基金數",
+      "topFunds": "主要基金",
+      "exchange": "交易所"
+    },
+    "tabNport": "N-PORT 基金",
+    "tabBlocks": "大宗交易",
+    "tickerFilterPlaceholder": "依代碼篩選 (例: NVDA)",
+    "clusters": "集中偵測",
+    "nportExplainer": "Form N-PORT 是共同基金的月度持股揭露 — 比 13F(季)快 3 倍,60 天內揭露,可看到 Fidelity / Vanguard / BlackRock 上月買賣了什麼。依追蹤代碼彙總。",
+    "blocksLockedTitle": "💰 大宗交易資料屬於付費",
+    "blocksLockedBody": "Polygon.io Starter 月費 $29 (15 分鐘延遲) 或 Advanced 月費 $199 (即時)。頁尾月 $200 贊助目標達成後開放。免費方案下其他 6 個分頁均即時運作。"
   },
   "supply": {
     "tab": {

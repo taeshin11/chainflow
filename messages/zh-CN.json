@@ -673,8 +673,8 @@
     "tabKorea": "韩国资金",
     "explainerTitle": "Bloomberg 也无法提供实时 13F — 法定 45 天延迟",
     "explainerBody": "组合 Form 4(D+2)内部人交易、Schedule 13D/13G(5%+持股)、期权异常流、韩国 KRX 外资/机构净买卖,即可实时追踪机构动向。",
-    "optionsLockedTitle": "期权流需要付费 API",
-    "optionsLockedBody": "Unusual Whales 每月 $48。设置 UNUSUAL_WHALES_KEY 环境变量以启用。当前未配置,其他标签均基于免费 SEC EDGAR 数据。",
+    "optionsLockedTitle": "💰 期权流属于付费数据",
+    "optionsLockedBody": "需要 Unusual Whales API(每月 $48)。页脚的每月 $200 捐赠目标达成后开放此标签。当前内部人交易、13D/G、韩国资金流全部基于免费数据。",
     "koreaAsOf": "{date} 数据",
     "tickers": "只",
     "foreignTopBuy": "外资净买入前十",
@@ -700,8 +700,19 @@
       "sentiment": "方向",
       "contract": "行权·到期",
       "size": "合约数",
-      "premium": "权利金"
-    }
+      "premium": "权利金",
+      "totalValue": "总持仓额",
+      "fundCount": "基金数",
+      "topFunds": "主要基金",
+      "exchange": "交易所"
+    },
+    "tabNport": "N-PORT 基金",
+    "tabBlocks": "大宗交易",
+    "tickerFilterPlaceholder": "按代码筛选 (例: NVDA)",
+    "clusters": "集中检测",
+    "nportExplainer": "Form N-PORT 是共同基金的月度持仓披露 — 比 13F(季度)快 3 倍,60 天内披露,可看到 Fidelity / Vanguard / BlackRock 上月买卖了什么。按追踪代码聚合。",
+    "blocksLockedTitle": "💰 大宗交易数据属于付费",
+    "blocksLockedBody": "Polygon.io Starter 每月 $29 (15 分钟延迟) 或 Advanced 每月 $199 (实时)。页脚月 $200 捐赠目标达成后开放。免费级别下其他 6 个标签均已实时运行。"
   },
   "supply": {
     "tab": {

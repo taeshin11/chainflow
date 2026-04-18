@@ -1,0 +1,51 @@
+/**
+ * /api/nport-holdings
+ *
+ * Form N-PORT-P mutual fund monthly holdings — 3× faster than 13F because
+ * mutual funds file within 60 days of month-end vs 13F's quarterly cadence.
+ *
+ * Output shape:
+ *   {
+ *     funds:      NPortFundSnapshot[]   // raw per-fund snapshots
+ *     byTicker:   NPortTickerAggregate[]// our-tickers first, aggregated
+ *     updatedAt:  ISO
+ *   }
+ *
+ * Redis cache 6h — N-PORT filings trickle in daily but are most valuable as
+ * a daily snapshot rather than minute-by-minute.
+ */
+import { NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
+import { fetchRecentNPORT, aggregateByTicker, type NPortFundSnapshot, type NPortTickerAggregate } from '@/lib/edgar-nport';
+
+const CACHE_KEY = 'flowvium:nport-holdings:v1';
+const CACHE_TTL = 6 * 60 * 60;
+
+export const maxDuration = 60;
+
+function createRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
+
+export async function GET(req: Request) {
+  const redis = createRedis();
+  const force = new URL(req.url).searchParams.get('refresh') === '1';
+  if (redis && !force) {
+    try {
+      const cached = await redis.get<{ funds: NPortFundSnapshot[]; byTicker: NPortTickerAggregate[]; updatedAt: string }>(CACHE_KEY);
+      if (cached) return NextResponse.json({ ...cached, cached: true });
+    } catch { /* non-fatal */ }
+  }
+
+  const funds = await fetchRecentNPORT({ feedCount: 30 });
+  const byTicker = aggregateByTicker(funds);
+  const payload = { funds, byTicker, updatedAt: new Date().toISOString() };
+
+  if (redis) {
+    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+  }
+  return NextResponse.json({ ...payload, cached: false });
+}

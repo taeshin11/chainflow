@@ -673,8 +673,8 @@
     "tabKorea": "韓国資金フロー",
     "explainerTitle": "Bloombergもリアルタイム13Fは出せません — 法定45日遅延",
     "explainerBody": "代わりにForm 4 (D+2) 内部者取引、Schedule 13D/13G (5%超保有)、オプションunusual flow、韓国KRX外国人・機関売買を組み合わせれば、機関の動きをリアルタイムで追跡できます。",
-    "optionsLockedTitle": "オプションフローは有料API必要",
-    "optionsLockedBody": "Unusual Whales 月$48。UNUSUAL_WHALES_KEY環境変数を設定すれば有効化。現在未設定、他のタブは無料SEC EDGARで動作します。",
+    "optionsLockedTitle": "💰 オプションフローは有料データ",
+    "optionsLockedBody": "Unusual Whales API (月$48) が必要です。フッターの月$200支援目標が達成されるとこのタブが有効化されます。それまで内部者取引・13D/G・韓国資金フローは全て無料データで動作します。",
     "koreaAsOf": "{date} 時点",
     "tickers": "銘柄",
     "foreignTopBuy": "外国人 純買い上位",
@@ -700,8 +700,19 @@
       "sentiment": "センチ",
       "contract": "権利行使·満期",
       "size": "契約数",
-      "premium": "プレミアム"
-    }
+      "premium": "プレミアム",
+      "totalValue": "合計保有額",
+      "fundCount": "ファンド数",
+      "topFunds": "主要ファンド",
+      "exchange": "取引所"
+    },
+    "tabNport": "N-PORT 投信",
+    "tabBlocks": "ブロック約定",
+    "tickerFilterPlaceholder": "ティッカー絞込 (例: NVDA)",
+    "clusters": "集中検出",
+    "nportExplainer": "Form N-PORTは投資信託の月次保有開示です。13F(四半期)の3倍速く、60日以内開示のためFidelity・Vanguard・BlackRockが先月何を売買したかが分かります。追跡銘柄別集計。",
+    "blocksLockedTitle": "💰 ブロック約定データは有料",
+    "blocksLockedBody": "Polygon.io Starter 月$29 (15分遅延) または Advanced 月$199 (リアルタイム)。フッターの月$200支援目標達成で有効化。無料プランでも他の6タブはライブ動作中です。"
   },
   "supply": {
     "tab": {

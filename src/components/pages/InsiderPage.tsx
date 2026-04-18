@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Loader2, RefreshCw, TrendingUp, TrendingDown, ExternalLink, Users, AlertTriangle, Zap, Globe } from 'lucide-react';
+import { Loader2, RefreshCw, TrendingUp, TrendingDown, ExternalLink, Users, AlertTriangle, Zap, Globe, Building2, DollarSign, Filter, X, Flame } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import type { InsiderTransaction, OwnershipAlert } from '@/lib/edgar-insider';
 import type { OptionsFlowAlert } from '@/lib/unusual-whales';
+import type { NPortFundSnapshot, NPortTickerAggregate } from '@/lib/edgar-nport';
+import type { BlockTrade } from '@/lib/polygon';
 
-type Tab = 'insider' | 'ownership' | 'options' | 'korea';
+type Tab = 'insider' | 'ownership' | 'options' | 'korea' | 'nport' | 'blocks';
 
 interface KoreaFlowPayload {
   updatedAt: string;
@@ -76,19 +78,26 @@ export default function InsiderPage() {
   const [options, setOptions] = useState<OptionsFlowAlert[]>([]);
   const [optionsConfigured, setOptionsConfigured] = useState<boolean>(true);
   const [korea, setKorea] = useState<KoreaFlowPayload | null>(null);
+  const [nportFunds, setNportFunds] = useState<NPortFundSnapshot[]>([]);
+  const [nportByTicker, setNportByTicker] = useState<NPortTickerAggregate[]>([]);
+  const [blocks, setBlocks] = useState<BlockTrade[]>([]);
+  const [blocksConfigured, setBlocksConfigured] = useState<boolean>(true);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [tickerFilter, setTickerFilter] = useState<string>('');
 
   const load = useCallback(async (force = false) => {
     if (force) setRefreshing(true); else setLoading(true);
     const q = force ? '?refresh=1' : '';
     try {
-      const [iRes, oRes, xRes, kRes] = await Promise.allSettled([
+      const [iRes, oRes, xRes, kRes, nRes, bRes] = await Promise.allSettled([
         fetch(`/api/insider-trades${q}`).then(r => r.json()),
         fetch(`/api/ownership-alerts${q}`).then(r => r.json()),
         fetch(`/api/options-flow${q}`).then(r => r.json()),
         fetch(`/api/korea-flow${q}`).then(r => r.json()),
+        fetch(`/api/nport-holdings${q}`).then(r => r.json()),
+        fetch(`/api/block-trades${q}`).then(r => r.json()),
       ]);
       if (iRes.status === 'fulfilled') setInsider(iRes.value.items ?? []);
       if (oRes.status === 'fulfilled') setOwnership(oRes.value.items ?? []);
@@ -97,6 +106,14 @@ export default function InsiderPage() {
         setOptionsConfigured(xRes.value.configured !== false);
       }
       if (kRes.status === 'fulfilled') setKorea(kRes.value ?? null);
+      if (nRes.status === 'fulfilled') {
+        setNportFunds(nRes.value.funds ?? []);
+        setNportByTicker(nRes.value.byTicker ?? []);
+      }
+      if (bRes.status === 'fulfilled') {
+        setBlocks(bRes.value.items ?? []);
+        setBlocksConfigured(bRes.value.configured !== false);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -108,9 +125,36 @@ export default function InsiderPage() {
   const TABS: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
     { id: 'insider',   label: t('tabInsider'),   icon: <Users className="w-4 h-4" />,          count: insider.length },
     { id: 'ownership', label: t('tabOwnership'), icon: <AlertTriangle className="w-4 h-4" />,  count: ownership.length },
+    { id: 'nport',     label: t('tabNport'),     icon: <Building2 className="w-4 h-4" />,      count: nportFunds.length },
+    { id: 'blocks',    label: t('tabBlocks'),    icon: <DollarSign className="w-4 h-4" />,     count: blocks.length },
     { id: 'options',   label: t('tabOptions'),   icon: <Zap className="w-4 h-4" />,             count: options.length },
     { id: 'korea',     label: t('tabKorea'),     icon: <Globe className="w-4 h-4" />,           count: korea ? (korea.topForeignBuy.length + korea.topForeignSell.length) : 0 },
   ];
+
+  // ── Filter + cluster insider transactions by ticker ─────────────────────
+  const tf = tickerFilter.trim().toUpperCase();
+  const insiderFiltered = tf ? insider.filter(i => i.ticker === tf || i.issuerName.toUpperCase().includes(tf)) : insider;
+  const ownershipFiltered = tf ? ownership.filter(a => a.ticker === tf || a.issuerName.toUpperCase().includes(tf)) : ownership;
+  const nportFilteredByTicker = tf ? nportByTicker.filter(a => a.ticker === tf) : nportByTicker;
+  const blocksFiltered = tf ? blocks.filter(b => b.ticker === tf) : blocks;
+
+  // Cluster: tickers with 3+ insider transactions in the feed (unusual concentration)
+  const clusterMap = new Map<string, InsiderTransaction[]>();
+  for (const x of insider) {
+    if (!x.ticker) continue;
+    const arr = clusterMap.get(x.ticker) ?? [];
+    arr.push(x);
+    clusterMap.set(x.ticker, arr);
+  }
+  const clusters = Array.from(clusterMap.entries())
+    .filter(([, arr]) => arr.length >= 3)
+    .map(([ticker, arr]) => {
+      const buys = arr.filter(x => x.direction === 'buy').length;
+      const sells = arr.filter(x => x.direction === 'sell').length;
+      const totalValue = arr.reduce((s, x) => s + (x.transactionValueUsd ?? 0), 0);
+      return { ticker, count: arr.length, buys, sells, totalValue };
+    })
+    .sort((a, b) => b.count - a.count);
 
   if (loading) {
     return (
@@ -146,6 +190,39 @@ export default function InsiderPage() {
       <div className="cf-card p-4 mb-4 bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10">
         <p className="text-xs font-bold text-cf-text-primary mb-1.5">💡 {t('explainerTitle')}</p>
         <p className="text-[11px] text-cf-text-secondary leading-relaxed">{t('explainerBody')}</p>
+      </div>
+
+      {/* Ticker filter + cluster badges */}
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 flex-1 max-w-sm">
+          <Filter className="w-3.5 h-3.5 text-cf-text-secondary" />
+          <input
+            value={tickerFilter}
+            onChange={(e) => setTickerFilter(e.target.value)}
+            placeholder={t('tickerFilterPlaceholder')}
+            className="flex-1 bg-transparent text-xs outline-none text-cf-text-primary placeholder:text-cf-text-secondary/50 uppercase"
+          />
+          {tickerFilter && (
+            <button onClick={() => setTickerFilter('')} className="text-cf-text-secondary hover:text-cf-text-primary">
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+        {clusters.length > 0 && (
+          <div className="flex items-center gap-1.5 text-[10px] text-cf-text-secondary">
+            <Flame className="w-3 h-3 text-orange-400" /> {t('clusters')}:
+            {clusters.slice(0, 5).map(c => (
+              <button
+                key={c.ticker}
+                onClick={() => { setTickerFilter(c.ticker); setTab('insider'); }}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${c.buys > c.sells ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}
+                title={`${c.count} filings (${c.buys} buys / ${c.sells} sells)`}
+              >
+                {c.ticker} · {c.count}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -189,7 +266,7 @@ export default function InsiderPage() {
               </tr>
             </thead>
             <tbody>
-              {insider.map(ix => (
+              {insiderFiltered.map(ix => (
                 <tr key={ix.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(ix.filedAt)}</td>
                   <td className="px-3 py-2.5">
@@ -228,7 +305,7 @@ export default function InsiderPage() {
               ))}
             </tbody>
           </table>
-          {insider.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+          {insiderFiltered.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
         </div>
       )}
 
@@ -248,7 +325,7 @@ export default function InsiderPage() {
               </tr>
             </thead>
             <tbody>
-              {ownership.map(a => (
+              {ownershipFiltered.map(a => (
                 <tr key={a.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(a.filedAt)}</td>
                   <td className="px-3 py-2.5">
@@ -280,7 +357,91 @@ export default function InsiderPage() {
               ))}
             </tbody>
           </table>
-          {ownership.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+          {ownershipFiltered.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
+        </div>
+      )}
+
+      {/* N-PORT — mutual fund monthly holdings */}
+      {tab === 'nport' && (
+        <div className="space-y-4">
+          <div className="text-[11px] text-cf-text-secondary">
+            {t('nportExplainer')}
+          </div>
+          <div className="cf-card overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-white/5">
+                <tr className="text-[10px] text-cf-text-secondary">
+                  <th className="px-3 py-2 text-left">{t('th.ticker')}</th>
+                  <th className="px-3 py-2 text-right">{t('th.totalValue')}</th>
+                  <th className="px-3 py-2 text-right">{t('th.fundCount')}</th>
+                  <th className="px-3 py-2 text-left">{t('th.topFunds')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nportFilteredByTicker.map(agg => (
+                  <tr key={agg.ticker} className="border-b border-white/5 hover:bg-white/[0.02]">
+                    <td className="px-3 py-2.5">
+                      <Link href={`/company/${agg.ticker}` as Parameters<typeof Link>[0]['href']} className="font-bold text-cf-accent hover:underline">
+                        {agg.ticker}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-sm font-bold text-right text-emerald-400">{fmtUsd(agg.totalValueUsd)}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs text-right">{agg.funds.length}</td>
+                    <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary">
+                      {agg.funds.slice(0, 3).map((f, i) => (
+                        <span key={i} className="inline-block mr-2">
+                          <span className="text-cf-text-primary">{f.fund.slice(0, 28)}</span>
+                          <span className="text-cf-text-secondary/60 ml-1">{fmtUsd(f.valueUsd)}{f.pctOfNav != null ? ` (${f.pctOfNav.toFixed(1)}% NAV)` : ''}</span>
+                        </span>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {nportFilteredByTicker.length === 0 && (
+              <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Block trades */}
+      {tab === 'blocks' && !blocksConfigured && (
+        <div className="cf-card p-8 text-center">
+          <DollarSign className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+          <p className="text-sm font-bold text-cf-text-primary mb-2">{t('blocksLockedTitle')}</p>
+          <p className="text-xs text-cf-text-secondary leading-relaxed max-w-md mx-auto">{t('blocksLockedBody')}</p>
+        </div>
+      )}
+
+      {tab === 'blocks' && blocksConfigured && (
+        <div className="cf-card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-white/5">
+              <tr className="text-[10px] text-cf-text-secondary">
+                <th className="px-3 py-2 text-left">{t('th.time')}</th>
+                <th className="px-3 py-2 text-left">{t('th.ticker')}</th>
+                <th className="px-3 py-2 text-right">{t('th.shares')}</th>
+                <th className="px-3 py-2 text-right">{t('th.price')}</th>
+                <th className="px-3 py-2 text-right">{t('th.value')}</th>
+                <th className="px-3 py-2 text-left">{t('th.exchange')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {blocksFiltered.map(b => (
+                <tr key={b.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(b.timestamp)}</td>
+                  <td className="px-3 py-2.5"><Link href={`/company/${b.ticker}` as Parameters<typeof Link>[0]['href']} className="font-bold text-cf-accent hover:underline">{b.ticker}</Link></td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right">{b.size.toLocaleString()}</td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-right">${b.price.toFixed(2)}</td>
+                  <td className="px-3 py-2.5 font-mono text-sm font-bold text-right">{fmtUsd(b.valueUsd)}</td>
+                  <td className="px-3 py-2.5 text-[10px] text-cf-text-secondary">{b.exchange ?? '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {blocksFiltered.length === 0 && <div className="py-12 text-center text-sm text-cf-text-secondary">{t('empty')}</div>}
         </div>
       )}
 
@@ -306,7 +467,7 @@ export default function InsiderPage() {
               </tr>
             </thead>
             <tbody>
-              {options.map(o => (
+              {(tf ? options.filter(o => o.ticker === tf) : options).map(o => (
                 <tr key={o.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary font-mono whitespace-nowrap">{fmtTime(o.timestamp)}</td>
                   <td className="px-3 py-2.5 font-bold text-cf-accent">{o.ticker}</td>

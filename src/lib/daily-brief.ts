@@ -65,6 +65,8 @@ export interface TabContext {
   ownership: unknown[];           // 13D/13G 5%+ crossings (+10d)
   options: unknown[];             // Unusual Whales options flow (requires key)
   korea: unknown | null;          // KRX foreign/institutional real-time
+  nport: unknown | null;          // Form N-PORT mutual fund monthly holdings
+  blocks: unknown[];              // Polygon block trades (requires key)
 }
 
 async function safeGet<T = unknown>(redis: Redis, key: string): Promise<T | null> {
@@ -77,6 +79,7 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
     fedWatch: null, macro: null, credit: null, cascade: [],
     signals: institutionalSignals,
     insider: [], ownership: [], options: [], korea: null,
+    nport: null, blocks: [],
   };
   if (!redis) return ctx;
 
@@ -87,7 +90,7 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
   const [
     heatmap, shortData, capFlows, capFlowsYahoo, capFlowsNone,
     fg, fed, macroV4, macroV3, credit, cascadeIds, liveSignals,
-    insider, ownership, options, korea,
+    insider, ownership, options, korea, nport, blocks,
   ] = await Promise.all([
     safeGet(redis, `flowvium:heatmap:v5:US:${hour}`),
     safeGet(redis, 'flowvium:short-interest:v1'),
@@ -108,6 +111,8 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
     safeGet<unknown[]>(redis, 'flowvium:ownership-alerts:v1'),
     safeGet<unknown[]>(redis, 'flowvium:options-flow:v1'),
     safeGet(redis, 'flowvium:korea-flow:v1'),
+    safeGet(redis, 'flowvium:nport-holdings:v1'),
+    safeGet<unknown[]>(redis, 'flowvium:block-trades:v1'),
   ]);
 
   ctx.heatmap = heatmap;
@@ -122,6 +127,8 @@ export async function gatherTabContext(redis: Redis | null): Promise<TabContext>
   if (Array.isArray(ownership)) ctx.ownership = ownership;
   if (Array.isArray(options)) ctx.options = options;
   ctx.korea = korea;
+  ctx.nport = nport;
+  if (Array.isArray(blocks)) ctx.blocks = blocks;
 
   if (cascadeIds && cascadeIds.length > 0) {
     const articles = await Promise.all(
@@ -347,6 +354,23 @@ function summariseKorea(korea: unknown): string {
   return `외인매수:${fbStr} / 외인매도:${fsStr} / 기관매수:${ibStr}`;
 }
 
+function summariseNPort(nport: unknown): string {
+  const p = nport as Record<string, unknown> | null;
+  if (!p) return '';
+  const byTicker = (p.byTicker as Array<Record<string, unknown>>) ?? [];
+  return byTicker.slice(0, 4)
+    .map(a => `${a.ticker}:${(a.funds as unknown[])?.length ?? 0}펀드/$${Math.round((a.totalValueUsd as number) / 1e6)}M`)
+    .join(', ');
+}
+
+function summariseBlocks(items: unknown[]): string {
+  const arr = items as Array<Record<string, unknown>>;
+  if (!arr?.length) return '';
+  return arr.slice(0, 3)
+    .map(b => `${b.ticker}(${(b.size as number)?.toLocaleString()}주@$${(b.price as number)?.toFixed(2)})`)
+    .join(', ');
+}
+
 function summariseSupply(): string {
   return Object.entries(companySupplyChainUpdates)
     .flatMap(([tk, ups]) => ups.filter(u => u.impact === 'high').slice(0, 1).map(u => `${tk}:${u.type}`))
@@ -373,6 +397,8 @@ export function buildPrompt(tf: Timeframe, ctx?: TabContext): string {
   const ownership = ctx ? summariseOwnership(ctx.ownership) : '';
   const optionsFlow = ctx ? summariseOptionsFlow(ctx.options) : '';
   const korea = ctx ? summariseKorea(ctx.korea) : '';
+  const nport = ctx ? summariseNPort(ctx.nport) : '';
+  const blocks = ctx ? summariseBlocks(ctx.blocks) : '';
 
   return `Flowvium ${tfLabel} 리포트용 실시간 탭 데이터입니다. 각 탭을 종합해 한국어 JSON만 반환하세요.
 
@@ -392,6 +418,8 @@ export function buildPrompt(tf: Timeframe, ctx?: TabContext): string {
 [13D13G-Ownership] ${ownership || 'n/a'}
 [OptionsFlow] ${optionsFlow || 'n/a'}
 [Korea-Flow] ${korea || 'n/a'}
+[NPort-Funds] ${nport || 'n/a'}
+[Block-Trades] ${blocks || 'n/a'}
 
 출력 규칙: JSON만, 마크다운 금지, bullets는 각 25자 이내의 구체 수치 포함 문장.
 섹션 매핑:

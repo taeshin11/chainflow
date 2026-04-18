@@ -1,0 +1,119 @@
+Date: 2026-04-19 (follow-up to Bloomberg stack commit)
+Scope: N-PORT mutual funds + Polygon block trades + insider clustering + ticker filter + 11-lang native i18n
+
+─────────────────────────────────────────────────────────────
+WHY
+─────────────────────────────────────────────────────────────
+After the initial Bloomberg-stack commit, user asked "다음 단계 해" — push
+the remaining items from the future-work list of the prior research note:
+  - Form N-PORT monthly mutual fund holdings
+  - Polygon block trades (real-time tape)
+  - Insider aggregation / cluster view
+  - Ticker filter UX on insider tabs
+  - 11-language native translations for insider section
+
+User also pushed back on the "locked" tab message reading like a dev
+instruction ("Set UNUSUAL_WHALES_KEY env") — that's site-owner facing,
+not visitor facing. Rewrote to a funding-goal call.
+
+Pricing clarified to user:
+  - $48/mo  — Unusual Whales only (options flow)
+  - $77/mo  — + Polygon Starter ($29, 15-min delayed) block trades
+  - $247/mo — + Polygon Advanced ($199) realtime SIP/Level 2 tape
+The footer's $200/mo donation goal is a near-exact match for full real-time.
+
+─────────────────────────────────────────────────────────────
+NEW FILES
+─────────────────────────────────────────────────────────────
+src/lib/edgar-nport.ts
+  - fetchRecentNPORT({feedCount}) — walks NPORT-P RSS, downloads primary_doc.xml
+    per filing, regex-parses invstOrSec blocks, filters to our CUSIP map,
+    returns NPortFundSnapshot[] per fund with {seriesName, regName, repPdDate,
+    totalNetAssets, holdings[]}.
+  - aggregateByTicker(snapshots) → NPortTickerAggregate[] showing "for each of
+    our tickers, which mutual funds hold it with what value and % NAV".
+  - Handles large XMLs (100-500KB per fund) in batches of 4 concurrent.
+
+src/lib/polygon.ts
+  - polygonKey() env gate — POLYGON_KEY; returns [] unless set.
+  - fetchBlockTrades(ticker, minShares=10000, maxPages=2) — uses v3/trades
+    endpoint, filters to >=10K share prints.
+  - fetchBlockTradesForTickers(tickers) — parallel across tracked tickers.
+
+src/app/api/nport-holdings/route.ts
+  - GET returns {funds, byTicker, updatedAt}. Redis 6h TTL.
+
+src/app/api/block-trades/route.ts
+  - GET returns {items, configured, total}. {configured:false} when no key.
+  - Redis 5min TTL. Tracked roster of 27 semi/AI/defense/bio/energy tickers.
+
+scripts/fix-locked-msg.py
+  - Rewrote optionsLockedTitle/Body to funding-goal prose in all 16 languages.
+
+scripts/add-insider-v2-i18n.py
+  - Added tabNport / tabBlocks / blocksLockedTitle / blocksLockedBody /
+    tickerFilterPlaceholder / clusters / nportExplainer /
+    th.{totalValue,fundCount,topFunds,exchange}. English fallback for 11 langs.
+
+scripts/translate-insider-11langs.py
+  - Fills native translations (es/fr/de/pt/ru/ar/hi/id/th/tr/vi) for the
+    entire insider.* section, replacing the English fallback from the prior
+    commit. Now all 16 languages have proper translations.
+
+─────────────────────────────────────────────────────────────
+MODIFIED FILES
+─────────────────────────────────────────────────────────────
+src/components/pages/InsiderPage.tsx
+  - Two new tabs: `nport` (N-PORT fund aggregates) and `blocks` (Polygon tape).
+  - Ticker filter input (uppercase) + X reset button, applied across all tabs
+    uniformly via capFor-style filter variables.
+  - Cluster bar: tickers with 3+ insider filings show as clickable pills;
+    color-coded by net direction (buys > sells = green, else red). Click
+    jumps to insider tab with that ticker pre-filtered.
+  - blocksConfigured locked-state gate (same pattern as options).
+
+src/lib/daily-brief.ts
+  - TabContext + gatherTabContext extended with nport/blocks.
+  - summariseNPort/summariseBlocks helpers.
+  - Prompt adds [NPort-Funds] and [Block-Trades] labeled sections so the AI
+    report can surface "NVDA held by 12 mutual funds / $450M total" style lines.
+
+src/app/api/cron/update-all/route.ts
+  - Added /api/nport-holdings (55s timeout — XML heavy) and /api/block-trades
+    (30s) to parallel warm step.
+
+vercel.json
+  - maxDuration:60 for nport-holdings.
+
+messages/*.json (all 16)
+  - 4 scripts ran in order: add-insider-i18n → fix-locked-msg →
+    add-insider-v2-i18n → translate-insider-11langs. End state:
+    - Every language has: nav.insider, insider.{title, subtitle, loading, refresh,
+      empty, buy, sell, tabInsider, tabOwnership, tabNport, tabBlocks, tabOptions,
+      tabKorea, explainerTitle, explainerBody, optionsLockedTitle,
+      optionsLockedBody, blocksLockedTitle, blocksLockedBody, nportExplainer,
+      tickerFilterPlaceholder, clusters, koreaAsOf, tickers, foreignTopBuy/Sell,
+      instTopBuy/Sell, sources, th.{filed,ticker,issuer,insider,role,action,
+      shares,price,value,filer,formType,percent,sharesOwned,time,sentiment,
+      contract,size,premium,totalValue,fundCount,topFunds,exchange}}
+    - Locked messages now read as user-facing funding-goal call, not env var set.
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- Live curl: NPORT-P RSS + sample primary_doc.xml parsed
+  (Wellington Shields All-Cap Fund → ASML ADR $1.85M position, 2.67% NAV).
+- tsc --noEmit: exit 0 (fixed 2 TS7022 implicit-any issues in polygon.ts).
+- next build: /api/nport-holdings and /api/block-trades both listed.
+
+─────────────────────────────────────────────────────────────
+USER MESSAGE THREAD CONTEXT
+─────────────────────────────────────────────────────────────
+- Implementing $200/mo goal from footer.donationGoalTitle.
+- Paid integrations (Unusual Whales, Polygon) are site-owner-paid only.
+  Users NEVER enter API keys. Locked tabs show "this unlocks when the
+  $200/mo footer goal is reached" — concrete and honest.
+- Every tab that is currently locked has a free functional sibling:
+    options → insider (Form 4) + ownership (13D/G) both free EDGAR
+    blocks  → nport (mutual fund holdings) + korea (KRX live) both free
+  So visitors see real data today; paid tabs are upgrades, not blockers.

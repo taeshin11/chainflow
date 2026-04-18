@@ -4,6 +4,7 @@
     "src/app/api/cron/daily-brief/route.ts": { "maxDuration": 60 },
     "src/app/api/insider-trades/route.ts": { "maxDuration": 60 },
     "src/app/api/ownership-alerts/route.ts": { "maxDuration": 60 },
+    "src/app/api/nport-holdings/route.ts": { "maxDuration": 60 },
     "src/app/api/market-caps/route.ts": { "maxDuration": 60 }
   },
   "crons": [

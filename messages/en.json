@@ -673,8 +673,8 @@
     "tabKorea": "Korea Flow",
     "explainerTitle": "Bloomberg can't give real-time 13F either — 45-day legal lag",
     "explainerBody": "But combining Form 4 (D+2) insider trades, Schedule 13D/13G (5%+ crossings), options unusual flow, and KRX foreign/institutional net-buys, you get live institutional signals. This page stitches them together.",
-    "optionsLockedTitle": "Options flow requires paid API",
-    "optionsLockedBody": "Unusual Whales $48/mo. Set UNUSUAL_WHALES_KEY env to enable. Currently disabled — every other tab runs on free SEC EDGAR data.",
+    "optionsLockedTitle": "💰 Options flow is paid data",
+    "optionsLockedBody": "This requires the Unusual Whales API ($48/mo). It unlocks once the $200/mo donation goal in the footer is reached — until then, insider trades, 13D/G alerts, and Korea flow run entirely on free SEC/KRX data.",
     "koreaAsOf": "as of {date}",
     "tickers": "tickers",
     "foreignTopBuy": "Foreign Top Net Buy",
@@ -700,8 +700,19 @@
       "sentiment": "Sentiment",
       "contract": "Strike · Expiry",
       "size": "Size",
-      "premium": "Premium"
-    }
+      "premium": "Premium",
+      "totalValue": "Total Value",
+      "fundCount": "# Funds",
+      "topFunds": "Top Funds",
+      "exchange": "Exchange"
+    },
+    "tabNport": "N-PORT Funds",
+    "tabBlocks": "Block Trades",
+    "tickerFilterPlaceholder": "Filter by ticker (e.g. NVDA)",
+    "clusters": "Clusters",
+    "nportExplainer": "Form N-PORT is the monthly holdings disclosure for mutual funds — 3× faster than 13F (quarterly) with a 60-day lag, so you see what Fidelity / Vanguard / BlackRock bought last month. Aggregated by tracked ticker.",
+    "blocksLockedTitle": "💰 Block trade data is paid",
+    "blocksLockedBody": "Polygon.io Starter $29/mo (15-min delayed) or Advanced $199/mo (realtime). Unlocks once the $200/mo donation goal in the footer is reached. Even on the free tier the other 6 tabs are live."
   },
   "supply": {
     "tab": {
