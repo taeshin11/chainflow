@@ -1,0 +1,73 @@
+Date: 2026-04-18 (follow-up to crumb/AI-report commit)
+Scope: Dynamic market-cap bands for Explore filter
+
+─────────────────────────────────────────────────────────────
+PROBLEM
+─────────────────────────────────────────────────────────────
+src/data/companies.ts and companies-batch*.ts hard-code marketCap
+bands ('titan'/'mega'/'large'/'mid'/'small') per company. Many of
+these drifted: COIN marked 'mid' (~$2B-$10B) but is actually ~$55B
+(large); FSLR marked 'mid' but is ~$20B (large). User screenshot
+showed that filtering by 'Small (<$2B)' produced a confusing mix
+because static labels lie.
+
+Full static rewrite is error-prone and goes stale again in months.
+
+─────────────────────────────────────────────────────────────
+SOLUTION
+─────────────────────────────────────────────────────────────
+Fetch real market caps from Yahoo daily and override the static
+enum at render time. Keep static data as offline fallback.
+
+New pieces:
+
+1) src/lib/yahoo-finance.ts
+   - Added marketCapToBand(rawUsd): titan >=$1T, mega >=$200B,
+     large >=$10B, mid >=$2B, else small.
+   - Added fetchYFMarketCaps(tickers) — batches 40 symbols per
+     v7/quote request with crumb+cookie (reuses existing getYFCreds).
+     Returns YFMarketCap[] = {ticker, marketCap, band, currency}.
+
+2) src/app/api/market-caps/route.ts (new)
+   - Collects unique tickers from allCompanies (dedupes batch overlaps).
+   - Calls fetchYFMarketCaps, returns { bands: {ticker→band},
+     caps: {ticker→USD}, updatedAt, count }.
+   - Redis key flowvium:market-caps:v1, 24h TTL.
+
+3) src/components/pages/ExplorePage.tsx
+   - New state liveBands (Record<ticker, band>).
+   - Mount-time fetch('/api/market-caps'), non-blocking.
+   - Helper capFor(c) = liveBands[c.ticker] ?? c.marketCap.
+   - All three uses now route through capFor:
+       • filteredCompanies (the filter the user clicked)
+       • graphData.val (force graph node size)
+       • company card sub-line
+   - SidePanel accepts liveBand prop for consistency.
+
+4) src/app/api/cron/update-all/route.ts
+   - Added /api/short-interest and /api/market-caps to the parallel
+     warm-up step so the caches are populated 3×/day without needing
+     a new cron entry in vercel.json.
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- Yahoo v7/quote batch test (curl with crumb): AAPL=3971B, MSFT=3142B,
+  NVDA=4901B, COIN=55.6B, FSLR=20.5B — matches reality, bands classify
+  correctly (AAPL/MSFT/NVDA→titan, COIN/FSLR→large).
+- tsc --noEmit: exit 0
+- next build: compiled, /api/market-caps registered as dynamic route
+
+─────────────────────────────────────────────────────────────
+NOT DONE / FUTURE
+─────────────────────────────────────────────────────────────
+- Non-US listings (e.g. 005930.KS) have market cap denominated in
+  local currency from Yahoo. marketCapToBand() treats raw as USD.
+  For Korean/Japanese/Chinese tickers this will misclassify — could
+  convert via currency field + FX rates later. Current deployment
+  silently leaves those with static band (fallback) since the band
+  field is still populated from Yahoo's raw; revisit if the Explore
+  page's non-US sectors look wrong.
+- Static marketCap fields in companies*.ts are NOT edited — they
+  remain as fallback and build-time seed. Will drift but no longer
+  drive the live UI.

@@ -1,40 +1,66 @@
 /**
  * /api/cron/update-all
  *
- * 매일 06:00 KST (21:00 UTC) 실행
- * 모든 캐시를 순차적으로 워밍:
- *   1. macro-indicators (FRED 실시간)
- *   2. fedwatch (CME 기반)
+ * 하루 3회 실행 (vercel.json 기준 KST):
+ *   07:50 KST / 15:50 KST / 21:20 KST
+ *
+ * 캐시 워밍 순서:
+ *   1. macro-indicators (FRED)
+ *   2. fedwatch (CME)
  *   3. capital-flows (Yahoo Finance)
- *   4. flow-analysis (EXAONE AI)
- *   5. fear-greed (CNN + Yahoo)
- *   6. credit-balance
+ *   4. fear-greed (CNN + Yahoo — force=1로 강제 갱신)
+ *   5. credit-balance
+ *   6. flow-analysis (AI, capital-flows 이후)
+ *   7. daily-brief x3 timeframes (EXAONE AI)
+ *   8. news-cascade (fire & forget)
+ *   9. stock-supply 주요 티커 pre-warm
  */
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
+// VERCEL_URL은 프리뷰 URL이므로 항상 프로덕션 도메인 고정
 function getBaseUrl(): string {
-  return process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\s+/g, '').replace(/\\n/g, '') ||
+    'https://flowvium.vercel.app'
+  );
 }
 
-async function warmEndpoint(base: string, path: string, label: string): Promise<{ label: string; ok: boolean; ms: number }> {
+async function warm(
+  base: string,
+  path: string,
+  label: string,
+  timeoutMs = 25000,
+): Promise<{ label: string; ok: boolean; ms: number; status?: number }> {
   const start = Date.now();
   try {
     const res = await fetch(`${base}${path}`, {
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(timeoutMs),
       headers: { 'x-cron-warm': '1' },
     });
-    return { label, ok: res.ok, ms: Date.now() - start };
-  } catch {
-    return { label, ok: false, ms: Date.now() - start };
+    return { label, ok: res.ok, ms: Date.now() - start, status: res.status };
+  } catch (e) {
+    return { label, ok: false, ms: Date.now() - start, status: 0 };
   }
 }
 
+// Redis 캐시 강제 삭제 (daily-brief DELETE endpoint)
+async function bustDailyBriefCache(base: string, secret: string) {
+  try {
+    await fetch(`${base}/api/daily-brief`, {
+      method: 'DELETE',
+      headers: { 'x-cron-secret': secret },
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch { /* non-fatal */ }
+}
+
+const TOP_TICKERS = ['NVDA', 'AAPL', 'MSFT', 'TSMC', 'AMZN', 'GOOGL', 'META', 'LMT', 'MU', 'ASML'];
+
 export async function GET(req: Request) {
-  // Auth check
   const authHeader = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
+  const cronSecret = process.env.CRON_SECRET ?? '';
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -42,30 +68,48 @@ export async function GET(req: Request) {
   const base = getBaseUrl();
   const startTime = Date.now();
 
-  // 1. Bust daily-keyed caches by calling endpoints (they auto-regenerate)
-  // Run in parallel where safe, then flow-analysis after capital-flows
-  const [macroResult, fedwatchResult, capitalResult, fearGreedResult, creditResult] =
-    await Promise.all([
-      warmEndpoint(base, '/api/macro-indicators', 'macro-indicators'),
-      warmEndpoint(base, '/api/fedwatch', 'fedwatch'),
-      warmEndpoint(base, '/api/capital-flows', 'capital-flows'),
-      warmEndpoint(base, '/api/fear-greed', 'fear-greed'),
-      warmEndpoint(base, '/api/credit-balance', 'credit-balance'),
-    ]);
+  // ── 1단계: 독립적인 데이터 소스 병렬 갱신 ────────────────────────────────
+  const [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR] = await Promise.all([
+    warm(base, '/api/macro-indicators', 'macro-indicators'),
+    warm(base, '/api/fedwatch', 'fedwatch'),
+    warm(base, '/api/capital-flows', 'capital-flows'),
+    warm(base, '/api/fear-greed?force=1', 'fear-greed'),   // force 갱신
+    warm(base, '/api/credit-balance', 'credit-balance'),
+    warm(base, '/api/short-interest', 'short-interest', 45000),  // Yahoo crumb, ~28 tickers
+    warm(base, '/api/market-caps', 'market-caps', 50000),         // Yahoo batch, all tickers
+  ]);
 
-  // Flow analysis depends on capital-flows
-  const flowResult = await warmEndpoint(base, '/api/flow-analysis?tf=4w', 'flow-analysis');
+  // ── 2단계: capital-flows 의존 분석 ─────────────────────────────────────
+  const flowR = await warm(base, '/api/flow-analysis?tf=4w', 'flow-analysis');
 
-  // News cascade pre-warm (fire and forget — it's slow)
+  // ── 3단계: AI 리포트 캐시 삭제 후 재생성 ────────────────────────────────
+  if (cronSecret) await bustDailyBriefCache(base, cronSecret);
+  const [brief1wR, brief4wR, brief13wR] = await Promise.all([
+    warm(base, '/api/daily-brief?tf=1w&force=1', 'daily-brief-1w', 20000),
+    warm(base, '/api/daily-brief?tf=4w&force=1', 'daily-brief-4w', 20000),
+    warm(base, '/api/daily-brief?tf=13w&force=1', 'daily-brief-13w', 20000),
+  ]);
+
+  // ── 4단계: 수급동향 주요 티커 pre-warm (fire & forget) ─────────────────
+  for (const ticker of TOP_TICKERS) {
+    fetch(`${base}/api/stock-supply?ticker=${ticker}`, {
+      signal: AbortSignal.timeout(15000),
+    }).catch(() => {});
+  }
+
+  // ── 5단계: news-cascade (느림 — fire & forget) ─────────────────────────
   fetch(`${base}/api/news-cascade`, { signal: AbortSignal.timeout(60000) }).catch(() => {});
 
-  const results = [macroResult, fedwatchResult, capitalResult, fearGreedResult, creditResult, flowResult];
-  const allOk = results.every(r => r.ok);
+  const results = [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, flowR, brief1wR, brief4wR, brief13wR];
+  const failedCount = results.filter(r => !r.ok).length;
 
   return NextResponse.json({
-    success: allOk,
+    success: failedCount === 0,
+    failedCount,
     totalMs: Date.now() - startTime,
+    baseUrl: base,
     results,
     updatedAt: new Date().toISOString(),
+    kstTime: new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ') + ' KST',
   });
 }

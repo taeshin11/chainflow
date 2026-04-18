@@ -74,9 +74,10 @@ function getRoleSize(role: string): number {
 interface SidePanelProps {
   company: Company;
   onClose: () => void;
+  liveBand?: string;
 }
 
-function SidePanel({ company, onClose }: SidePanelProps) {
+function SidePanel({ company, onClose, liveBand }: SidePanelProps) {
   const t = useTranslations('explore');
   const translatedDescription = useTranslatedText(company.description);
   const pieData = company.revenue.segments.map((s) => ({
@@ -130,7 +131,7 @@ function SidePanel({ company, onClose }: SidePanelProps) {
           <div className="flex items-center gap-2 text-sm">
             <DollarSign className="w-4 h-4 text-cf-text-secondary" />
             <span className="text-cf-text-secondary">{t('sidePanel.cap')}:</span>
-            <span className="font-medium">{marketCapLabels[company.marketCap] ?? company.marketCap}</span>
+            <span className="font-medium">{marketCapLabels[liveBand ?? company.marketCap] ?? (liveBand ?? company.marketCap)}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="w-4 h-4 text-cf-text-secondary" />
@@ -278,9 +279,27 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
   const [containerWidth, setContainerWidth] = useState(800);
+  // Live-fetched market-cap bands (overrides stale static `c.marketCap` enums)
+  const [liveBands, setLiveBands] = useState<Record<string, string>>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const graphRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch live market-cap bands from Yahoo (cached 24h server-side).
+  // Non-blocking: if the call fails the UI keeps static data as fallback.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/market-caps')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!cancelled && data?.bands) setLiveBands(data.bands as Record<string, string>);
+      })
+      .catch(() => { /* static fallback */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Resolve a company's effective cap band — live data if present, else static.
+  const capFor = (c: Company): string => liveBands[c.ticker] ?? c.marketCap;
 
   useEffect(() => {
     setMounted(true);
@@ -324,7 +343,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
       filtered = filtered.filter((c) => c.sector === selectedSector);
     }
     if (selectedCap !== 'all') {
-      filtered = filtered.filter((c) => c.marketCap === selectedCap);
+      filtered = filtered.filter((c) => capFor(c) === selectedCap);
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -345,7 +364,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
       name: c.name,
       ticker: c.ticker,
       sector: c.sector,
-      val: marketCapSizes[c.marketCap] || getRoleSize(c.role),
+      val: marketCapSizes[capFor(c)] || getRoleSize(c.role),
       color: sectorColorMap[c.sector] || '#888',
     }));
 
@@ -612,7 +631,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
                   {c.name}
                 </p>
                 <p className="text-xs text-cf-text-secondary">
-                  {c.ticker} &middot; {marketCapLabels[c.marketCap] ?? c.marketCap}
+                  {c.ticker} &middot; {marketCapLabels[capFor(c)] ?? capFor(c)}
                 </p>
               </div>
             </Link>
@@ -630,6 +649,7 @@ export default function ExplorePage({ initialSector }: ExplorePageProps) {
           <SidePanel
             company={selectedCompany}
             onClose={() => setSelectedCompany(null)}
+            liveBand={liveBands[selectedCompany.ticker]}
           />
         </>
       )}
