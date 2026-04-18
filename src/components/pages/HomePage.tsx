@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import EmailCTA from '@/components/EmailCTA';
+import LiveFeed from '@/components/LiveFeed';
 import { useRouter } from '@/i18n/routing';
 import { allCompanies } from '@/data/companies';
 import { companyNamesI18n } from '@/data/company-names-i18n';
@@ -673,10 +674,16 @@ export default function HomePage() {
               <HeroSearch />
             </div>
             <div className="cf-card p-6">
-              <p className="text-xs text-cf-text-secondary mb-2 font-medium uppercase tracking-wider">
-                {tHome('livePreview')}
-              </p>
-              <MiniGraph />
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-cf-text-secondary font-medium uppercase tracking-wider">
+                  최신 업데이트
+                </p>
+                <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  실시간
+                </span>
+              </div>
+              <LiveFeed />
             </div>
           </div>
         </div>
@@ -945,36 +952,6 @@ export default function HomePage() {
 
       {/* Email CTA */}
       <EmailCTA />
-
-      {/* Support banner */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="rounded-2xl bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 border border-amber-200 px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div className="text-3xl leading-none select-none">☕</div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-amber-900 mb-1">Bloomberg Terminal은 월 $2,000, Flowvium은 무료입니다</p>
-            <p className="text-xs text-amber-700 leading-relaxed">
-              광고 없이 운영하고 있습니다. 서버비에 보탬이 된다면 커피 한 잔 값의 후원이 큰 힘이 돼요.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="bg-white border border-amber-200 rounded-2xl px-4 py-3 text-center shadow-sm">
-              <div className="text-[10px] text-amber-600 font-bold mb-1 uppercase tracking-wider">🇰🇷 카카오뱅크</div>
-              <div className="font-mono text-sm font-extrabold text-amber-900 tracking-widest">3333-17-2320727</div>
-              <div className="text-xs text-amber-700 mt-0.5 font-medium">예금주: 김태신</div>
-            </div>
-            <a
-              href="https://buymeacoffee.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#FFDD00] border border-yellow-300 rounded-2xl px-4 py-3 text-center shadow-sm hover:brightness-95 transition-all flex flex-col items-center justify-center"
-            >
-              <div className="text-[10px] text-yellow-900 font-bold mb-1 uppercase tracking-wider">🌍 International</div>
-              <div className="text-sm font-extrabold text-yellow-900">Buy Me a Coffee</div>
-              <div className="text-[10px] text-yellow-800 mt-0.5">Card · PayPal</div>
-            </a>
-          </div>
-        </div>
-      </section>
 
       {/* Disclaimer */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
