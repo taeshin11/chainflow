@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 /**
  * /api/capital-flows
  *
@@ -113,12 +114,15 @@ async function fetchPricesStooq(ticker: string): Promise<number[]> {
 async function fetchPrices(ticker: string, twelveKey: string | null): Promise<{ prices: number[]; source: string }> {
   if (twelveKey) {
     try { return { prices: await fetchPricesTwelve(ticker, twelveKey), source: 'twelve' }; }
-    catch { /* try next */ }
+    catch (e) { logger.warn('capital-flows', 'twelve_failed', { ticker, error: e }); }
   }
   try { return { prices: await fetchPricesYahoo(ticker), source: 'yahoo' }; }
-  catch { /* try next */ }
+  catch (e) { logger.warn('capital-flows', 'yahoo_failed', { ticker, error: e }); }
   try { return { prices: await fetchPricesStooq(ticker), source: 'stooq' }; }
-  catch { return { prices: [], source: 'failed' }; }
+  catch (e) {
+    logger.error('capital-flows', 'all_sources_failed', { ticker, error: e });
+    return { prices: [], source: 'failed' };
+  }
 }
 
 // ── Analytics ─────────────────────────────────────────────────────────────────
@@ -130,12 +134,15 @@ function pctReturn(prices: number[], days: number): number {
   return parseFloat(((last - prev) / prev * 100).toFixed(2));
 }
 
-/** Scan back to find roughly when the group spread first became significant (≥1%/wk) */
+/** Scan back to find roughly when the group spread first became significant (≥1%/wk).
+ *  maxWeeks bounds the lookback — the caller passes the selected timeframe so that
+ *  e.g. a "1주 기준" view doesn't report a 13주-전 start. */
 function estimateRotationStart(
   priceMap: Record<string, number[]>,
   toGroup: string,
   fromGroup: string,
   assets: typeof ASSETS,
+  maxWeeks: number = 12,
 ): { weeksAgo: number; startDate: string; momentum: 'accelerating' | 'holding' | 'fading' } {
   const toTickers = assets.filter((a) => a.group === toGroup).map((a) => a.ticker);
   const fromTickers = assets.filter((a) => a.group === fromGroup).map((a) => a.ticker);
@@ -153,13 +160,13 @@ function estimateRotationStart(
     return rets.length ? rets.reduce((a, b) => a + b, 0) / rets.length : 0;
   };
 
-  // Scan back in 1-week steps (max 12 weeks) to find start of divergence
+  // Scan back in 1-week steps (bounded by maxWeeks) to find start of divergence
   let weeksAgo = 1;
-  for (let w = 12; w >= 1; w--) {
+  for (let w = maxWeeks; w >= 1; w--) {
     const toRet = avgGroupReturn(toTickers, w * 5, 5);
     const fromRet = avgGroupReturn(fromTickers, w * 5, 5);
     if (toRet - fromRet < 0.5) {
-      weeksAgo = w + 1;
+      weeksAgo = Math.min(w + 1, maxWeeks);
       break;
     }
     weeksAgo = 1; // still going
@@ -196,6 +203,8 @@ function buildRotations(
   retKey: 'ret1w' | 'ret4w' | 'ret13w',
   minSpread: number,
 ): RotationEntry[] {
+  // Limit rotation-start lookback to the selected timeframe so the UI label is consistent
+  const maxWeeks = retKey === 'ret1w' ? 2 : retKey === 'ret4w' ? 5 : 13;
   const groupPerf: Record<string, number[]> = {};
   for (const r of results) {
     if (!groupPerf[r.group]) groupPerf[r.group] = [];
@@ -211,7 +220,7 @@ function buildRotations(
     for (let j = i + 1; j < groupAvg.length; j++) {
       const spread = groupAvg[i].avg - groupAvg[j].avg;
       if (spread > minSpread) {
-        const timing = estimateRotationStart(priceMap, groupAvg[i].group, groupAvg[j].group, ASSETS);
+        const timing = estimateRotationStart(priceMap, groupAvg[i].group, groupAvg[j].group, ASSETS, maxWeeks);
         rotations.push({
           from: GROUP_LABELS[groupAvg[j].group] ?? groupAvg[j].group,
           to: GROUP_LABELS[groupAvg[i].group] ?? groupAvg[i].group,
@@ -261,7 +270,7 @@ export async function GET() {
     try {
       const cached = await redis.get<object>(cacheKey);
       if (cached) return NextResponse.json(cached);
-    } catch { /* non-fatal */ }
+    } catch (e) { logger.warn('capital-flows', 'cache_read_error', { error: e }); }
   }
 
   const allTickers = Array.from(new Set([
@@ -366,7 +375,10 @@ export async function GET() {
   const response = { assets: results, flow, goldVsDollar, countryFlow, dataSource: sourceSummary || dataSource, updatedAt: new Date().toISOString() };
 
   if (redis) {
-    try { await redis.set(cacheKey, response, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try {
+      await loggedRedisSet(redis, 'api.capital-flows', cacheKey, response, { ex: CACHE_TTL });
+      logger.info('capital-flows', 'cache_saved', { assets: results.length, failedTickers: sourceCount['failed'] ?? 0 });
+    } catch (e) { logger.warn('capital-flows', 'cache_write_error', { error: e }); }
   }
 
   return NextResponse.json(response);

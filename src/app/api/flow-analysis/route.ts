@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 /**
  * /api/flow-analysis
  *
@@ -53,7 +54,7 @@ async function callAI(prompt: string): Promise<string> {
         const text = data.choices?.[0]?.message?.content ?? '';
         if (text.length > 50) return text;
       }
-    } catch { /* fallback to Gemini */ }
+    } catch (e) { logger.warn('flow-analysis', 'vllm_failed', { error: e }); }
   }
 
   // 2순위: Gemini
@@ -64,7 +65,10 @@ async function callAI(prompt: string): Promise<string> {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);
     return result.response.text();
-  } catch { return ''; }
+  } catch (e) {
+    logger.error('flow-analysis', 'gemini_failed', { error: e });
+    return '';
+  }
 }
 
 // ── 프롬프트 빌더 ─────────────────────────────────────────────────────────────
@@ -139,8 +143,14 @@ export async function GET(request: Request) {
   let capitalData: Record<string, unknown> | null = null;
   try {
     const res = await fetch(`${baseUrl}/api/capital-flows`, { signal: AbortSignal.timeout(20000) });
-    if (res.ok) capitalData = await res.json();
-  } catch { /* proceed with empty */ }
+    if (res.ok) {
+      capitalData = await res.json();
+    } else {
+      logger.warn('flow-analysis', 'capital_flows_http_error', { status: res.status });
+    }
+  } catch (e) {
+    logger.error('flow-analysis', 'capital_flows_fetch_failed', { error: e });
+  }
 
   if (!capitalData) {
     return NextResponse.json({ error: 'capital-flows data unavailable' }, { status: 503 });
@@ -186,7 +196,7 @@ export async function GET(request: Request) {
     try {
       const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/) ?? [null, raw];
       analysis = JSON.parse((jsonMatch[1] ?? raw).trim());
-    } catch { /* ignore parse error */ }
+    } catch (e) { logger.warn('flow-analysis', 'ai_parse_failed', { tf, rawLength: raw.length, error: e }); }
   }
 
   const result = {
@@ -197,7 +207,10 @@ export async function GET(request: Request) {
   };
 
   if (redis && analysis) {
-    try { await redis.set(cacheKey(tf), result, { ex: 4 * 60 * 60 }); } catch { /* non-fatal */ }
+    try {
+      await loggedRedisSet(redis, 'api.flow-analysis', cacheKey(tf), result, { ex: 4 * 60 * 60 });
+      logger.info('flow-analysis', 'cache_saved', { tf });
+    } catch (e) { logger.warn('flow-analysis', 'cache_write_error', { tf, error: e }); }
   }
 
   return NextResponse.json(result);

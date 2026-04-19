@@ -92,6 +92,16 @@ export async function GET(req: Request) {
     warm(base, '/api/block-trades', 'block-trades', 30000),         // Polygon (no-op without key)
   ]);
 
+  // ── 1-b: 히트맵 (국가별 x 시간별 키라 US만 워밍) + OSINT ───────────────
+  const [heatmapR, osintSocR, osintSancR, osintCorpR, osintCryptoR, latestR] = await Promise.all([
+    warm(base, '/api/market-heatmap?country=US', 'market-heatmap', 45000),
+    warm(base, '/api/osint/social',    'osint-social',    25000),
+    warm(base, '/api/osint/sanctions', 'osint-sanctions', 25000),
+    warm(base, '/api/osint/corporate', 'osint-corporate', 25000),
+    warm(base, '/api/osint/crypto',    'osint-crypto',    25000),
+    warm(base, '/api/latest-updates',  'latest-updates',  15000),  // aggregates everything, warm last in stage 1
+  ]);
+
   // ── 2단계: capital-flows 의존 분석 ─────────────────────────────────────
   const flowR = await warm(base, '/api/flow-analysis?tf=4w', 'flow-analysis');
 
@@ -113,7 +123,12 @@ export async function GET(req: Request) {
   // ── 5단계: news-cascade (느림 — fire & forget) ─────────────────────────
   fetch(`${base}/api/news-cascade`, { signal: AbortSignal.timeout(60000) }).catch(() => {});
 
-  const results = [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, insiderR, ownerR, optR, koreaR, nportR, blockR, flowR, brief1wR, brief4wR, brief13wR];
+  const results = [
+    macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR,
+    insiderR, ownerR, optR, koreaR, nportR, blockR,
+    heatmapR, osintSocR, osintSancR, osintCorpR, osintCryptoR, latestR,
+    flowR, brief1wR, brief4wR, brief13wR,
+  ];
   const failedCount = results.filter(r => !r.ok).length;
 
   // Log per-endpoint warming outcome so /admin/logs shows which cron targets

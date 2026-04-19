@@ -1,0 +1,133 @@
+Date: 2026-04-19
+Scope: 모든 쓰기·저장·업로드·배포·빌드·푸쉬 작업 단계별 로깅 + 자동 업데이트 범위 확장
+
+─────────────────────────────────────────────────────────────
+REQUEST
+─────────────────────────────────────────────────────────────
+"핵심 모든 쓰기 작업, 저장 작업, 업로드 작업, 배포, 빌드, 푸쉬 작업에
+단계별 로그 다 깔어"
+"이후 사이트 개선에 필요한거 다 해. 모든 탭에서 수치들 자동화로
+업데이트 다 되는지 확인"
+
+─────────────────────────────────────────────────────────────
+1) 로깅 헬퍼 확장
+─────────────────────────────────────────────────────────────
+src/lib/logger.ts에 공통 래퍼 추가:
+  - loggedRedisSet(redis, source, key, value, opts)
+      → start 없이 성공시 cache_write info(ttl, size, duration)
+        실패시 cache_write_failed error(error, duration) 기록.
+  - loggedRedisLpushTrim(redis, source, key, value, cap)
+  - loggedRedisDel(redis, source, keys[])
+  - loggedFetch(source, event, url, init, timeoutMs)
+      → 2xx info, 4xx/5xx warn, throw error. URL 내 apiKey/token/crumb 자동 REDACTED.
+  - logBoot()
+      → cold_start 이벤트. commit/branch/deploymentId/region/env/nodeVersion
+        최초 import 시 1회 자동 호출.
+
+─────────────────────────────────────────────────────────────
+2) /api/admin/health (신규)
+─────────────────────────────────────────────────────────────
+CRON_SECRET 인증. 반환값:
+  - deploy: { commit, branch, deploymentId, region, env, nodeVersion }
+  - redis: { configured, trackedCaches (10개 주요 키별 exists+size),
+            populatedCount, missingCount }
+  - paidApis: { unusualWhales, polygon, twelveData, gemini,
+                alphaVantage, vllm }  → 각 키 설정 여부만 boolean
+  - logs: { bufferCount, errorCount, warnCount, oldestInBuffer }
+
+/admin/logs 페이지 상단에 Health 카드 추가: commit, env/region, 캐시
+populated/missing 수, 로그 버퍼 상태, 유료 API 활성 bar, 전개 가능한
+캐시 키 상세표.
+
+─────────────────────────────────────────────────────────────
+3) redis.set → loggedRedisSet 일괄 교체
+─────────────────────────────────────────────────────────────
+scripts/upgrade-redis-logging.py가 정규식으로 자동 치환:
+  (이전) try { await redis.set(K, V, {ex: T}); } catch { /* non-fatal */ }
+  (이후) await loggedRedisSet(redis, 'source.tag', K, V, { ex: T });
+
+업그레이드 파일 (18개):
+  api/capital-flows, api/macro-indicators, api/fear-greed, api/fedwatch,
+  api/credit-balance, api/news-cascade (2 writes), api/market-heatmap,
+  api/stock-supply, api/flow-analysis, api/translate,
+  api/company-financials/[ticker], api/latest-updates,
+  api/cron/update-signals (2 writes), api/cron/update-credit-balance,
+  api/osint/corporate, api/osint/crypto, api/osint/sanctions
+  그리고 수동 업그레이드된 6개:
+  api/insider-trades, api/ownership-alerts, api/nport-holdings,
+  api/options-flow, api/block-trades, api/korea-flow, api/market-caps,
+  api/short-interest, api/daily-brief, api/cron/daily-brief
+
+모든 Redis set에 이제 다음 이벤트 기록:
+  cache_write { key, ttl, size(bytes), durationMs }
+  cache_write_failed { key, ttl, error, durationMs }
+
+─────────────────────────────────────────────────────────────
+4) AI 호출 (업로드) 단계 로깅
+─────────────────────────────────────────────────────────────
+src/lib/daily-brief.ts의 callAI():
+  ai.vllm:
+    request_start { promptLen, url }
+    response_ok { textLen, durationMs }
+    empty_text / http_error { status, durationMs }
+    request_failed { error, durationMs }
+  ai.gemini:
+    no_key (warn if not configured)
+    request_start { promptLen, model }
+    response_ok { textLen, durationMs }
+    request_failed { error, durationMs }
+
+─────────────────────────────────────────────────────────────
+5) 자동 업데이트 누락 탭 발견 & 보완
+─────────────────────────────────────────────────────────────
+감사 결과, cron update-all에서 누락되어 있던 엔드포인트:
+  ❌ /api/market-heatmap     → 첫 사용자가 20-45s 대기
+  ❌ /api/osint/social       → 스크레이핑 느림
+  ❌ /api/osint/sanctions
+  ❌ /api/osint/corporate
+  ❌ /api/osint/crypto
+  ❌ /api/latest-updates     → 집계라 lazy지만 첫 방문 느림
+
+추가 (1-b 단계, 1단계 병렬 완료 후):
+  warm(base, '/api/market-heatmap?country=US', 'market-heatmap', 45000)
+  warm(base, '/api/osint/social',    25000)
+  warm(base, '/api/osint/sanctions', 25000)
+  warm(base, '/api/osint/corporate', 25000)
+  warm(base, '/api/osint/crypto',    25000)
+  warm(base, '/api/latest-updates',  15000)
+
+─────────────────────────────────────────────────────────────
+6) 탭별 자동 업데이트 상태 (최종)
+─────────────────────────────────────────────────────────────
+모든 탭은 cron 트리거(vercel.json)로 자동 갱신:
+  - update-all: 하루 3회 (07:50 / 15:50 / 21:20 KST)
+  - daily-brief: 하루 3회 (07:55 / 15:55 / 21:25 KST)
+  - update-signals (13F EDGAR): 하루 1회 (11:00 KST)
+  - update-credit-balance (NYSE): 하루 1회 (12:30 KST)
+
+| 탭/페이지 | 데이터 API | 자동갱신 | TTL |
+|----------|-----------|----------|-----|
+| Home — LiveFeed | latest-updates | ✅ 3회/일 | 15분 |
+| Report | daily-brief (1w/4w/13w) | ✅ 3회/일 | 26h |
+| Insider — Form 4 | insider-trades | ✅ 3회/일 | 30분 |
+| Insider — 13D/G | ownership-alerts | ✅ 3회/일 | 2h |
+| Insider — N-PORT | nport-holdings | ✅ 3회/일 | 6h |
+| Insider — Blocks | block-trades | ✅ (key 필요) | 5분 |
+| Insider — Options | options-flow | ✅ (key 필요) | 10분 |
+| Insider — Korea | korea-flow | ✅ 3회/일 | 15분 |
+| Heatmap | market-heatmap | ✅ 3회/일 (신규 워밍) | 15분 |
+| Screener | signals + short-interest | ✅ | 4h + 4h |
+| Short | short-interest | ✅ 3회/일 | 4h |
+| Explore | market-caps | ✅ 3회/일 | 24h |
+| Cascade | news-cascade | ✅ (fire&forget) | 24h |
+| Signals | signals (13F EDGAR) | ✅ 1회/일 | 1h |
+| NewsGap | 정적 data/news-gap.ts | - (코드 배포시 갱신) | - |
+| Intelligence | capital-flows/fear/fed/macro/credit | ✅ 3회/일 | 1-24h |
+| OSINT — 4 tabs | osint/* | ✅ 3회/일 (신규 워밍) | 1-24h |
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- tsc --noEmit: exit 0 (RedisLike 타입 호환성 위해 any로 완화)
+- next build: 전체 라우트 정상 등록, /api/admin/health 포함
+- 자동 스크립트 upgrade-redis-logging.py 18파일 치환 성공

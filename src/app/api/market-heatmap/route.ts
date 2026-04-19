@@ -1,0 +1,186 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
+/**
+ * /api/market-heatmap?country=US|KR|JP|CN|EU|IN|TW
+ *
+ * TradingView-style treemap data per country. Uses iShares ETF holdings CSV
+ * (public, no auth) for constituents + market cap weights, then Stooq for
+ * live price changes (US only — non-US stocks use iShares intraday price).
+ *
+ * Redis cache: 15 minutes per country.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
+import { fetchStooqQuotes } from '@/lib/stooq';
+import { fetchIShareHoldings, ISHARES_ETFS } from '@/lib/ishares-holdings';
+import { SECTOR_COLORS } from '@/data/heatmap-stocks';
+
+const CACHE_TTL = 15 * 60;
+
+const INDICES_BY_COUNTRY: Record<string, Array<{ symbol: string; label: string }>> = {
+  US: [
+    { symbol: 'SPY', label: 'S&P 500' },
+    { symbol: 'QQQ', label: 'NASDAQ 100' },
+    { symbol: 'IWM', label: 'Russell 2000' },
+    { symbol: 'DIA', label: 'Dow Jones' },
+  ],
+  KR: [{ symbol: 'EWY', label: 'Korea (EWY)' }],
+  JP: [{ symbol: 'EWJ', label: 'Japan (EWJ)' }],
+  CN: [{ symbol: 'MCHI', label: 'China (MCHI)' }, { symbol: 'FXI', label: 'FXI' }],
+  EU: [{ symbol: 'EZU', label: 'Eurozone (EZU)' }, { symbol: 'VGK', label: 'VGK' }],
+  IN: [{ symbol: 'INDA', label: 'India (INDA)' }, { symbol: 'SMIN', label: 'SMIN' }],
+  TW: [{ symbol: 'EWT', label: 'Taiwan (EWT)' }],
+};
+
+export interface HeatmapStock {
+  ticker: string;
+  name: string;
+  sector: string;
+  marketCap: number;
+  changePct: number | null;
+  close: number | null;
+}
+
+export interface HeatmapSector {
+  sector: string;
+  color: string;
+  stocks: HeatmapStock[];
+  totalMarketCap: number;
+  avgChangePct: number | null;
+}
+
+export interface HeatmapIndex {
+  symbol: string;
+  label: string;
+  changePct: number | null;
+  close: number | null;
+}
+
+export interface HeatmapData {
+  country: string;
+  countryLabel: string;
+  sectors: HeatmapSector[];
+  indices: HeatmapIndex[];
+  totalStocks: number;
+  updatedAt: string;
+  dataDate: string | null;
+  source: string;
+}
+
+function createRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
+
+const SUPPORTED = ['US', 'KR', 'JP', 'CN', 'EU', 'IN', 'TW'];
+
+export async function GET(req: NextRequest) {
+  const rawCountry = (new URL(req.url).searchParams.get('country') ?? 'US').toUpperCase();
+  const country = SUPPORTED.includes(rawCountry) ? rawCountry : 'US';
+  const cfg = ISHARES_ETFS[country];
+  const hour = new Date().toISOString().slice(0, 13);
+  const cacheKey = `flowvium:heatmap:v5:${country}:${hour}`;
+  const redis = createRedis();
+
+  if (redis) {
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) return NextResponse.json({ ...(cached as object), cached: true });
+    } catch { /* non-fatal */ }
+  }
+
+  // 1. Fetch ETF constituents (includes market cap weights)
+  const holdings = await fetchIShareHoldings(country);
+
+  // Filter out tiny holdings — top stocks by market value, cap at 200
+  const topHoldings = holdings
+    .sort((a, b) => b.marketValue - a.marketValue)
+    .slice(0, country === 'US' ? 200 : 80);
+
+  // 2. Fetch Stooq quotes for US stocks (live intraday change)
+  //    Non-US: use iShares end-of-day price vs sector-weighted avg as approximation
+  const stooqMap = new Map<string, { changePct: number | null; close: number | null; date: string | null }>();
+  if (country === 'US') {
+    const tickers = topHoldings.map(h => h.ticker.replace('.', '-'));
+    const quotes = await fetchStooqQuotes(tickers);
+    for (const q of quotes) {
+      stooqMap.set(q.symbol, { changePct: q.changePct, close: q.close, date: q.date });
+    }
+  }
+
+  // 3. Build HeatmapStock list
+  const stocks: HeatmapStock[] = topHoldings.map(h => {
+    const live = stooqMap.get(h.ticker);
+    return {
+      ticker: h.ticker,
+      name: h.name,
+      sector: h.sector,
+      marketCap: h.marketValue / 1e9,   // USD billions for display; treemap uses raw marketCap
+      changePct: live?.changePct ?? null,
+      close: live?.close ?? (h.price || null),
+    };
+  });
+
+  // 4. Group by sector
+  const bySector: Record<string, HeatmapStock[]> = {};
+  for (const s of stocks) {
+    if (!bySector[s.sector]) bySector[s.sector] = [];
+    bySector[s.sector].push(s);
+  }
+
+  const sectors: HeatmapSector[] = Object.entries(bySector).map(([name, ss]) => {
+    const valid = ss.filter(x => x.changePct != null);
+    const totalMC = ss.reduce((s, x) => s + x.marketCap, 0);
+    const weighted = valid.length
+      ? valid.reduce((s, x) => s + (x.changePct! * x.marketCap), 0) / valid.reduce((s, x) => s + x.marketCap, 0)
+      : null;
+    return {
+      sector: name,
+      color: SECTOR_COLORS[name] ?? '#64748b',
+      stocks: ss.sort((a, b) => b.marketCap - a.marketCap),
+      totalMarketCap: totalMC,
+      avgChangePct: weighted != null ? parseFloat(weighted.toFixed(2)) : null,
+    };
+  }).sort((a, b) => b.totalMarketCap - a.totalMarketCap);
+
+  // 5. Fetch indices
+  const indexConfigs = INDICES_BY_COUNTRY[country] ?? [];
+  const indexQuotes = await fetchStooqQuotes(indexConfigs.map(i => i.symbol));
+  const indexMap = new Map(indexQuotes.map(q => [q.symbol, q]));
+  const indices: HeatmapIndex[] = indexConfigs.map(i => {
+    const q = indexMap.get(i.symbol);
+    return {
+      symbol: i.symbol, label: i.label,
+      changePct: q?.changePct ?? null,
+      close: q?.close ?? null,
+    };
+  });
+
+  const anyDate = stooqMap.values().next().value?.date ?? null;
+  const data: HeatmapData = {
+    country,
+    countryLabel: cfg?.countryLabel ?? country,
+    sectors,
+    indices,
+    totalStocks: stocks.length,
+    updatedAt: new Date().toISOString(),
+    dataDate: anyDate,
+    source: country === 'US'
+      ? 'iShares IVV (구성) + Stooq (시세)'
+      : `iShares ${cfg?.etfTicker} 보유종목 (EOD)`,
+  };
+
+  if (redis) {
+    const t0 = Date.now();
+    try {
+      logger.info('market-heatmap', 'save_start', { key: cacheKey, ttl: CACHE_TTL });
+      await loggedRedisSet(redis, 'api.market-heatmap', cacheKey, data, { ex: CACHE_TTL });
+      logger.info('market-heatmap', 'save_ok', { key: cacheKey, durationMs: Date.now() - t0 });
+    } catch (err) {
+      logger.error('market-heatmap', 'save_failed', { key: cacheKey, error: err });
+    }
+  }
+
+  return NextResponse.json({ ...data, cached: false });
+}

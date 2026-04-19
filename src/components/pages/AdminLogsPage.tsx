@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, AlertCircle, Info, RefreshCw, Trash2, Loader2, Lock } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info, RefreshCw, Trash2, Lock, Server, CheckCircle2, XCircle } from 'lucide-react';
 
 interface LogEntry {
   t: string;
@@ -20,6 +20,27 @@ interface BySource {
   errors: number;
   warns: number;
   lastSeen: string;
+}
+
+interface HealthPayload {
+  deploy: {
+    commit: string;
+    branch: string | null;
+    deploymentId: string | null;
+    region: string | null;
+    env: string;
+    nodeVersion: string;
+  };
+  redis: {
+    configured: boolean;
+    trackedCaches: Record<string, { exists: boolean; size?: number; error?: string }>;
+    populatedCount: number;
+    missingCount: number;
+  };
+  paidApis: Record<string, boolean>;
+  logs: { bufferCount: number; errorCount: number; warnCount: number };
+  checkedAt: string;
+  checkDurationMs: number;
 }
 
 const LEVEL_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
@@ -47,6 +68,7 @@ export default function AdminLogsPage() {
   const [secretInput, setSecretInput] = useState<string>('');
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [bySource, setBySource] = useState<Record<string, BySource>>({});
+  const [health, setHealth] = useState<HealthPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [levelFilter, setLevelFilter] = useState<string>('');
@@ -65,14 +87,16 @@ export default function AdminLogsPage() {
       const params = new URLSearchParams({ limit: '500' });
       if (levelFilter) params.set('level', levelFilter);
       if (sourceFilter) params.set('source', sourceFilter);
-      const res = await fetch(`/api/admin/logs?${params.toString()}`, {
-        headers: { 'x-admin-secret': secret },
-      });
-      if (res.status === 401) { setError('Unauthorized — check CRON_SECRET'); setEntries([]); return; }
-      if (!res.ok) { setError(`HTTP ${res.status}`); return; }
-      const data = await res.json();
+      const [logRes, healthRes] = await Promise.all([
+        fetch(`/api/admin/logs?${params.toString()}`, { headers: { 'x-admin-secret': secret } }),
+        fetch(`/api/admin/health`, { headers: { 'x-admin-secret': secret } }),
+      ]);
+      if (logRes.status === 401) { setError('Unauthorized — check CRON_SECRET'); setEntries([]); return; }
+      if (!logRes.ok) { setError(`HTTP ${logRes.status}`); return; }
+      const data = await logRes.json();
       setEntries(data.entries ?? []);
       setBySource(data.bySource ?? {});
+      if (healthRes.ok) setHealth(await healthRes.json());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fetch failed');
     } finally { setLoading(false); }
@@ -158,6 +182,69 @@ export default function AdminLogsPage() {
       {error && (
         <div className="cf-card p-3 mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
           {error}
+        </div>
+      )}
+
+      {/* Health — deploy + caches + paid APIs */}
+      {health && (
+        <div className="cf-card p-4 mb-4 bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-bold text-cf-text-primary flex items-center gap-2">
+              <Server className="w-4 h-4 text-emerald-400" /> Deploy & Health
+            </p>
+            <span className="text-[10px] text-cf-text-secondary">probed {health.checkDurationMs}ms</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-[10px] mb-3">
+            <div>
+              <p className="text-cf-text-secondary">Commit</p>
+              <p className="font-mono text-cf-text-primary text-xs">{health.deploy.commit}</p>
+              {health.deploy.branch && <p className="text-cf-text-secondary/60 font-mono">{health.deploy.branch}</p>}
+            </div>
+            <div>
+              <p className="text-cf-text-secondary">Env · Region</p>
+              <p className="font-mono text-cf-text-primary text-xs">{health.deploy.env}</p>
+              <p className="text-cf-text-secondary/60 font-mono">{health.deploy.region ?? 'local'}</p>
+            </div>
+            <div>
+              <p className="text-cf-text-secondary">Caches populated</p>
+              <p className={`font-mono text-xs ${health.redis.missingCount > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {health.redis.populatedCount} / {health.redis.populatedCount + health.redis.missingCount}
+              </p>
+              {health.redis.missingCount > 0 && <p className="text-cf-text-secondary/60">{health.redis.missingCount} missing</p>}
+            </div>
+            <div>
+              <p className="text-cf-text-secondary">Log buffer</p>
+              <p className="font-mono text-xs text-cf-text-primary">{health.logs.bufferCount}</p>
+              {(health.logs.errorCount > 0 || health.logs.warnCount > 0) && (
+                <p className="text-[10px]">
+                  {health.logs.errorCount > 0 && <span className="text-red-400">✕{health.logs.errorCount}</span>}
+                  {health.logs.errorCount > 0 && health.logs.warnCount > 0 && ' '}
+                  {health.logs.warnCount > 0 && <span className="text-amber-400">⚠{health.logs.warnCount}</span>}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {Object.entries(health.paidApis).map(([api, ok]) => (
+              <span key={api} className={`text-[10px] px-2 py-0.5 rounded-md border flex items-center gap-1 ${ok ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-cf-text-secondary'}`}>
+                {ok ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                {api}
+              </span>
+            ))}
+          </div>
+          <details className="text-[10px]">
+            <summary className="cursor-pointer text-cf-text-secondary hover:text-cf-text-primary">Cache key detail ({Object.keys(health.redis.trackedCaches).length})</summary>
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1">
+              {Object.entries(health.redis.trackedCaches).map(([k, v]) => (
+                <div key={k} className="flex items-center justify-between gap-2 font-mono">
+                  <span className={v.exists ? 'text-cf-text-primary' : 'text-cf-text-secondary/50'}>{k}</span>
+                  <span className={v.exists ? 'text-emerald-400' : 'text-red-400'}>
+                    {v.exists ? `${Math.round((v.size ?? 0) / 1024)}KB` : 'empty'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
       )}
 

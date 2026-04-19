@@ -15,7 +15,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchOptionsFlow, unusualWhalesKey, type OptionsFlowAlert } from '@/lib/unusual-whales';
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:options-flow:v1';
 const CACHE_TTL = 10 * 60;
@@ -48,10 +48,7 @@ export async function GET(req: Request) {
   }
 
   const items = await fetchOptionsFlow(60);
-  if (redis) {
-    try { await redis.set(CACHE_KEY, items, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.options-flow', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.options-flow', CACHE_KEY, items, { ex: CACHE_TTL });
   logger.info('api.options-flow', 'served', { total: items.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ items, configured: true, cached: false, total: items.length });
 }

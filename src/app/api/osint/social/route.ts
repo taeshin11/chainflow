@@ -6,6 +6,7 @@
  */
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
 function createRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
@@ -301,7 +302,14 @@ export async function GET() {
   };
 
   if (redis) {
-    try { await redis.set(cacheKey, result, { ex: 30 * 60 }); } catch { /* non-fatal */ }
+    try {
+      logger.info('osint.social', 'save_start', { key: cacheKey });
+      const t0 = Date.now();
+      await redis.set(cacheKey, result, { ex: 30 * 60 });
+      logger.info('osint.social', 'save_ok', { key: cacheKey, durationMs: Date.now() - t0 });
+    } catch (e) {
+      logger.error('osint.social', 'save_failed', { key: cacheKey, error: e });
+    }
   }
 
   return NextResponse.json(result);

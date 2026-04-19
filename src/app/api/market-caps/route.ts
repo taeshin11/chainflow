@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 /**
  * /api/market-caps
  *
@@ -70,10 +70,7 @@ export async function GET(req: Request) {
     count: Object.keys(bands).length,
   };
 
-  if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.market-caps', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.market-caps', CACHE_KEY, payload, { ex: CACHE_TTL });
 
   logger.info('api.market-caps', 'served', { tickers: tickers.length, mapped: Object.keys(bands).length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });

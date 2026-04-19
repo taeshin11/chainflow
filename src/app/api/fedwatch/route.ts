@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 /**
  * /api/fedwatch
  *
@@ -285,7 +286,15 @@ export async function GET() {
   };
 
   if (redis) {
-    try { await redis.set(cacheKey(), result, { ex: 4 * 60 * 60 }); } catch { /* non-fatal */ }
+    const key = cacheKey();
+    try {
+      logger.info('fedwatch', 'save_start', { key, ttl: 4 * 60 * 60 });
+      const t0 = Date.now();
+      await loggedRedisSet(redis, 'api.fedwatch', key, result, { ex: 4 * 60 * 60 });
+      logger.info('fedwatch', 'save_ok', { key, durationMs: Date.now() - t0 });
+    } catch (err) {
+      logger.error('fedwatch', 'save_failed', { key, error: err });
+    }
   }
 
   return NextResponse.json(result);

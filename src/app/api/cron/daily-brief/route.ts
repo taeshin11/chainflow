@@ -29,10 +29,25 @@ export async function GET(req: NextRequest) {
 
   for (const tf of TIMEFRAMES) {
     try {
-      if (redis) { try { await redis.del(cacheKey(tf)); } catch { /* ignore */ } }
+      if (redis) {
+        try {
+          logger.info('cron.daily-brief', 'cache_bust_start', { key: cacheKey(tf) });
+          await redis.del(cacheKey(tf));
+          logger.info('cron.daily-brief', 'cache_bust_ok', { key: cacheKey(tf) });
+        } catch { /* ignore */ }
+      }
       const { text, source } = await callAI(buildPrompt(tf, ctx));
       const brief = (text && parseAIResponse(text, tf, source)) ?? fallbackBrief(tf, ctx);
-      if (redis) await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 });
+      if (redis) {
+        const t0 = Date.now();
+        logger.info('cron.daily-brief', 'save_start', { key: cacheKey(tf), ttl: 26 * 60 * 60 });
+        try {
+          await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 });
+          logger.info('cron.daily-brief', 'save_ok', { key: cacheKey(tf), durationMs: Date.now() - t0 });
+        } catch (saveErr) {
+          logger.error('cron.daily-brief', 'save_failed', { key: cacheKey(tf), error: saveErr });
+        }
+      }
       results[tf] = `ok (${source})`;
     } catch (e) {
       results[tf] = `error: ${e instanceof Error ? e.message : String(e)}`;

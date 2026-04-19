@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 /**
  * /api/macro-indicators
  *
@@ -24,7 +25,7 @@ function kstDate(): string {
   return kst.toISOString().slice(0, 10);
 }
 function cacheKey(): string {
-  return `flowvium:macro-indicators:v3:${kstDate()}`;
+  return `flowvium:macro-indicators:v4:${kstDate()}`;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -64,7 +65,10 @@ async function fetchFREDCsv(series: string, monthsBack: number = 15): Promise<Ar
       headers: { 'User-Agent': 'Mozilla/5.0' },
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      logger.warn('macro-indicators', 'fred_csv_http_error', { series, status: res.status });
+      return [];
+    }
     const text = await res.text();
     return text.trim().split('\n').slice(1)
       .map(line => {
@@ -73,7 +77,10 @@ async function fetchFREDCsv(series: string, monthsBack: number = 15): Promise<Ar
         return (!date || isNaN(value)) ? null : { date: date.trim(), value };
       })
       .filter((x): x is { date: string; value: number } => x !== null);
-  } catch { return []; }
+  } catch (err) {
+    logger.error('macro-indicators', 'fred_csv_error', { series, error: err });
+    return [];
+  }
 }
 
 // Latest value
@@ -133,27 +140,82 @@ async function fetchMoMPct(series: string): Promise<{ value: number; previous: n
   };
 }
 
-// ── Yield Curve ───────────────────────────────────────────────────────────────
-const YIELD_SERIES = [
-  { label: '1M', series: 'DGS1MO' }, { label: '3M', series: 'DGS3MO' },
-  { label: '6M', series: 'DGS6MO' }, { label: '1Y', series: 'DGS1' },
-  { label: '2Y', series: 'DGS2' },   { label: '5Y', series: 'DGS5' },
-  { label: '10Y', series: 'DGS10' }, { label: '30Y', series: 'DGS30' },
-];
-
+// ── Yield Curve — US Treasury Direct API ──────────────────────────────────────
+// 훨씬 빠르고 정확한 소스 (FRED CSV는 전체 히스토리 반환으로 느림)
 export interface YieldPoint { label: string; value: number | null; }
 
+// Treasury CSV 컬럼 인덱스 → 우리 레이블 매핑
+const TREASURY_COL_MAP: Record<string, string> = {
+  '1 Mo': '1M', '3 Mo': '3M', '6 Mo': '6M', '1 Yr': '1Y',
+  '2 Yr': '2Y', '5 Yr': '5Y', '10 Yr': '10Y', '20 Yr': '20Y', '30 Yr': '30Y',
+};
+const DISPLAY_ORDER = ['1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y', '20Y', '30Y'];
+
+// FRED series IDs for each maturity
+const FRED_YIELD_SERIES: Record<string, string> = {
+  '1M':  'DGS1MO',
+  '3M':  'DGS3MO',
+  '6M':  'DGS6MO',
+  '1Y':  'DGS1',
+  '2Y':  'DGS2',
+  '5Y':  'DGS5',
+  '10Y': 'DGS10',
+  '20Y': 'DGS20',
+  '30Y': 'DGS30',
+};
+
+async function fetchFredLatest(seriesId: string, apiKey: string): Promise<number | null> {
+  try {
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=10`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Flowvium' },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const obs = (json.observations ?? []) as Array<{ value: string }>;
+    // Take the most recent non-null ('.' means no data)
+    for (const o of obs) {
+      if (o.value && o.value !== '.') {
+        const v = parseFloat(o.value);
+        if (!isNaN(v)) return v;
+      }
+    }
+    return null;
+  } catch (err) {
+    logger.warn('macro-indicators', 'fred_api_error', { seriesId, error: err });
+    return null;
+  }
+}
+
 async function fetchYieldCurve(): Promise<{ points: YieldPoint[]; inverted: boolean; spread10y2y: number | null }> {
-  const results = await Promise.all(
-    YIELD_SERIES.map(async ({ label, series }) => {
-      const d = await fetchLatest(series);
-      return { label, value: d?.value ?? null };
-    })
-  );
-  const y2 = results.find(r => r.label === '2Y')?.value ?? null;
-  const y10 = results.find(r => r.label === '10Y')?.value ?? null;
-  const spread10y2y = y2 !== null && y10 !== null ? parseFloat((y10 - y2).toFixed(2)) : null;
-  return { points: results, inverted: spread10y2y !== null && spread10y2y < 0, spread10y2y };
+  const empty = { points: DISPLAY_ORDER.map(l => ({ label: l, value: null })), inverted: false, spread10y2y: null };
+  const apiKey = process.env.FRED_API_KEY?.trim();
+  if (!apiKey) return empty;
+
+  try {
+    const labels = DISPLAY_ORDER;
+    const results = await Promise.all(
+      labels.map(l => fetchFredLatest(FRED_YIELD_SERIES[l], apiKey))
+    );
+
+    const labelMap: Record<string, number | null> = {};
+    labels.forEach((l, i) => { labelMap[l] = results[i]; });
+
+    const points: YieldPoint[] = DISPLAY_ORDER.map(l => ({
+      label: l,
+      value: labelMap[l] ?? null,
+    }));
+
+    const y2 = labelMap['2Y'] ?? null;
+    const y10 = labelMap['10Y'] ?? null;
+    const spread10y2y = y2 !== null && y10 !== null ? parseFloat((y10 - y2).toFixed(2)) : null;
+
+    return { points, inverted: spread10y2y !== null && spread10y2y < 0, spread10y2y };
+  } catch (err) {
+    logger.error('macro-indicators', 'yield_curve_error', { error: err });
+    return empty;
+  }
 }
 
 // ── Surprise classification ───────────────────────────────────────────────────
@@ -392,7 +454,7 @@ export async function GET() {
     try {
       const cached = await redis.get<object>(key);
       if (cached) return NextResponse.json(cached);
-    } catch { /* non-fatal */ }
+    } catch (e) { logger.warn('macro-indicators', 'cache_read_error', { error: e }); }
   }
 
   // Fetch FRED data in parallel
@@ -633,7 +695,10 @@ export async function GET() {
   const response = { indicators, yieldCurve: yc, updatedAt: new Date().toISOString() };
 
   if (redis) {
-    try { await redis.set(key, response, { ex: 25 * 60 * 60 }); } catch { /* non-fatal */ }
+    try {
+      await loggedRedisSet(redis, 'api.macro-indicators', key, response, { ex: 25 * 60 * 60 });
+      logger.info('macro-indicators', 'cache_saved', { indicators: indicators.length });
+    } catch (e) { logger.warn('macro-indicators', 'cache_write_error', { error: e }); }
   }
 
   return NextResponse.json(response);

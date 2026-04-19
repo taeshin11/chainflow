@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 
@@ -12,6 +13,7 @@ function createRedis(): Redis | null {
 
 // ── CNN Fear & Greed (US only) ─────────────────────────────────────────────────
 async function fetchCNNScore(): Promise<{ score: number; prevScore: number } | null> {
+  const start = Date.now();
   try {
     const res = await fetch(
       'https://production.dataviz.cnn.io/index/fearandgreed/graphdata',
@@ -20,7 +22,10 @@ async function fetchCNNScore(): Promise<{ score: number; prevScore: number } | n
         signal: AbortSignal.timeout(6000),
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn('fear-greed', 'cnn_http_error', { status: res.status, durationMs: Date.now() - start });
+      return null;
+    }
     const data = await res.json();
     const score = Math.round(data?.fear_and_greed?.score ?? 0);
     // Previous score: one week ago from historical data
@@ -29,8 +34,10 @@ async function fetchCNNScore(): Promise<{ score: number; prevScore: number } | n
     const weekAgoMs = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const weekAgoEntry = hist.find((d) => Math.abs(d.x - weekAgoMs) < 2 * 24 * 60 * 60 * 1000);
     const prevScore = weekAgoEntry ? Math.round(weekAgoEntry.y) : score;
+    logger.info('fear-greed', 'cnn_ok', { score, durationMs: Date.now() - start });
     return { score, prevScore };
-  } catch {
+  } catch (err) {
+    logger.error('fear-greed', 'cnn_fetch_failed', { error: err });
     return null;
   }
 }
@@ -42,7 +49,10 @@ async function fetchPrices(ticker: string): Promise<number[]> {
     headers: { 'User-Agent': 'Mozilla/5.0' },
     signal: AbortSignal.timeout(8000),
   });
-  if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
+  if (!res.ok) {
+    logger.warn('fear-greed', 'yahoo_http_error', { ticker, status: res.status });
+    throw new Error(`Yahoo HTTP ${res.status}`);
+  }
   const data = await res.json();
   const closes: number[] = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close ?? [];
   return closes.filter((v: number) => v != null && !isNaN(v));
@@ -332,7 +342,7 @@ async function buildEntry(
   };
 
   if (redis) {
-    try { await redis.set(cacheKey, entry, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    await loggedRedisSet(redis, 'api.fear-greed', cacheKey, entry, { ex: CACHE_TTL })
   }
   return entry;
 }

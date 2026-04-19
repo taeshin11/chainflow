@@ -48,8 +48,14 @@ export async function GET(request: Request) {
   }
 
   if (redis) {
-    try { await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 }); }
-    catch (err) { logger.warn('api.daily-brief', 'cache_write_error', { tf, error: err }); }
+    const t0 = Date.now();
+    logger.info('api.daily-brief', 'save_start', { key: cacheKey(tf), ttl: 26 * 60 * 60 });
+    try {
+      await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 });
+      logger.info('api.daily-brief', 'save_ok', { key: cacheKey(tf), durationMs: Date.now() - t0 });
+    } catch (err) {
+      logger.error('api.daily-brief', 'save_failed', { key: cacheKey(tf), error: err });
+    }
   }
 
   logger.info('api.daily-brief', 'served', { tf, source: brief.source, durationMs: Date.now() - reqStart });
@@ -63,6 +69,10 @@ export async function DELETE(request: Request) {
   const redis = createRedis();
   if (!redis) return NextResponse.json({ error: 'No Redis' }, { status: 503 });
   const keys = (['1w', '4w', '13w'] as Timeframe[]).map(cacheKey);
-  await Promise.allSettled(keys.map((k) => redis.del(k)));
+  await Promise.allSettled(keys.map(async (k) => {
+    logger.info('api.daily-brief', 'cache_bust_start', { key: k });
+    await redis.del(k);
+    logger.info('api.daily-brief', 'cache_bust_ok', { key: k });
+  }));
   return NextResponse.json({ deleted: keys });
 }

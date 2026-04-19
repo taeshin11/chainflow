@@ -13,7 +13,7 @@
  */
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:korea-flow:v1';
 const CACHE_TTL = 15 * 60;
@@ -139,10 +139,7 @@ export async function GET(req: Request) {
     totalTickers: all.length,
   };
 
-  if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.korea-flow', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.korea-flow', CACHE_KEY, payload, { ex: CACHE_TTL });
 
   logger.info('api.korea-flow', 'served', { totalTickers: all.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });

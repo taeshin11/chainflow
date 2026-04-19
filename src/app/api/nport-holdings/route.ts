@@ -17,7 +17,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchRecentNPORT, aggregateByTicker, type NPortFundSnapshot, type NPortTickerAggregate } from '@/lib/edgar-nport';
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:nport-holdings:v1';
 const CACHE_TTL = 6 * 60 * 60;
@@ -49,10 +49,7 @@ export async function GET(req: Request) {
   const byTicker = aggregateByTicker(funds);
   const payload = { funds, byTicker, updatedAt: new Date().toISOString() };
 
-  if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.nport-holdings', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.nport-holdings', CACHE_KEY, payload, { ex: CACHE_TTL });
   logger.info('api.nport-holdings', 'served', { funds: funds.length, byTicker: byTicker.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 
@@ -67,8 +68,13 @@ export async function POST(request: NextRequest) {
     // 3. Store in Redis
     if (redis && translated) {
       try {
+        logger.info('translate', 'save_start', { key });
+        const t0 = Date.now();
         await redis.set(key, translated, { ex: CACHE_TTL });
-      } catch { /* non-fatal */ }
+        logger.info('translate', 'save_ok', { key, durationMs: Date.now() - t0 });
+      } catch (e) {
+        logger.error('translate', 'save_failed', { key, error: e });
+      }
     }
 
     return NextResponse.json({ translated });

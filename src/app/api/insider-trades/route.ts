@@ -10,7 +10,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchRecentForm4, type InsiderTransaction } from '@/lib/edgar-insider';
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:insider-trades:v1';
 const CACHE_TTL = 30 * 60;
@@ -44,10 +44,7 @@ export async function GET(req: Request) {
 
   const transactions = await fetchRecentForm4({ feedCount: 80, includeOther: false });
 
-  if (redis) {
-    try { await redis.set(CACHE_KEY, transactions, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.insider-trades', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.insider-trades', CACHE_KEY, transactions, { ex: CACHE_TTL });
 
   const filtered = tickerFilter ? transactions.filter(t => t.ticker === tickerFilter) : transactions;
   logger.info('api.insider-trades', 'served', { total: transactions.length, filtered: filtered.length, forced: force, durationMs: Date.now() - reqStart });

@@ -159,6 +159,138 @@ export const logger = {
   },
 };
 
+// ── Write-operation wrappers ──────────────────────────────────────────────────
+// These exist so every storage/IO/API call gets uniform start/end/error logs
+// without each caller having to repeat the pattern. Use them instead of raw
+// redis.set / redis.lpush / fetch whenever the outcome matters for debugging.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RedisLike = any;  // Upstash Redis has a complex SetCommandOptions union we don't need to reproduce
+
+/** Redis SET with structured logging. Returns true on success. */
+export async function loggedRedisSet(
+  redis: RedisLike | null,
+  source: string,
+  key: string,
+  value: unknown,
+  opts?: { ex?: number },
+): Promise<boolean> {
+  if (!redis) {
+    logger.debug(source, 'cache_write_skipped', { key, reason: 'no_redis' });
+    return false;
+  }
+  const start = Date.now();
+  try {
+    await redis.set(key, value, opts);
+    const size = (() => { try { return JSON.stringify(value).length; } catch { return -1; } })();
+    logger.info(source, 'cache_write', { key, ttl: opts?.ex, size, durationMs: Date.now() - start });
+    return true;
+  } catch (err) {
+    logger.error(source, 'cache_write_failed', { key, ttl: opts?.ex, error: err, durationMs: Date.now() - start });
+    return false;
+  }
+}
+
+/** Redis LPUSH + LTRIM (queue-style) with structured logging. */
+export async function loggedRedisLpushTrim(
+  redis: RedisLike | null,
+  source: string,
+  key: string,
+  value: unknown,
+  capAt: number,
+): Promise<boolean> {
+  if (!redis) return false;
+  const start = Date.now();
+  try {
+    await redis.lpush(key, JSON.stringify(value));
+    await redis.ltrim(key, 0, capAt - 1);
+    logger.debug(source, 'list_push', { key, cap: capAt, durationMs: Date.now() - start });
+    return true;
+  } catch (err) {
+    logger.error(source, 'list_push_failed', { key, error: err, durationMs: Date.now() - start });
+    return false;
+  }
+}
+
+/** Redis DEL with structured logging. */
+export async function loggedRedisDel(
+  redis: RedisLike | null,
+  source: string,
+  keys: string[],
+): Promise<boolean> {
+  if (!redis || keys.length === 0) return false;
+  const start = Date.now();
+  try {
+    await redis.del(...keys);
+    logger.info(source, 'cache_delete', { keys, durationMs: Date.now() - start });
+    return true;
+  } catch (err) {
+    logger.error(source, 'cache_delete_failed', { keys, error: err, durationMs: Date.now() - start });
+    return false;
+  }
+}
+
+/**
+ * fetch() wrapper that always logs the HTTP outcome.
+ *   success (2xx) → info
+ *   4xx/5xx       → warn with status
+ *   thrown        → error
+ * Returns the Response on reachability (even if non-2xx) or null on exception.
+ */
+export async function loggedFetch(
+  source: string,
+  event: string,
+  url: string,
+  init?: RequestInit,
+  timeoutMs = 10_000,
+): Promise<Response | null> {
+  const start = Date.now();
+  try {
+    const res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    const dur = Date.now() - start;
+    if (res.ok) logger.info(source, event, { url: safeUrl(url), status: res.status, durationMs: dur });
+    else        logger.warn(source, event + '_http_error', { url: safeUrl(url), status: res.status, durationMs: dur });
+    return res;
+  } catch (err) {
+    logger.error(source, event + '_failed', { url: safeUrl(url), error: err, durationMs: Date.now() - start });
+    return null;
+  }
+}
+
+/** Strip API keys / auth tokens from URL before logging. */
+function safeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    for (const k of ['apiKey', 'api_key', 'token', 'crumb', 'x-api-key']) {
+      if (u.searchParams.has(k)) u.searchParams.set(k, 'REDACTED');
+    }
+    // Truncate long query strings
+    const full = u.toString();
+    return full.length > 200 ? full.slice(0, 200) + '…' : full;
+  } catch {
+    return url.length > 200 ? url.slice(0, 200) + '…' : url;
+  }
+}
+
+// ── Boot-time deploy marker ───────────────────────────────────────────────────
+// Fires once per lambda cold-start so /admin/logs shows deployment lineage
+// (useful for "which commit is actually live right now" debugging).
+let booted = false;
+export function logBoot() {
+  if (booted) return;
+  booted = true;
+  logger.info('boot', 'cold_start', {
+    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ?? 'local',
+    branch: process.env.VERCEL_GIT_COMMIT_REF ?? 'n/a',
+    deploymentId: process.env.VERCEL_DEPLOYMENT_ID ?? 'n/a',
+    region: process.env.VERCEL_REGION ?? 'n/a',
+    env: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown',
+    nodeVersion: process.version,
+  });
+}
+// Fire on module load
+logBoot();
+
 // ── Admin viewer helpers ──────────────────────────────────────────────────────
 
 /** Fetch recent log entries (newest first). Returns [] if Redis is absent. */

@@ -10,7 +10,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchBlockTradesForTickers, polygonKey, type BlockTrade } from '@/lib/polygon';
-import { logger } from '@/lib/logger';
+import { logger, loggedRedisSet } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:block-trades:v1';
 const CACHE_TTL = 5 * 60;
@@ -50,10 +50,7 @@ export async function GET(req: Request) {
   }
 
   const trades = await fetchBlockTradesForTickers(TRACKED_TICKERS, 10_000);
-  if (redis) {
-    try { await redis.set(CACHE_KEY, trades, { ex: CACHE_TTL }); }
-    catch (err) { logger.warn('api.block-trades', 'cache_write_error', { error: err }); }
-  }
+  await loggedRedisSet(redis, 'api.block-trades', CACHE_KEY, trades, { ex: CACHE_TTL });
   logger.info('api.block-trades', 'served', { total: trades.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ items: trades, configured: true, cached: false, total: trades.length });
 }

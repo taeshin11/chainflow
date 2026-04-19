@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
 const CACHE_TTL = 30 * 60; // 30 minutes
 
@@ -205,7 +206,14 @@ export async function GET(req: NextRequest) {
     const result = chain === 'btc' ? await fetchBtc(address) : await fetchEth(address);
 
     if (redis) {
-      try { await redis.set(cacheKey, result, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+      try {
+        logger.info('osint.crypto', 'save_start', { key: cacheKey });
+        const t0 = Date.now();
+        await redis.set(cacheKey, result, { ex: CACHE_TTL });
+        logger.info('osint.crypto', 'save_ok', { key: cacheKey, durationMs: Date.now() - t0 });
+      } catch (e) {
+        logger.error('osint.crypto', 'save_failed', { key: cacheKey, error: e });
+      }
     }
 
     return NextResponse.json(result);

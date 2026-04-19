@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -68,7 +69,10 @@ async function fetchRSS(feedUrl: string, source: string): Promise<RawNewsItem[]>
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FlowviumBot/1.0)' },
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      logger.warn('news-cascade', 'rss_http_error', { source, status: res.status });
+      return [];
+    }
     const xml = await res.text();
 
     const items: RawNewsItem[] = [];
@@ -87,7 +91,8 @@ async function fetchRSS(feedUrl: string, source: string): Promise<RawNewsItem[]>
       if (items.length >= 5) break; // max 5 per feed
     }
     return items;
-  } catch {
+  } catch (e) {
+    logger.error('news-cascade', 'rss_fetch_failed', { source, error: e });
     return [];
   }
 }
@@ -118,15 +123,20 @@ async function callAI(prompt: string): Promise<string> {
         const data = await res.json();
         return data.choices?.[0]?.message?.content ?? '';
       }
-    } catch { /* fallback */ }
+    } catch (e) { logger.warn('news-cascade', 'vllm_failed', { error: e }); }
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return '';
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  const result = await model.generateContent(prompt);
-  return result.response.text();
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (e) {
+    logger.error('news-cascade', 'gemini_failed', { error: e });
+    return '';
+  }
 }
 
 function buildCascadePrompt(title: string): string {
@@ -234,14 +244,12 @@ export async function GET() {
         result = parseCascade(raw || '', item);
         // Cache per-article for 24h
         if (redis && result) {
-          try {
-            await redis.set(articleKey(id), result, { ex: 24 * 60 * 60 });
-          } catch { /* ignore */ }
+          await loggedRedisSet(redis, 'api.news-cascade', articleKey(id), result, { ex: 24 * 60 * 60 })
         }
       }
 
       analyzed.push(result);
-    } catch { /* skip this article */ }
+    } catch (e) { logger.error('news-cascade', 'article_analysis_failed', { title: item.title, error: e }); }
   }
 
   // 4. Sort by importance then date
@@ -252,9 +260,7 @@ export async function GET() {
 
   // 5. Cache the full list for 4h
   if (redis && sorted.length > 0) {
-    try {
-      await redis.set(listKey(), sorted, { ex: 4 * 60 * 60 });
-    } catch { /* ignore */ }
+    await loggedRedisSet(redis, 'api.news-cascade', listKey(), sorted, { ex: 4 * 60 * 60 })
   }
 
   return NextResponse.json({ articles: sorted, cached: false });
