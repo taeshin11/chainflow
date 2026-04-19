@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * /api/cron/update-all
  *
@@ -39,8 +40,14 @@ async function warm(
       signal: AbortSignal.timeout(timeoutMs),
       headers: { 'x-cron-warm': '1' },
     });
+    if (!res.ok) {
+      logger.warn('cron.update-all', 'warm_http_error', { label, status: res.status, ms: Date.now() - start });
+    } else {
+      logger.info('cron.update-all', 'warm_ok', { label, ms: Date.now() - start });
+    }
     return { label, ok: res.ok, ms: Date.now() - start, status: res.status };
   } catch (e) {
+    logger.error('cron.update-all', 'warm_timeout', { label, error: e, ms: Date.now() - start });
     return { label, ok: false, ms: Date.now() - start, status: 0 };
   }
 }
@@ -108,6 +115,13 @@ export async function GET(req: Request) {
 
   const results = [macroR, fedR, capitalR, fearGreedR, creditR, shortR, capsR, insiderR, ownerR, optR, koreaR, nportR, blockR, flowR, brief1wR, brief4wR, brief13wR];
   const failedCount = results.filter(r => !r.ok).length;
+
+  // Log per-endpoint warming outcome so /admin/logs shows which cron targets
+  // failed without having to tail Vercel dashboard.
+  for (const r of results) {
+    if (!r.ok) logger.warn('cron.update-all', 'warm_failed', { label: r.label, status: r.status, durationMs: r.ms });
+  }
+  logger.info('cron.update-all', 'run_complete', { failedCount, totalMs: Date.now() - startTime });
 
   return NextResponse.json({
     success: failedCount === 0,

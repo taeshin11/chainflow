@@ -1,0 +1,109 @@
+Date: 2026-04-19
+Scope: Structured logging + admin error viewer
+
+─────────────────────────────────────────────────────────────
+WHY
+─────────────────────────────────────────────────────────────
+User: "오류 뜨는거 확실히 알수 있게 로그를 매우 세분화해서 파악할 수 있게 해줘"
+Problem: most fetchers had `catch {}` blocks that silently swallowed errors.
+When the /short or /insider tab showed no data, there was no way to tell
+whether it was Yahoo crumb rejection, SEC rate-limit, XML parse failure, or
+just empty RSS feed.
+
+─────────────────────────────────────────────────────────────
+NEW
+─────────────────────────────────────────────────────────────
+src/lib/logger.ts
+  - Structured logger with {debug,info,warn,error} levels.
+  - Emits single-line JSON to stdout so Vercel dashboard captures it:
+      {"t":"2026-04-19T…","level":"error","source":"yahoo.crumb","event":"getcrumb_bad_status","status":401,"durationMs":5200}
+  - warn+error entries also pushed to Redis list
+    flowvium:log:recent (capped LTRIM @ 500), so the in-app admin viewer
+    doesn't require Vercel dashboard access.
+  - logger.time(source,event,fn) auto-times and logs start/end.
+  - logger.timeSafe(...) same but swallows exceptions with a fallback.
+  - Source tags: dotted (`yahoo.crumb`, `edgar.form4`, `edgar.nport`,
+    `edgar.13dg`, `polygon.trades`, `uw.flow`, `krx.flow`, `api.*`).
+
+src/app/api/admin/logs/route.ts
+  - GET returns {entries, totalInBuffer, filtered, bySource} with
+    per-source aggregate (total/errors/warns/lastSeen).
+  - Protected by CRON_SECRET via x-admin-secret header.
+  - DELETE clears buffer.
+  - Supports ?level=error&source=yahoo filter.
+
+src/app/[locale]/admin/logs/page.tsx + src/components/pages/AdminLogsPage.tsx
+  - Password-gated SPA (secret stored in localStorage).
+  - Top: source summary cards — click a source to filter.
+  - Entry list: level badge, timestamp, source, event, status, duration,
+    error stack (top 3 frames), data blob.
+  - metadata.robots = {index:false, follow:false}.
+
+─────────────────────────────────────────────────────────────
+SILENT CATCHES RETROFITTED
+─────────────────────────────────────────────────────────────
+src/lib/yahoo-finance.ts
+  - fetchYFCreds: now logs seed_cookie_failed/empty, getcrumb_bad_status,
+    getcrumb_invalid_body, getcrumb_failed, and acquired (info).
+  - fetchYFShortData: logs no_creds, crumb_rejected, http_error,
+    no_stats_in_response, fetch_exception (per ticker).
+  - fetchYFMarketCaps: same pattern + batch_fallback_to_null warn.
+
+src/lib/edgar-insider.ts
+  - fetchAtomFeed: http_error + fetch_exception + info fetched count.
+  - findPrimaryXml: dir_http_error, no_xml_in_dir, dir_fetch_exception.
+  - fetchRecentForm4: parse_exception per filing, run_complete summary
+    with durationMs/feedEntries/uniqueFilings/totalTransactions/
+    filteredTransactions/failedFilings.
+  - fetchRecentOwnershipAlerts: run_complete summary.
+
+src/lib/edgar-nport.ts
+  - rss_http_error, empty_feed, xml_http_error, parse_exception,
+    run_complete (with counts), run_exception.
+
+src/lib/polygon.ts
+  - http_error + fetch_exception per page.
+
+src/lib/unusual-whales.ts
+  - no_key, http_error, fetch_exception, fetched (info).
+
+src/app/api/korea-flow/route.ts
+  - http_error, fetch_exception, fetched (info), served summary.
+
+src/app/api/insider-trades/route.ts
+src/app/api/ownership-alerts/route.ts
+src/app/api/nport-holdings/route.ts
+src/app/api/options-flow/route.ts
+src/app/api/block-trades/route.ts
+  - Every route now logs: cache_hit, cache_read_error, cache_write_error,
+    served (with total/filtered/durationMs), unconfigured (for paid tabs).
+
+─────────────────────────────────────────────────────────────
+HOW TO USE
+─────────────────────────────────────────────────────────────
+1. Set CRON_SECRET env (already set for cron auth — same value reused).
+2. Visit /admin/logs (not linked in nav — bookmark only).
+3. Enter CRON_SECRET value on unlock screen (saved to localStorage).
+4. Page shows recent warn+error entries + per-source aggregate.
+   Click a source card to filter to just that subsystem.
+
+For full verbose stream (including info/debug), use Vercel dashboard:
+  https://vercel.com/<team>/flowvium/logs
+Everything logger.* emits shows up there in real time.
+
+─────────────────────────────────────────────────────────────
+NON-GOAL
+─────────────────────────────────────────────────────────────
+Did NOT retrofit older code paths (capital-flows, macro-indicators,
+fear-greed, news-cascade, stock-supply). Those already had partial
+error handling and their UIs are more stable. Future pass if needed.
+
+─────────────────────────────────────────────────────────────
+VERIFICATION
+─────────────────────────────────────────────────────────────
+- tsc --noEmit: exit 0
+- next build: /api/admin/logs and /[locale]/admin/logs both registered.
+- Manual smoke test plan after deploy:
+    curl -I /api/insider-trades?refresh=1   → triggers EDGAR fetch
+    open /admin/logs with CRON_SECRET        → verify entries appear
+    curl /api/ownership-alerts?refresh=1     → more entries

@@ -18,6 +18,7 @@
  */
 
 import { EDGAR_UA, TICKER_TO_CUSIP, CUSIP_TO_TICKER, TICKER_TO_COMPANY } from './edgar-13f';
+import { logger } from './logger';
 
 // ── Shared ────────────────────────────────────────────────────────────────────
 const EDGAR_BASE = 'https://www.sec.gov';
@@ -95,12 +96,21 @@ function parseAtomFeed(xml: string): AtomEntry[] {
 
 async function fetchAtomFeed(type: string, count = 40): Promise<AtomEntry[]> {
   const url = `${EDGAR_BASE}/cgi-bin/browse-edgar?action=getcurrent&type=${encodeURIComponent(type)}&owner=include&count=${count}&output=atom`;
+  const start = Date.now();
   try {
     const res = await pacedFetch(url, 10000);
-    if (!res.ok) return [];
+    if (!res.ok) {
+      logger.warn('edgar.atom', 'http_error', { formType: type, status: res.status, durationMs: Date.now() - start });
+      return [];
+    }
     const xml = await res.text();
-    return parseAtomFeed(xml);
-  } catch { return []; }
+    const entries = parseAtomFeed(xml);
+    logger.info('edgar.atom', 'fetched', { formType: type, count: entries.length, durationMs: Date.now() - start });
+    return entries;
+  } catch (err) {
+    logger.error('edgar.atom', 'fetch_exception', { formType: type, error: err, durationMs: Date.now() - start });
+    return [];
+  }
 }
 
 /** Find the primary XML document for a filing accession. */
@@ -108,11 +118,17 @@ async function findPrimaryXml(cik: string, accessionPath: string, preferredNames
   const dirUrl = `${EDGAR_BASE}/Archives/edgar/data/${cik}/${accessionPath}/`;
   try {
     const res = await pacedFetch(dirUrl, 6000);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn('edgar.primary', 'dir_http_error', { cik, accession: accessionPath, status: res.status });
+      return null;
+    }
     const html = await res.text();
     // Find all .xml hrefs
     const hrefs = Array.from(html.matchAll(/href="([^"]+\.xml)"/g)).map(m => m[1]);
-    if (!hrefs.length) return null;
+    if (!hrefs.length) {
+      logger.warn('edgar.primary', 'no_xml_in_dir', { cik, accession: accessionPath });
+      return null;
+    }
     // Prefer known names (ownership.xml, primary_doc.xml, etc.)
     for (const name of preferredNames) {
       const hit = hrefs.find(h => h.toLowerCase().endsWith('/' + name.toLowerCase()) || h.toLowerCase().endsWith(name.toLowerCase()));
@@ -122,7 +138,10 @@ async function findPrimaryXml(cik: string, accessionPath: string, preferredNames
     const pick = hrefs.find(h => !/FilingSummary\.xml$|\/R\d+\.xml$/i.test(h));
     const chosen = pick ?? hrefs[0];
     return chosen.startsWith('/') ? EDGAR_BASE + chosen : chosen;
-  } catch { return null; }
+  } catch (err) {
+    logger.error('edgar.primary', 'dir_fetch_exception', { cik, accession: accessionPath, error: err });
+    return null;
+  }
 }
 
 // ── Form 4: insider transactions ──────────────────────────────────────────────
@@ -232,8 +251,12 @@ export async function fetchRecentForm4(opts: {
   tickersOnly?: string[];  // if set, filter to these tickers
 } = {}): Promise<InsiderTransaction[]> {
   const { feedCount = 40, includeOther = false, tickersOnly } = opts;
+  const runStart = Date.now();
   const feed = await fetchAtomFeed('4', feedCount);
-  if (!feed.length) return [];
+  if (!feed.length) {
+    logger.warn('edgar.form4', 'empty_feed', { message: 'RSS returned 0 entries' });
+    return [];
+  }
 
   // RSS entries duplicate each filing (Issuer + Reporting entry). Dedupe.
   const seen = new Set<string>();
@@ -256,27 +279,46 @@ export async function fetchRecentForm4(opts: {
   // Fetch XML in parallel batches of 8 (conservative on SEC limits)
   const results: InsiderTransaction[] = [];
   const BATCH = 8;
+  let failedCount = 0;
   for (let i = 0; i < issuerEntries.length; i += BATCH) {
     const slice = issuerEntries.slice(i, i + BATCH);
     const parsed = await Promise.allSettled(slice.map(async entry => {
       const xmlUrl = await findPrimaryXml(entry.cik, entry.accessionPath, ['ownership.xml', 'primary_doc.xml']);
       if (!xmlUrl) return [];
       const res = await pacedFetch(xmlUrl, 6000);
-      if (!res.ok) return [];
+      if (!res.ok) {
+        logger.warn('edgar.form4', 'xml_http_error', { accession: entry.accession, status: res.status });
+        return [];
+      }
       const xml = await res.text();
       const filedAt = entry.filedDate ? new Date(entry.filedDate).toISOString() : entry.updatedAt;
-      return parseForm4Xml(xml, { accession: entry.accession, filingUrl: entry.link, filedAt });
+      try {
+        return parseForm4Xml(xml, { accession: entry.accession, filingUrl: entry.link, filedAt });
+      } catch (err) {
+        logger.error('edgar.form4', 'parse_exception', { accession: entry.accession, error: err });
+        return [];
+      }
     }));
     for (const r of parsed) {
       if (r.status === 'fulfilled') results.push(...r.value);
+      else failedCount++;
     }
   }
 
-  // Filter + sort
-  return results
+  const filtered = results
     .filter(t => includeOther || t.direction !== 'other')
-    .filter(t => !tickersOnly || (t.ticker && tickersOnly.includes(t.ticker)))
-    .sort((a, b) => (b.filedAt || '').localeCompare(a.filedAt || ''));
+    .filter(t => !tickersOnly || (t.ticker && tickersOnly.includes(t.ticker)));
+
+  logger.info('edgar.form4', 'run_complete', {
+    durationMs: Date.now() - runStart,
+    feedEntries: feed.length,
+    uniqueFilings: issuerEntries.length,
+    totalTransactions: results.length,
+    filteredTransactions: filtered.length,
+    failedFilings: failedCount,
+  });
+
+  return filtered.sort((a, b) => (b.filedAt || '').localeCompare(a.filedAt || ''));
 }
 
 // ── Schedule 13D / 13G ────────────────────────────────────────────────────────
@@ -348,8 +390,12 @@ export async function fetchRecentOwnershipAlerts(opts: {
   minPercent?: number;   // only surface alerts crossing this % (default 5)
 } = {}): Promise<OwnershipAlert[]> {
   const { tickersOnly, minPercent = 5 } = opts;
+  const runStart = Date.now();
   const feed = await fetchAtomBothForms();
-  if (!feed.length) return [];
+  if (!feed.length) {
+    logger.warn('edgar.13dg', 'empty_feed', { message: 'all 4 RSS feeds returned 0 entries' });
+    return [];
+  }
 
   // Dedupe by accession
   const seen = new Set<string>();
@@ -402,8 +448,17 @@ export async function fetchRecentOwnershipAlerts(opts: {
     }
   }
 
-  return results
+  const filtered = results
     .filter(a => !tickersOnly || (a.ticker && tickersOnly.includes(a.ticker)))
-    .filter(a => a.percentOwned == null || a.percentOwned >= minPercent)
-    .sort((a, b) => (b.filedAt || '').localeCompare(a.filedAt || ''));
+    .filter(a => a.percentOwned == null || a.percentOwned >= minPercent);
+
+  logger.info('edgar.13dg', 'run_complete', {
+    durationMs: Date.now() - runStart,
+    feedEntries: feed.length,
+    uniqueFilings: uniques.length,
+    totalParsed: results.length,
+    filtered: filtered.length,
+  });
+
+  return filtered.sort((a, b) => (b.filedAt || '').localeCompare(a.filedAt || ''));
 }

@@ -9,6 +9,7 @@
  *
  * Crumb/cookie pair is cached in-process for the lifetime of the lambda.
  */
+import { logger } from './logger';
 
 const YF_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -35,6 +36,7 @@ function parseCookiesFromResponse(res: Response): string {
 }
 
 async function fetchYFCreds(): Promise<YFCreds | null> {
+  const start = Date.now();
   // Step 1: visit fc.yahoo.com to seed A3 cookie
   let cookie = '';
   try {
@@ -45,8 +47,14 @@ async function fetchYFCreds(): Promise<YFCreds | null> {
       signal: AbortSignal.timeout(8000),
     });
     cookie = parseCookiesFromResponse(seed);
-  } catch { return null; }
-  if (!cookie) return null;
+  } catch (err) {
+    logger.error('yahoo.crumb', 'seed_cookie_failed', { error: err, durationMs: Date.now() - start });
+    return null;
+  }
+  if (!cookie) {
+    logger.warn('yahoo.crumb', 'seed_cookie_empty', { durationMs: Date.now() - start, message: 'fc.yahoo.com returned no A3 cookie (possibly blocked)' });
+    return null;
+  }
 
   // Step 2: fetch crumb with the cookie
   try {
@@ -55,12 +63,22 @@ async function fetchYFCreds(): Promise<YFCreds | null> {
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     });
-    if (!crumbRes.ok) return null;
+    if (!crumbRes.ok) {
+      logger.warn('yahoo.crumb', 'getcrumb_bad_status', { status: crumbRes.status, durationMs: Date.now() - start });
+      return null;
+    }
     const crumb = (await crumbRes.text()).trim();
     // getcrumb returns a short opaque string; empty/HTML means we were blocked
-    if (!crumb || crumb.length > 64 || crumb.includes('<')) return null;
+    if (!crumb || crumb.length > 64 || crumb.includes('<')) {
+      logger.warn('yahoo.crumb', 'getcrumb_invalid_body', { durationMs: Date.now() - start, message: `crumb body looks invalid (len=${crumb.length})` });
+      return null;
+    }
+    logger.info('yahoo.crumb', 'acquired', { durationMs: Date.now() - start });
     return { cookie, crumb, fetchedAt: Date.now() };
-  } catch { return null; }
+  } catch (err) {
+    logger.error('yahoo.crumb', 'getcrumb_failed', { error: err, durationMs: Date.now() - start });
+    return null;
+  }
 }
 
 async function getYFCreds(force = false): Promise<YFCreds | null> {
@@ -143,7 +161,10 @@ export async function fetchYFShortData(ticker: string): Promise<YFShortData> {
   // Try up to twice: fresh creds → on 401, invalidate and retry once.
   for (let attempt = 0; attempt < 2; attempt++) {
     const creds = await getYFCreds(attempt > 0);
-    if (!creds) return base;
+    if (!creds) {
+      logger.warn('yahoo.short', 'no_creds', { ticker, attempt });
+      return base;
+    }
     try {
       const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics&crumb=${encodeURIComponent(creds.crumb)}`;
       const res = await fetch(url, {
@@ -152,14 +173,20 @@ export async function fetchYFShortData(ticker: string): Promise<YFShortData> {
         signal: AbortSignal.timeout(10000),
       });
       if (res.status === 401 || res.status === 403) {
-        // Invalid crumb — drop cache and retry with fresh creds
+        logger.warn('yahoo.short', 'crumb_rejected', { ticker, status: res.status, attempt, message: 'retrying with fresh crumb' });
         yfCreds = null;
         continue;
       }
-      if (!res.ok) return base;
+      if (!res.ok) {
+        logger.warn('yahoo.short', 'http_error', { ticker, status: res.status });
+        return base;
+      }
       const json = await res.json();
       const stats = json.quoteSummary?.result?.[0]?.defaultKeyStatistics;
-      if (!stats) return base;
+      if (!stats) {
+        logger.warn('yahoo.short', 'no_stats_in_response', { ticker });
+        return base;
+      }
 
       const shortPct = stats.sharesShortPercentOfFloat?.raw ?? null;
       const prior = stats.sharesShortPriorMonth?.raw ?? null;
@@ -176,7 +203,8 @@ export async function fetchYFShortData(ticker: string): Promise<YFShortData> {
         sharesShortPriorMonth: prior,
         shortChangeMonthly: changeMonthly != null ? +changeMonthly.toFixed(1) : null,
       };
-    } catch {
+    } catch (err) {
+      logger.error('yahoo.short', 'fetch_exception', { ticker, error: err });
       return base;
     }
   }
@@ -222,7 +250,10 @@ export async function fetchYFMarketCaps(tickers: string[]): Promise<YFMarketCap[
 
     for (let attempt = 0; attempt < 2 && !got; attempt++) {
       const creds = await getYFCreds(attempt > 0);
-      if (!creds) break;
+      if (!creds) {
+        logger.warn('yahoo.mcap', 'no_creds', { batchIndex: i, attempt });
+        break;
+      }
       try {
         const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(slice.join(','))}&crumb=${encodeURIComponent(creds.crumb)}`;
         const res = await fetch(url, {
@@ -231,9 +262,13 @@ export async function fetchYFMarketCaps(tickers: string[]): Promise<YFMarketCap[
           signal: AbortSignal.timeout(12000),
         });
         if (res.status === 401 || res.status === 403) {
+          logger.warn('yahoo.mcap', 'crumb_rejected', { batchIndex: i, status: res.status, attempt });
           yfCreds = null; continue;
         }
-        if (!res.ok) break;
+        if (!res.ok) {
+          logger.warn('yahoo.mcap', 'http_error', { batchIndex: i, status: res.status });
+          break;
+        }
         const json = await res.json();
         const results = json.quoteResponse?.result ?? [];
         const byTicker = new Map<string, Record<string, unknown>>();
@@ -255,10 +290,14 @@ export async function fetchYFMarketCaps(tickers: string[]): Promise<YFMarketCap[
           out.push({ ticker: t, marketCap: mcap, band, currency });
         }
         got = true;
-      } catch { break; }
+      } catch (err) {
+        logger.error('yahoo.mcap', 'fetch_exception', { batchIndex: i, error: err });
+        break;
+      }
     }
 
     if (!got) {
+      logger.warn('yahoo.mcap', 'batch_fallback_to_null', { batchIndex: i, size: slice.length, message: 'returning null band for entire batch' });
       for (const t of slice) out.push({ ticker: t, marketCap: null, band: null });
     }
   }

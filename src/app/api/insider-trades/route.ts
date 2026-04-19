@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchRecentForm4, type InsiderTransaction } from '@/lib/edgar-insider';
+import { logger } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:insider-trades:v1';
 const CACHE_TTL = 30 * 60;
@@ -24,6 +25,7 @@ function createRedis(): Redis | null {
 }
 
 export async function GET(req: Request) {
+  const reqStart = Date.now();
   const redis = createRedis();
   const url = new URL(req.url);
   const force = url.searchParams.get('refresh') === '1';
@@ -34,17 +36,20 @@ export async function GET(req: Request) {
       const cached = await redis.get<InsiderTransaction[]>(CACHE_KEY);
       if (cached) {
         const filtered = tickerFilter ? cached.filter(t => t.ticker === tickerFilter) : cached;
+        logger.info('api.insider-trades', 'cache_hit', { total: cached.length, filtered: filtered.length, durationMs: Date.now() - reqStart });
         return NextResponse.json({ items: filtered, cached: true, total: cached.length });
       }
-    } catch { /* non-fatal */ }
+    } catch (err) { logger.warn('api.insider-trades', 'cache_read_error', { error: err }); }
   }
 
   const transactions = await fetchRecentForm4({ feedCount: 80, includeOther: false });
 
   if (redis) {
-    try { await redis.set(CACHE_KEY, transactions, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, transactions, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.insider-trades', 'cache_write_error', { error: err }); }
   }
 
   const filtered = tickerFilter ? transactions.filter(t => t.ticker === tickerFilter) : transactions;
+  logger.info('api.insider-trades', 'served', { total: transactions.length, filtered: filtered.length, forced: force, durationMs: Date.now() - reqStart });
   return NextResponse.json({ items: filtered, cached: false, total: transactions.length });
 }

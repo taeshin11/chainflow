@@ -6,6 +6,8 @@
  * When absent, fetchers return [] and the UI shows a "locked" state.
  */
 
+import { logger } from './logger';
+
 export interface BlockTrade {
   id: string;
   timestamp: string;       // ISO
@@ -39,7 +41,10 @@ export async function fetchBlockTrades(ticker: string, minShares = 10_000, maxPa
   while (url && pages < maxPages) {
     try {
       const res: Response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10000) });
-      if (!res.ok) break;
+      if (!res.ok) {
+        logger.warn('polygon.trades', 'http_error', { ticker, status: res.status, page: pages });
+        break;
+      }
       const json: Record<string, unknown> = await res.json();
       const results = ((json?.results as unknown[]) ?? []) as Array<Record<string, unknown>>;
       for (const r of results) {
@@ -62,7 +67,10 @@ export async function fetchBlockTrades(ticker: string, minShares = 10_000, maxPa
       const nextUrl = json?.next_url as string | undefined;
       url = nextUrl ? `${nextUrl}&apiKey=${key}` : null;
       pages++;
-    } catch { break; }
+    } catch (err) {
+      logger.error('polygon.trades', 'fetch_exception', { ticker, page: pages, error: err });
+      break;
+    }
   }
   return out;
 }

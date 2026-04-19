@@ -19,6 +19,7 @@
  */
 
 import { EDGAR_UA, CUSIP_TO_TICKER } from './edgar-13f';
+import { logger } from './logger';
 
 const EDGAR_BASE = 'https://www.sec.gov';
 const EDGAR_HEADERS = { 'User-Agent': EDGAR_UA, 'Accept': 'application/xml,text/html' };
@@ -129,13 +130,20 @@ function parseNPortXml(xml: string, meta: { accession: string; filingUrl: string
  */
 export async function fetchRecentNPORT(opts: { feedCount?: number } = {}): Promise<NPortFundSnapshot[]> {
   const feedCount = opts.feedCount ?? 20;
+  const runStart = Date.now();
   try {
     const rssRes = await pacedFetch(
       `${EDGAR_BASE}/cgi-bin/browse-edgar?action=getcurrent&type=NPORT-P&count=${feedCount}&output=atom`
     );
-    if (!rssRes.ok) return [];
+    if (!rssRes.ok) {
+      logger.warn('edgar.nport', 'rss_http_error', { status: rssRes.status });
+      return [];
+    }
     const entries = parseAtomFeed(await rssRes.text());
-    if (!entries.length) return [];
+    if (!entries.length) {
+      logger.warn('edgar.nport', 'empty_feed');
+      return [];
+    }
 
     // Dedupe accessions (RSS duplicates Filer entries)
     const seen = new Set<string>();
@@ -148,26 +156,48 @@ export async function fetchRecentNPORT(opts: { feedCount?: number } = {}): Promi
     // Fetch primary_doc.xml for each in batches of 4 (XML can be large)
     const snapshots: NPortFundSnapshot[] = [];
     const BATCH = 4;
+    let failedCount = 0;
+    let emptyCount = 0;
     for (let i = 0; i < unique.length; i += BATCH) {
       const slice = unique.slice(i, i + BATCH);
       const parsed = await Promise.allSettled(slice.map(async e => {
         const xmlUrl = `${EDGAR_BASE}/Archives/edgar/data/${e.cik}/${e.accessionPath}/primary_doc.xml`;
         const res = await pacedFetch(xmlUrl, 12000);
-        if (!res.ok) return null;
+        if (!res.ok) {
+          logger.warn('edgar.nport', 'xml_http_error', { accession: e.accession, status: res.status });
+          return null;
+        }
         const xml = await res.text();
         const filedAt = e.filedDate ? new Date(e.filedDate).toISOString() : new Date().toISOString();
-        return parseNPortXml(xml, { accession: e.accession, filingUrl: e.link, filedAt });
+        try {
+          return parseNPortXml(xml, { accession: e.accession, filingUrl: e.link, filedAt });
+        } catch (err) {
+          logger.error('edgar.nport', 'parse_exception', { accession: e.accession, error: err });
+          return null;
+        }
       }));
       for (const r of parsed) {
-        if (r.status === 'fulfilled' && r.value && r.value.holdings.length > 0) {
-          snapshots.push(r.value);
-        }
+        if (r.status === 'rejected') { failedCount++; continue; }
+        if (r.value && r.value.holdings.length > 0) snapshots.push(r.value);
+        else if (r.value) emptyCount++;
       }
     }
 
+    logger.info('edgar.nport', 'run_complete', {
+      durationMs: Date.now() - runStart,
+      feedEntries: entries.length,
+      uniqueFilings: unique.length,
+      snapshotsWithTracked: snapshots.length,
+      snapshotsEmpty: emptyCount,
+      failedFilings: failedCount,
+    });
+
     // Sort newest first
     return snapshots.sort((a, b) => (b.filedAt || '').localeCompare(a.filedAt || ''));
-  } catch { return []; }
+  } catch (err) {
+    logger.error('edgar.nport', 'run_exception', { error: err, durationMs: Date.now() - runStart });
+    return [];
+  }
 }
 
 /**

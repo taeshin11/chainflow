@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * /api/market-caps
  *
@@ -38,11 +39,15 @@ export async function GET(req: Request) {
   const redis = createRedis();
   const force = new URL(req.url).searchParams.get('refresh') === '1';
 
+  const reqStart = Date.now();
   if (redis && !force) {
     try {
       const cached = await redis.get<MarketCapPayload>(CACHE_KEY);
-      if (cached) return NextResponse.json({ ...cached, cached: true });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.market-caps', 'cache_hit', { count: cached.count });
+        return NextResponse.json({ ...cached, cached: true });
+      }
+    } catch (err) { logger.warn('api.market-caps', 'cache_read_error', { error: err }); }
   }
 
   // Deduplicate tickers across batches (allCompanies concatenates multiple files
@@ -66,8 +71,10 @@ export async function GET(req: Request) {
   };
 
   if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.market-caps', 'cache_write_error', { error: err }); }
   }
 
+  logger.info('api.market-caps', 'served', { tickers: tickers.length, mapped: Object.keys(bands).length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });
 }

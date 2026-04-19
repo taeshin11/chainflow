@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Vercel Cron — 21:00 UTC = 06:00 KST
  * Regenerates 1w / 4w / 13w daily briefs and stores in Redis.
@@ -35,8 +36,10 @@ export async function GET(req: NextRequest) {
       results[tf] = `ok (${source})`;
     } catch (e) {
       results[tf] = `error: ${e instanceof Error ? e.message : String(e)}`;
+      logger.error('cron.daily-brief', 'tf_failed', { tf, error: e });
     }
   }
+  logger.info('cron.daily-brief', 'run_complete', { results, durationMs: Date.now() - start });
 
   const kstNow = new Date(Date.now() + 9 * 3600000);
   return NextResponse.json({

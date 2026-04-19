@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchBlockTradesForTickers, polygonKey, type BlockTrade } from '@/lib/polygon';
+import { logger } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:block-trades:v1';
 const CACHE_TTL = 5 * 60;
@@ -29,21 +30,30 @@ function createRedis(): Redis | null {
 }
 
 export async function GET(req: Request) {
+  const reqStart = Date.now();
   const configured = polygonKey() != null;
-  if (!configured) return NextResponse.json({ items: [], configured: false, total: 0 });
+  if (!configured) {
+    logger.info('api.block-trades', 'unconfigured');
+    return NextResponse.json({ items: [], configured: false, total: 0 });
+  }
 
   const redis = createRedis();
   const force = new URL(req.url).searchParams.get('refresh') === '1';
   if (redis && !force) {
     try {
       const cached = await redis.get<BlockTrade[]>(CACHE_KEY);
-      if (cached) return NextResponse.json({ items: cached, configured: true, cached: true, total: cached.length });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.block-trades', 'cache_hit', { total: cached.length });
+        return NextResponse.json({ items: cached, configured: true, cached: true, total: cached.length });
+      }
+    } catch (err) { logger.warn('api.block-trades', 'cache_read_error', { error: err }); }
   }
 
   const trades = await fetchBlockTradesForTickers(TRACKED_TICKERS, 10_000);
   if (redis) {
-    try { await redis.set(CACHE_KEY, trades, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, trades, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.block-trades', 'cache_write_error', { error: err }); }
   }
+  logger.info('api.block-trades', 'served', { total: trades.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ items: trades, configured: true, cached: false, total: trades.length });
 }

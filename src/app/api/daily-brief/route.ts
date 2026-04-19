@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import {
   createRedis, cacheKey, callAI, buildPrompt, parseAIResponse, fallbackBrief,
@@ -13,12 +14,16 @@ export async function GET(request: Request) {
   const tf = (searchParams.get('tf') as Timeframe) ?? '4w';
   const force = searchParams.get('force') === '1';
 
+  const reqStart = Date.now();
   const redis = createRedis();
   if (redis && !force) {
     try {
       const cached = await redis.get(cacheKey(tf));
-      if (cached) return NextResponse.json({ ...(cached as object), cached: true });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.daily-brief', 'cache_hit', { tf });
+        return NextResponse.json({ ...(cached as object), cached: true });
+      }
+    } catch (err) { logger.warn('api.daily-brief', 'cache_read_error', { tf, error: err }); }
   }
 
   // Pull live data from every tab (heatmap, short, capital, fg, fed, macro,
@@ -32,14 +37,22 @@ export async function GET(request: Request) {
   try {
     const { text, source } = await callAI(prompt);
     if (text) brief = parseAIResponse(text, tf, source);
-  } catch { /* fallback */ }
-
-  if (!brief) brief = fallbackBrief(tf, ctx);
-
-  if (redis) {
-    try { await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 }); } catch { /* non-fatal */ }
+    if (!brief) logger.warn('api.daily-brief', 'ai_unparseable', { tf, source });
+  } catch (err) {
+    logger.error('api.daily-brief', 'ai_exception', { tf, error: err });
   }
 
+  if (!brief) {
+    brief = fallbackBrief(tf, ctx);
+    logger.warn('api.daily-brief', 'used_fallback', { tf });
+  }
+
+  if (redis) {
+    try { await redis.set(cacheKey(tf), brief, { ex: 26 * 60 * 60 }); }
+    catch (err) { logger.warn('api.daily-brief', 'cache_write_error', { tf, error: err }); }
+  }
+
+  logger.info('api.daily-brief', 'served', { tf, source: brief.source, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...brief, cached: false });
 }
 

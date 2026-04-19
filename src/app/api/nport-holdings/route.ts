@@ -17,6 +17,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchRecentNPORT, aggregateByTicker, type NPortFundSnapshot, type NPortTickerAggregate } from '@/lib/edgar-nport';
+import { logger } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:nport-holdings:v1';
 const CACHE_TTL = 6 * 60 * 60;
@@ -33,11 +34,15 @@ function createRedis(): Redis | null {
 export async function GET(req: Request) {
   const redis = createRedis();
   const force = new URL(req.url).searchParams.get('refresh') === '1';
+  const reqStart = Date.now();
   if (redis && !force) {
     try {
       const cached = await redis.get<{ funds: NPortFundSnapshot[]; byTicker: NPortTickerAggregate[]; updatedAt: string }>(CACHE_KEY);
-      if (cached) return NextResponse.json({ ...cached, cached: true });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.nport-holdings', 'cache_hit', { funds: cached.funds.length, byTicker: cached.byTicker.length });
+        return NextResponse.json({ ...cached, cached: true });
+      }
+    } catch (err) { logger.warn('api.nport-holdings', 'cache_read_error', { error: err }); }
   }
 
   const funds = await fetchRecentNPORT({ feedCount: 30 });
@@ -45,7 +50,9 @@ export async function GET(req: Request) {
   const payload = { funds, byTicker, updatedAt: new Date().toISOString() };
 
   if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.nport-holdings', 'cache_write_error', { error: err }); }
   }
+  logger.info('api.nport-holdings', 'served', { funds: funds.length, byTicker: byTicker.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });
 }

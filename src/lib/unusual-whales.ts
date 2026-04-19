@@ -23,6 +23,8 @@ export interface OptionsFlowAlert {
   sourceUrl?: string;
 }
 
+import { logger } from './logger';
+
 const UW_BASE = 'https://api.unusualwhales.com/api';
 
 export function unusualWhalesKey(): string | null {
@@ -32,7 +34,11 @@ export function unusualWhalesKey(): string | null {
 /** Fetch the most recent institutional-size option trades (flow alerts). */
 export async function fetchOptionsFlow(limit = 40): Promise<OptionsFlowAlert[]> {
   const key = unusualWhalesKey();
-  if (!key) return [];
+  if (!key) {
+    logger.info('uw.flow', 'no_key', { message: 'UNUSUAL_WHALES_KEY not set — returning []' });
+    return [];
+  }
+  const start = Date.now();
   try {
     const res = await fetch(`${UW_BASE}/option-trades/flow-alerts?limit=${limit}`, {
       headers: {
@@ -42,9 +48,13 @@ export async function fetchOptionsFlow(limit = 40): Promise<OptionsFlowAlert[]> 
       cache: 'no-store',
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      logger.warn('uw.flow', 'http_error', { status: res.status, durationMs: Date.now() - start });
+      return [];
+    }
     const json = await res.json();
     const rows = (json?.data ?? []) as Array<Record<string, unknown>>;
+    logger.info('uw.flow', 'fetched', { rows: rows.length, durationMs: Date.now() - start });
     return rows.map((r, i) => {
       const side = (r.side as string)?.toLowerCase() as OptionsFlowAlert['side'];
       const optType = ((r.option_type ?? r.type) as string)?.toLowerCase() as OptionsFlowAlert['optionType'];
@@ -69,7 +79,8 @@ export async function fetchOptionsFlow(limit = 40): Promise<OptionsFlowAlert[]> 
         sourceUrl: r.source_url as string | undefined,
       };
     });
-  } catch {
+  } catch (err) {
+    logger.error('uw.flow', 'fetch_exception', { error: err, durationMs: Date.now() - start });
     return [];
   }
 }

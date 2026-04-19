@@ -13,6 +13,7 @@
  */
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:korea-flow:v1';
 const CACHE_TTL = 15 * 60;
@@ -56,6 +57,7 @@ async function fetchKrxFlow(market: 'KOSPI' | 'KOSDAQ'): Promise<KoreaFlowEntry[
     csvxls_isNo: 'false',
   });
 
+  const start = Date.now();
   try {
     const res = await fetch('https://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd', {
       method: 'POST',
@@ -64,9 +66,13 @@ async function fetchKrxFlow(market: 'KOSPI' | 'KOSDAQ'): Promise<KoreaFlowEntry[
       cache: 'no-store',
       signal: AbortSignal.timeout(12000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      logger.warn('krx.flow', 'http_error', { market, status: res.status, durationMs: Date.now() - start });
+      return [];
+    }
     const json = await res.json();
     const rows = (json?.output ?? []) as Array<Record<string, string>>;
+    logger.info('krx.flow', 'fetched', { market, rows: rows.length, durationMs: Date.now() - start });
     return rows.map(r => ({
       ticker: r.ISU_SRT_CD,
       name: r.ISU_ABBRV,
@@ -77,20 +83,25 @@ async function fetchKrxFlow(market: 'KOSPI' | 'KOSDAQ'): Promise<KoreaFlowEntry[
       closePrice: Number((r.TDD_CLSPRC ?? '0').replace(/,/g, '')) || null,
       changePct: Number((r.FLUC_RT ?? '0').replace(/,/g, '')) || null,
     })).filter(e => e.ticker && e.name);
-  } catch {
+  } catch (err) {
+    logger.error('krx.flow', 'fetch_exception', { market, error: err, durationMs: Date.now() - start });
     return [];
   }
 }
 
 export async function GET(req: Request) {
+  const reqStart = Date.now();
   const redis = createRedis();
   const force = new URL(req.url).searchParams.get('refresh') === '1';
 
   if (redis && !force) {
     try {
       const cached = await redis.get(CACHE_KEY);
-      if (cached) return NextResponse.json({ ...(cached as object), cached: true });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.korea-flow', 'cache_hit');
+        return NextResponse.json({ ...(cached as object), cached: true });
+      }
+    } catch (err) { logger.warn('api.korea-flow', 'cache_read_error', { error: err }); }
   }
 
   const [kospi, kosdaq] = await Promise.all([
@@ -129,8 +140,10 @@ export async function GET(req: Request) {
   };
 
   if (redis) {
-    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, payload, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.korea-flow', 'cache_write_error', { error: err }); }
   }
 
+  logger.info('api.korea-flow', 'served', { totalTickers: all.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ ...payload, cached: false });
 }

@@ -15,6 +15,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { fetchOptionsFlow, unusualWhalesKey, type OptionsFlowAlert } from '@/lib/unusual-whales';
+import { logger } from '@/lib/logger';
 
 const CACHE_KEY = 'flowvium:options-flow:v1';
 const CACHE_TTL = 10 * 60;
@@ -27,8 +28,10 @@ function createRedis(): Redis | null {
 }
 
 export async function GET(req: Request) {
+  const reqStart = Date.now();
   const configured = unusualWhalesKey() != null;
   if (!configured) {
+    logger.info('api.options-flow', 'unconfigured');
     return NextResponse.json({ items: [], configured: false, total: 0 });
   }
 
@@ -37,13 +40,18 @@ export async function GET(req: Request) {
   if (redis && !force) {
     try {
       const cached = await redis.get<OptionsFlowAlert[]>(CACHE_KEY);
-      if (cached) return NextResponse.json({ items: cached, configured: true, cached: true, total: cached.length });
-    } catch { /* non-fatal */ }
+      if (cached) {
+        logger.info('api.options-flow', 'cache_hit', { total: cached.length });
+        return NextResponse.json({ items: cached, configured: true, cached: true, total: cached.length });
+      }
+    } catch (err) { logger.warn('api.options-flow', 'cache_read_error', { error: err }); }
   }
 
   const items = await fetchOptionsFlow(60);
   if (redis) {
-    try { await redis.set(CACHE_KEY, items, { ex: CACHE_TTL }); } catch { /* non-fatal */ }
+    try { await redis.set(CACHE_KEY, items, { ex: CACHE_TTL }); }
+    catch (err) { logger.warn('api.options-flow', 'cache_write_error', { error: err }); }
   }
+  logger.info('api.options-flow', 'served', { total: items.length, durationMs: Date.now() - reqStart });
   return NextResponse.json({ items, configured: true, cached: false, total: items.length });
 }
