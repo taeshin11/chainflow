@@ -1,0 +1,289 @@
+'use client';
+
+import { useEffect, useState, useMemo } from 'react';
+import { TrendingUp, TrendingDown, Minus, AlertTriangle, RefreshCw, Loader2, ArrowUpDown, ExternalLink } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+import type { ShortEntry } from '@/app/api/short-interest/route';
+
+const SECTOR_LABELS: Record<string, string> = {
+  semiconductors: '반도체',
+  'ai-cloud': 'AI·클라우드',
+  'ev-battery': 'EV·배터리',
+  defense: '방산',
+  'pharma-biotech': '바이오',
+  commodities: '원자재',
+  other: '기타',
+};
+
+const ACTION_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  accumulating: { label: '매집', color: '#10b981', icon: <TrendingUp className="w-3 h-3" /> },
+  new_position: { label: '신규', color: '#3b82f6', icon: <TrendingUp className="w-3 h-3" /> },
+  reducing:     { label: '축소', color: '#f59e0b', icon: <TrendingDown className="w-3 h-3" /> },
+  exit:         { label: '청산', color: '#ef4444', icon: <Minus className="w-3 h-3" /> },
+};
+
+type SortKey = 'squeezeScore' | 'shortFloatPct' | 'shortRatio' | 'shortChangeMonthly' | 'ticker';
+
+function SqueezeBar({ score }: { score: number }) {
+  const color = score >= 70 ? '#ef4444' : score >= 45 ? '#f59e0b' : score >= 25 ? '#6366f1' : '#64748b';
+  const label = score >= 70 ? '위험' : score >= 45 ? '주의' : score >= 25 ? '보통' : '낮음';
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden min-w-[60px]">
+        <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: color }} />
+      </div>
+      <span className="text-[10px] font-bold min-w-[28px]" style={{ color }}>{label}</span>
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="cf-card px-4 py-3">
+      <p className="text-[10px] text-cf-text-secondary mb-1">{label}</p>
+      <p className="text-lg font-bold text-cf-text-primary">{value}</p>
+      {sub && <p className="text-[10px] text-cf-text-secondary mt-0.5">{sub}</p>}
+    </div>
+  );
+}
+
+export default function ShortPage() {
+  const [entries, setEntries] = useState<ShortEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>('squeezeScore');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [sectorFilter, setSectorFilter] = useState<string>('all');
+  const [actionFilter, setActionFilter] = useState<string>('all');
+
+  const load = async (force = false) => {
+    if (force) setRefreshing(true);
+    try {
+      const res = await fetch(`/api/short-interest${force ? '?refresh=1' : ''}`);
+      const data = await res.json();
+      setEntries(data.entries ?? []);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const sectors = useMemo(() => ['all', ...Array.from(new Set(entries.map(e => e.sector)))], [entries]);
+
+  const sorted = useMemo(() => {
+    const filtered = entries
+      .filter(e => sectorFilter === 'all' || e.sector === sectorFilter)
+      .filter(e => actionFilter === 'all' || e.instAction === actionFilter);
+
+    return [...filtered].sort((a, b) => {
+      const va = a[sortKey] ?? -999;
+      const vb = b[sortKey] ?? -999;
+      if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb as string) : (vb as string).localeCompare(va);
+      return sortDir === 'asc' ? (va as number) - (vb as number) : (vb as number) - (va as number);
+    });
+  }, [entries, sortKey, sortDir, sectorFilter, actionFilter]);
+
+  const topSqueeze = useMemo(() => entries.filter(e => e.squeezeScore >= 45).length, [entries]);
+  const avgShort = useMemo(() => {
+    const valid = entries.filter(e => e.shortFloatPct != null);
+    if (!valid.length) return null;
+    return (valid.reduce((s, e) => s + (e.shortFloatPct ?? 0), 0) / valid.length).toFixed(1);
+  }, [entries]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('desc'); }
+  };
+
+  const SortTh = ({ label, k }: { label: string; k: SortKey }) => (
+    <th
+      className="px-3 py-2 text-left text-[10px] text-cf-text-secondary cursor-pointer hover:text-cf-text-primary select-none whitespace-nowrap"
+      onClick={() => handleSort(k)}
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        <ArrowUpDown className="w-2.5 h-2.5 opacity-40" />
+        {sortKey === k && <span className="opacity-70">{sortDir === 'desc' ? '↓' : '↑'}</span>}
+      </div>
+    </th>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] gap-3 text-cf-text-secondary">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        <span>공매도 데이터 수신 중 (Yahoo Finance)...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-cf-text-primary flex items-center gap-2">
+            <AlertTriangle className="w-6 h-6 text-amber-400" />
+            공매도 · 숏 스퀴즈
+          </h1>
+          <p className="text-sm text-cf-text-secondary mt-1">
+            Short Interest % of Float · Days to Cover · 기관 매집 충돌 분석
+          </p>
+        </div>
+        <button
+          onClick={() => load(true)}
+          disabled={refreshing}
+          className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors disabled:opacity-40"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          새로고침
+        </button>
+      </div>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <StatCard label="추적 종목" value={`${entries.length}개`} sub="Yahoo Finance 기준" />
+        <StatCard label="스퀴즈 위험 (주의+)" value={`${topSqueeze}개`} sub="점수 45점 이상" />
+        <StatCard label="평균 Short Float" value={avgShort ? `${avgShort}%` : '-'} sub="추적 종목 평균" />
+        <StatCard
+          label="최고 스퀴즈 점수"
+          value={sorted[0] ? `${sorted[0].squeezeScore}점` : '-'}
+          sub={sorted[0]?.ticker ?? ''}
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <select
+          value={sectorFilter}
+          onChange={e => setSectorFilter(e.target.value)}
+          className="text-xs bg-cf-card border border-white/10 rounded-lg px-3 py-1.5 text-cf-text-primary"
+        >
+          <option value="all">전체 섹터</option>
+          {sectors.filter(s => s !== 'all').map(s => (
+            <option key={s} value={s}>{SECTOR_LABELS[s] ?? s}</option>
+          ))}
+        </select>
+        <select
+          value={actionFilter}
+          onChange={e => setActionFilter(e.target.value)}
+          className="text-xs bg-cf-card border border-white/10 rounded-lg px-3 py-1.5 text-cf-text-primary"
+        >
+          <option value="all">전체 기관 액션</option>
+          <option value="accumulating">매집</option>
+          <option value="new_position">신규 편입</option>
+          <option value="reducing">비중 축소</option>
+          <option value="exit">청산</option>
+        </select>
+        {/* Preset filters */}
+        <button
+          onClick={() => { setActionFilter('accumulating'); setSortKey('squeezeScore'); setSortDir('desc'); }}
+          className="text-[10px] px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors"
+        >
+          🔥 스퀴즈 후보 (매집 + 높은 숏)
+        </button>
+        <button
+          onClick={() => { setActionFilter('all'); setSortKey('shortFloatPct'); setSortDir('desc'); }}
+          className="text-[10px] px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+        >
+          📊 숏 비율 높은 순
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="cf-card overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="border-b border-white/5">
+            <tr>
+              <SortTh label="티커" k="ticker" />
+              <th className="px-3 py-2 text-left text-[10px] text-cf-text-secondary">기업</th>
+              <th className="px-3 py-2 text-left text-[10px] text-cf-text-secondary">섹터</th>
+              <SortTh label="Short % Float" k="shortFloatPct" />
+              <SortTh label="Days to Cover" k="shortRatio" />
+              <SortTh label="MoM 변화" k="shortChangeMonthly" />
+              <th className="px-3 py-2 text-left text-[10px] text-cf-text-secondary">기관 액션</th>
+              <SortTh label="스퀴즈 점수" k="squeezeScore" />
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map(entry => {
+              const actionCfg = entry.instAction ? ACTION_CONFIG[entry.instAction] : null;
+              return (
+                <tr key={entry.ticker} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="px-3 py-2.5">
+                    <Link
+                      href={`/company/${entry.ticker}` as Parameters<typeof Link>[0]['href']}
+                      className="font-bold text-cf-accent hover:underline flex items-center gap-1"
+                    >
+                      {entry.ticker}
+                      <ExternalLink className="w-3 h-3 opacity-40" />
+                    </Link>
+                  </td>
+                  <td className="px-3 py-2.5 text-[11px] text-cf-text-secondary max-w-[140px] truncate">
+                    {entry.companyName}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-cf-text-secondary">
+                      {SECTOR_LABELS[entry.sector] ?? entry.sector}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    {entry.shortFloatPct != null ? (
+                      <span className={`font-mono font-semibold text-sm ${entry.shortFloatPct > 20 ? 'text-red-400' : entry.shortFloatPct > 10 ? 'text-amber-400' : 'text-cf-text-primary'}`}>
+                        {entry.shortFloatPct.toFixed(1)}%
+                      </span>
+                    ) : <span className="text-cf-text-secondary/40">-</span>}
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-sm">
+                    {entry.shortRatio != null ? (
+                      <span className={entry.shortRatio > 5 ? 'text-amber-400' : 'text-cf-text-primary'}>
+                        {entry.shortRatio.toFixed(1)}일
+                      </span>
+                    ) : <span className="text-cf-text-secondary/40">-</span>}
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-sm">
+                    {entry.shortChangeMonthly != null ? (
+                      <span className={entry.shortChangeMonthly > 5 ? 'text-red-400' : entry.shortChangeMonthly < -5 ? 'text-green-400' : 'text-cf-text-secondary'}>
+                        {entry.shortChangeMonthly > 0 ? '+' : ''}{entry.shortChangeMonthly.toFixed(1)}%
+                      </span>
+                    ) : <span className="text-cf-text-secondary/40">-</span>}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    {actionCfg ? (
+                      <span
+                        className="flex items-center gap-1 text-[10px] font-semibold w-fit px-1.5 py-0.5 rounded"
+                        style={{ color: actionCfg.color, backgroundColor: actionCfg.color + '20' }}
+                      >
+                        {actionCfg.icon}
+                        {actionCfg.label}
+                      </span>
+                    ) : <span className="text-cf-text-secondary/40 text-[10px]">데이터 없음</span>}
+                  </td>
+                  <td className="px-3 py-2.5 min-w-[120px]">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm w-8 text-right">{entry.squeezeScore}</span>
+                      <div className="flex-1">
+                        <SqueezeBar score={entry.squeezeScore} />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {sorted.length === 0 && (
+          <div className="text-center py-12 text-cf-text-secondary text-sm">
+            조건에 맞는 종목이 없습니다
+          </div>
+        )}
+      </div>
+
+      <p className="text-[10px] text-cf-text-secondary/40 mt-3">
+        출처: Yahoo Finance defaultKeyStatistics · SEC EDGAR 13F · 캐시 4시간
+      </p>
+    </div>
+  );
+}
