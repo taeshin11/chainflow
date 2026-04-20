@@ -107,12 +107,13 @@ async function getFearGreedItem(redis: Redis): Promise<UpdateItem | null> {
 // ── 2. Capital Flows 상위 변동 ────────────────────────────────────────────────
 async function getCapitalFlowItems(redis: Redis): Promise<UpdateItem[]> {
   try {
-    // v4 키 (TWELVE_DATA_KEY 유무에 따라 다름), v2 fallback
+    // v5 키 (TWELVE_DATA_KEY 유무에 따라 다름), 이전 버전 fallback
     let data: Record<string, unknown> | null = null;
     for (const key of [
+      'flowvium:capital-flows:v5:yahoo',
+      'flowvium:capital-flows:v5:twelve',
       'flowvium:capital-flows:v4:yahoo',
       'flowvium:capital-flows:v4:twelve',
-      'flowvium:capital-flows:v4:none',
       'flowvium:capital-flows:v2',
     ]) {
       const d = await redis.get(key) as Record<string, unknown> | null;
@@ -154,7 +155,9 @@ async function getCapitalFlowItems(redis: Redis): Promise<UpdateItem[]> {
 async function getMacroItems(redis: Redis): Promise<UpdateItem[]> {
   try {
     const kstDate = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
-    const data = await redis.get(`flowvium:macro-indicators:v3:${kstDate}`) as Record<string, unknown> | null;
+    // v4가 현재 쓰기 버전 (macro-indicators/route.ts). v3는 구 캐시 호환.
+    const data = (await redis.get(`flowvium:macro-indicators:v4:${kstDate}`) as Record<string, unknown> | null)
+              ?? (await redis.get(`flowvium:macro-indicators:v3:${kstDate}`) as Record<string, unknown> | null);
     if (!data) return [];
 
     const indicators = data.indicators as Array<{

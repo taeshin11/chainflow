@@ -26,26 +26,41 @@ function checkAuth(req: Request): boolean {
   return req.headers.get('x-admin-secret') === secret;
 }
 
-/** List of cache keys whose existence we probe as a liveness signal. */
-const TRACKED_CACHE_KEYS = [
-  'flowvium:insider-trades:v1',
-  'flowvium:ownership-alerts:v1',
-  'flowvium:nport-holdings:v1',
-  'flowvium:options-flow:v1',
-  'flowvium:block-trades:v1',
-  'flowvium:korea-flow:v1',
-  'flowvium:short-interest:v1',
-  'flowvium:market-caps:v1',
-  'flowvium:fg:v3:SPY',
-  'flowvium:13f-signals:v1',
-];
-
+/** List of cache keys whose existence we probe as a liveness signal.
+ *  NOTE: 버전 숫자 바뀌면 여기도 업데이트. 일부 키는 date/hour 변수가 들어가므로
+ *  오늘자/이번시간 키를 동적으로 계산. */
+function buildTrackedKeys(): string[] {
+  const kstDate = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  const hour = new Date().toISOString().slice(0, 13);
+  return [
+    'flowvium:insider-trades:v1',
+    'flowvium:ownership-alerts:v1',
+    'flowvium:nport-holdings:v1',
+    'flowvium:options-flow:v1',
+    'flowvium:block-trades:v1',
+    'flowvium:korea-flow:v1',
+    'flowvium:short-interest:v1',
+    'flowvium:market-caps:v1',
+    'flowvium:fg:v3:SPY',
+    'flowvium:13f-signals:v1',
+    // 추가 핵심 키 (이전엔 누락)
+    'flowvium:capital-flows:v5:yahoo',
+    'flowvium:capital-flows:v5:twelve',
+    `flowvium:macro-indicators:v4:${kstDate}`,
+    `flowvium:fedwatch:v1:${hour}`,
+    `flowvium:credit-balance:v2:${kstDate}`,
+    'flowvium:latest-updates:v2',
+  ];
+}
 export async function GET(req: Request) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const start = Date.now();
 
   const redis = createRedis();
   const redisOk = redis != null;
+
+  // 매 요청마다 빌드 — 일자/시간 key 변수가 최신 반영되어야 함
+  const TRACKED_CACHE_KEYS = buildTrackedKeys();
 
   // Probe each tracked key: exists? + size
   const cacheStatus: Record<string, { exists: boolean; size?: number; error?: string }> = {};
