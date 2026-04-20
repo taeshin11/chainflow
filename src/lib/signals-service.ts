@@ -1,4 +1,5 @@
 import { institutionalSignals, type InstitutionalSignal } from '@/data/institutional-signals';
+import { logger } from '@/lib/logger';
 import { fetchNewsData, computeNewsGapScore } from '@/lib/alpha-vantage';
 import {
   getNewsGapCache,
@@ -6,6 +7,30 @@ import {
   mergeNewsGapCache,
   type TickerNewsCache,
 } from '@/lib/signals-cache';
+import { Redis } from '@upstash/redis';
+
+const REDIS_KEY_SIGNALS = 'flowvium:13f-signals:v1';
+
+function createRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
+
+/** Redis에 저장된 EDGAR 13F 파싱 결과를 읽어옴. 없으면 null. */
+async function get13FSignals(): Promise<InstitutionalSignal[] | null> {
+  try {
+    const redis = createRedis();
+    if (!redis) return null;
+    const data = await redis.get(REDIS_KEY_SIGNALS);
+    if (!Array.isArray(data) || data.length === 0) return null;
+    return data as InstitutionalSignal[];
+  } catch (err) {
+    logger.error('signals.service', 'get_13f_failed', { error: err });
+    return null;
+  }
+}
 
 /**
  * All US-listed tickers we track.
@@ -56,6 +81,9 @@ async function refreshNewsGaps(
     for (let j = 0; j < batch.length; j++) {
       const ticker = batch[j];
       const r = results[j];
+      if (r.status === 'rejected') {
+        logger.error('signals.service', 'news_fetch_failed', { ticker, error: r.reason });
+      }
       if (r.status === 'fulfilled' && r.value !== null) {
         result[ticker] = {
           score: computeNewsGapScore(r.value.count),
@@ -94,10 +122,10 @@ function applyNewsGaps(
  * Main entry point called by the signals server component.
  *
  * Strategy:
- * 1. Try Redis cache (fast path — serves stale-while-revalidating in ISR)
- * 2. If no cache or forced refresh → fetch fresh news counts from Alpha Vantage
- * 3. Persist refreshed data to Redis (26h TTL)
- * 4. Merge into static signal list and return
+ * 1. Redis 13F 데이터 확인 (EDGAR 크론이 저장한 실제 파싱 데이터)
+ * 2. 없으면 정적 데이터 사용
+ * 3. Alpha Vantage 뉴스갭 스코어 오버레이
+ * 4. Persist refreshed data to Redis (26h TTL)
  */
 export async function getSignals(forceRefresh = false): Promise<SignalsResult> {
   const apiKey =
@@ -107,13 +135,17 @@ export async function getSignals(forceRefresh = false): Promise<SignalsResult> {
 
   const lastUpdated = new Date().toISOString();
 
-  // === No API key → pure static fallback ===
+  // === 1. EDGAR 13F Redis 데이터 우선 사용 ===
+  const liveSignals = await get13FSignals();
+  const baseSignals = liveSignals ?? institutionalSignals;
+
+  // === No API key → EDGAR 또는 static fallback ===
   if (!apiKey) {
     return {
-      signals: institutionalSignals,
+      signals: baseSignals,
       lastUpdated,
       updatedTickers: 0,
-      source: 'static',
+      source: liveSignals ? 'live' : 'static',
     };
   }
 
@@ -122,7 +154,7 @@ export async function getSignals(forceRefresh = false): Promise<SignalsResult> {
 
   if (cached && !forceRefresh) {
     return {
-      signals: applyNewsGaps(institutionalSignals, cached),
+      signals: applyNewsGaps(baseSignals, cached),
       lastUpdated,
       updatedTickers: Object.keys(cached).length,
       source: 'cached',
@@ -133,28 +165,30 @@ export async function getSignals(forceRefresh = false): Promise<SignalsResult> {
   try {
     const fresh = await refreshNewsGaps(apiKey);
     const merged = mergeNewsGapCache(cached, fresh);
+    logger.info('signals.service', 'news_refresh_ok', { updatedTickers: Object.keys(fresh).length });
 
     // Persist to Redis asynchronously (don't block response)
     setNewsGapCache(merged).catch(() => undefined);
 
     return {
-      signals: applyNewsGaps(institutionalSignals, merged),
+      signals: applyNewsGaps(baseSignals, merged),
       lastUpdated,
       updatedTickers: Object.keys(fresh).length,
       source: 'live',
     };
-  } catch {
+  } catch (err) {
+    logger.error('signals.service', 'news_refresh_failed', { error: err });
     // Fetch failed — serve from cache or static
     if (cached) {
       return {
-        signals: applyNewsGaps(institutionalSignals, cached),
+        signals: applyNewsGaps(baseSignals, cached),
         lastUpdated,
         updatedTickers: Object.keys(cached).length,
         source: 'cached',
       };
     }
     return {
-      signals: institutionalSignals,
+      signals: baseSignals,
       lastUpdated,
       updatedTickers: 0,
       source: 'static',

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getSignals } from '@/lib/signals-service';
 import { NextResponse } from 'next/server';
 

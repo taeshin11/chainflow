@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { allCompanies, type Company, type RevenueSegment } from '@/data/companies';
@@ -209,6 +209,33 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
     return null;
   }, [company, ticker]);
 
+  // ── Live financials from SEC EDGAR XBRL 10-K filings (24h cache) ────────────
+  const [liveFinancials, setLiveFinancials] = useState<{
+    revenueFormatted: string;
+    fiscalYear: number;
+    periodEnd: string;
+    source: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!ticker) return;
+    let cancelled = false;
+    fetch(`/api/company-financials/${ticker.toUpperCase()}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!cancelled && data && data.revenueFormatted) {
+          setLiveFinancials({
+            revenueFormatted: data.revenueFormatted,
+            fiscalYear: data.fiscalYear,
+            periodEnd: data.periodEnd,
+            source: data.source,
+          });
+        }
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [ticker]);
+
   if (!company) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20 text-center">
@@ -349,9 +376,17 @@ export default function CompanyPage({ ticker }: { ticker: string }) {
               </div>
               {/* Revenue pie */}
               <div>
-                <h3 className="text-sm font-bold text-cf-text-primary mb-3">
-                  {t('revenueBreakdown')} ({company.revenue.total})
+                <h3 className="text-sm font-bold text-cf-text-primary mb-1">
+                  {t('revenueBreakdown')} ({liveFinancials?.revenueFormatted ?? company.revenue.total})
                 </h3>
+                {liveFinancials ? (
+                  <p className="text-[10px] text-emerald-600 mb-3 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    FY{liveFinancials.fiscalYear} · {liveFinancials.periodEnd} · {liveFinancials.source}
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-cf-text-secondary/60 mb-3">정적 데이터 (실시간 재무 로딩 중…)</p>
+                )}
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>

@@ -38,6 +38,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
+import StockSupplyModal from '@/components/StockSupplyModal';
 
 function quarterToFilingDate(quarter: string): string {
   const parts = quarter.split(' ');
@@ -86,10 +87,13 @@ interface NewsGapPageProps {
 
 function GapCard({ entry }: { entry: NewsGapEntry }) {
   const [expanded, setExpanded] = useState(false);
+  const [showSupply, setShowSupply] = useState(false);
   const t = useTranslations('newsGap');
   const sectorClass = sectorColors[entry.sector] ?? 'bg-gray-50 text-gray-700 border-gray-200';
 
   return (
+    <>
+    {showSupply && <StockSupplyModal ticker={entry.ticker} onClose={() => setShowSupply(false)} />}
     <div className="cf-card overflow-hidden hover:shadow-lg transition-all">
       {/* Collapsed row */}
       <div className="p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
@@ -165,8 +169,15 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
           </div>
         </div>
 
-        {/* Expand toggle */}
-        <div className="lg:col-span-1 flex justify-end">
+        {/* Expand toggle + 수급 button */}
+        <div className="lg:col-span-1 flex flex-col items-end gap-1.5">
+          <button
+            onClick={() => setShowSupply(true)}
+            className="flex items-center gap-1 text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2.5 py-1 rounded-lg transition-colors border border-violet-200"
+          >
+            <BarChart2 className="w-3 h-3" />
+            수급
+          </button>
           <button
             onClick={() => setExpanded((v) => !v)}
             className="flex items-center gap-1 text-xs text-cf-text-secondary hover:text-cf-primary transition-colors px-2 py-1 rounded-lg hover:bg-gray-100"
@@ -411,6 +422,7 @@ function GapCard({ entry }: { entry: NewsGapEntry }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -628,22 +640,27 @@ export default function NewsGapPage({
           <ShareButtons title="News Gap Analyzer - The Silence IS the Signal | Flowvium" />
           {source === 'cached' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-200">
-              <Database className="w-3.5 h-3.5" />{updatedTickers} tickers live
+              <Database className="w-3.5 h-3.5" />실시간 데이터 ({updatedTickers}개 티커) · {new Date(lastUpdated).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </div>
           ) : source === 'live' ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
-              <Zap className="w-3.5 h-3.5" />{t('liveRefreshed', { count: updatedTickers })}
+              <Zap className="w-3.5 h-3.5" />방금 갱신 · {updatedTickers}개 티커 · {new Date(lastUpdated).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </div>
           ) : (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200">
-              <Database className="w-3.5 h-3.5" />{t('staticData')}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium border border-amber-200" title="Alpha Vantage 뉴스·EDGAR 13F 데이터가 아직 수집되지 않아 리서치 기반 정적 데이터를 표시 중입니다. 다음 cron 실행(02:00 UTC)에 갱신 예정">
+              <Database className="w-3.5 h-3.5" />리서치 기준 데이터 (2026-Q1) · 자동 갱신 대기 중
             </div>
           )}
-          <span className="text-xs text-cf-text-muted">
-            {new Date(lastUpdated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-          </span>
         </div>
         <p className="text-lg text-cf-text-secondary max-w-2xl mx-auto">{t('heroExplanation')}</p>
+
+        {/* Data freshness explainer */}
+        <div className="max-w-2xl mx-auto mt-4 text-[11px] text-cf-text-muted bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+          <span className="font-semibold text-cf-text-secondary">데이터 갱신 주기:</span>
+          {' '}기관 지분(EDGAR 13F) — 매일 02:00 UTC 크론 ·{' '}
+          미디어 커버리지(Alpha Vantage) — 매일 25개 티커 배치 ·{' '}
+          정적 기준 데이터는 2026-Q1 리서치 기반
+        </div>
       </div>
 
       {/* Scatter Plot */}

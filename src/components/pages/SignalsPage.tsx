@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import { type InstitutionalSignal } from '@/data/institutional-signals';
 import { newsGapData } from '@/data/news-gap';
 import { sectors } from '@/data/sectors';
+import StockSupplyModal from '@/components/StockSupplyModal';
 import {
   BarChart,
   Bar,
@@ -27,6 +28,7 @@ import {
   AlertTriangle,
   Zap,
   Database,
+  BarChart2,
 } from 'lucide-react';
 
 const actionColors: Record<string, { text: string; bg: string; key: string }> = {
@@ -70,6 +72,7 @@ export default function SignalsPage({
   const [sectorFilter, setSectorFilter] = useState<string>('all');
   const [actionFilter, setActionFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortKey>('date');
+  const [supplyTicker, setSupplyTicker] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...initialSignals];
@@ -125,6 +128,10 @@ export default function SignalsPage({
   }, []);
 
   return (
+    <>
+    {supplyTicker && (
+      <StockSupplyModal ticker={supplyTicker} onClose={() => setSupplyTicker(null)} />
+    )}
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="mb-8">
@@ -271,6 +278,7 @@ export default function SignalsPage({
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('value')}</th>
                 <th className="text-center py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('gapScore')}</th>
                 <th className="text-right py-3 px-4 text-cf-text-secondary font-medium text-xs">{t('filingDate')}</th>
+                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -330,6 +338,16 @@ export default function SignalsPage({
                       </div>
                     </td>
                     <td className="text-right py-3 px-4 text-xs text-cf-text-secondary">{sig.filingDate}</td>
+                    <td className="py-3 px-3">
+                      <button
+                        onClick={() => setSupplyTicker(sig.ticker)}
+                        className="flex items-center gap-1 text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-lg transition-colors"
+                        title="수급동향 보기"
+                      >
+                        <BarChart2 className="w-3 h-3" />
+                        수급
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -343,5 +361,6 @@ export default function SignalsPage({
         )}
       </div>
     </div>
+    </>
   );
 }

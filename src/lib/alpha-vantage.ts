@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 const AV_BASE = 'https://www.alphavantage.co/query';
 
 export interface AVHolder {
@@ -37,13 +39,20 @@ export async function fetchInstitutionalOwnership(
   ticker: string,
   apiKey: string
 ): Promise<AVHolder[] | null> {
+  const start = Date.now();
   try {
     const url = `${AV_BASE}?function=INSTITUTIONAL_OWNERSHIP&symbol=${encodeURIComponent(ticker)}&limit=5&apikey=${apiKey}`;
     const res = await fetch(url, { next: { revalidate: 43200 } });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn('av.ownership', 'http_error', { ticker, status: res.status, durationMs: Date.now() - start });
+      return null;
+    }
 
     const data = await res.json();
-    if (isRateLimited(data)) return null;
+    if (isRateLimited(data)) {
+      logger.warn('av.ownership', 'rate_limited', { ticker, note: data['Note'] ?? data['Information'] ?? data['Error Message'] });
+      return null;
+    }
 
     const quarterly: unknown[] =
       data?.quarterlyReports ??
@@ -57,7 +66,7 @@ export async function fetchInstitutionalOwnership(
       (latest?.holders as unknown[]) ??
       [];
 
-    return holders.map((h) => {
+    const result = holders.map((h) => {
       const holder = h as Record<string, unknown>;
       return {
         holder: String(holder.holder ?? holder.institutionName ?? ''),
@@ -67,7 +76,10 @@ export async function fetchInstitutionalOwnership(
         changeShares: parseInt(String(holder.changeShares ?? holder.sharesChange ?? '0'), 10) || 0,
       };
     });
-  } catch {
+    logger.info('av.ownership', 'fetched', { ticker, holders: result.length, durationMs: Date.now() - start });
+    return result;
+  } catch (err) {
+    logger.error('av.ownership', 'fetch_failed', { ticker, error: err, durationMs: Date.now() - start });
     return null;
   }
 }
@@ -80,6 +92,7 @@ export async function fetchNewsData(
   ticker: string,
   apiKey: string
 ): Promise<{ count: number; articles: NewsArticle[] } | null> {
+  const start = Date.now();
   try {
     const from = new Date();
     from.setDate(from.getDate() - 30);
@@ -88,10 +101,16 @@ export async function fetchNewsData(
 
     const url = `${AV_BASE}?function=NEWS_SENTIMENT&tickers=${encodeURIComponent(ticker)}&time_from=${timeFrom}&limit=200&apikey=${apiKey}`;
     const res = await fetch(url, { next: { revalidate: 86400 } });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn('av.news', 'http_error', { ticker, status: res.status, durationMs: Date.now() - start });
+      return null;
+    }
 
     const data = await res.json();
-    if (isRateLimited(data)) return null;
+    if (isRateLimited(data)) {
+      logger.warn('av.news', 'rate_limited', { ticker, note: data['Note'] ?? data['Information'] ?? data['Error Message'] });
+      return null;
+    }
 
     const feed = Array.isArray(data.feed) ? (data.feed as Record<string, unknown>[]) : [];
     const items = parseInt(String(data.items ?? ''), 10);
@@ -107,8 +126,10 @@ export async function fetchNewsData(
       }))
       .filter((a) => a.title);
 
+    logger.info('av.news', 'fetched', { ticker, count, articles: articles.length, durationMs: Date.now() - start });
     return { count, articles };
-  } catch {
+  } catch (err) {
+    logger.error('av.news', 'fetch_failed', { ticker, error: err, durationMs: Date.now() - start });
     return null;
   }
 }

@@ -1,3 +1,4 @@
+import { logger, loggedRedisSet} from '@/lib/logger';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
@@ -107,12 +108,13 @@ Analysis type: ${type || 'general'}`;
     const message = error instanceof Error ? error.message : 'Unknown error';
 
     if (message.includes('429') || message.includes('quota')) {
+      logger.warn('api.ai', 'rate_limited', { message });
       return NextResponse.json({
         analysis: 'AI analysis is temporarily rate-limited. Please try again in a few moments.',
       });
     }
 
-    console.error('Gemini API error:', message);
+    logger.error('api.ai', 'analysis_failed', { error: message });
     return NextResponse.json({
       analysis: 'AI analysis encountered an error. Please try again later.',
     });
